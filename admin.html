@@ -401,11 +401,153 @@ tr:hover td{background:var(--g0)}
 .ring-stat strong{color:var(--g7);font-size:13px}
 .ring-admin-card-foot{padding:var(--sp3) var(--sp5);border-top:1px solid var(--g2);display:flex;gap:var(--sp3)}
 
-/* Responsive */
+/* ── HAMBURGER BUTTON (hidden on desktop) ── */
+.hamburger{
+  display:none;width:40px;height:40px;border-radius:var(--r);
+  background:transparent;align-items:center;justify-content:center;
+  color:var(--g7);flex-shrink:0;
+}
+.hamburger:hover{background:var(--g1)}
+
+/* ── SIDEBAR OVERLAY (mobile) ── */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:199;opacity:0;transition:opacity .25s;
+}
+.sidebar-overlay.open{opacity:1}
+
+/* ── TABLET: 900px ── */
 @media(max-width:900px){
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .chart-grid{grid-template-columns:1fr}
   .dash-bottom{grid-template-columns:1fr}
+  .login-card{width:calc(100vw - 32px);padding:var(--sp6)}
+}
+
+/* ── MOBILE: 640px ── */
+@media(max-width:640px){
+
+  /* Sidebar slides off-screen by default */
+  .sidebar{
+    transform:translateX(-100%);
+    transition:transform .25s ease;
+    z-index:200;
+    box-shadow:var(--shl);
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay{display:block}
+
+  /* Main content fills full width */
+  .main{
+    margin-left:0;
+    padding:var(--sp4);
+  }
+
+  /* Topbar spans full width */
+  .topbar{
+    left:0;
+    padding:0 var(--sp4);
+    gap:var(--sp3);
+  }
+
+  /* Show hamburger, hide search on mobile */
+  .hamburger{display:flex}
+  .topbar-search{display:none}
+  .topbar-btn.secondary{display:none}
+
+  /* Topbar title smaller */
+  .topbar-title{font-size:14px}
+  .topbar-sub{display:none}
+
+  /* KPI grid: 2 columns on mobile */
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:var(--sp3)}
+  .kpi-value{font-size:22px}
+  .kpi-card{padding:var(--sp4)}
+
+  /* Charts full width */
+  .chart-grid{grid-template-columns:1fr}
+  .chart-canvas-wrap{height:140px}
+
+  /* Dashboard bottom stacked */
+  .dash-bottom{grid-template-columns:1fr}
+
+  /* Tables: horizontal scroll */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{min-width:560px}
+
+  /* Filters wrap */
+  .filters{gap:var(--sp2);padding:var(--sp3) var(--sp4)}
+  .filter-input{min-width:0;flex:1}
+  .filter-select{font-size:12px;padding:6px var(--sp2)}
+
+  /* KYT grid single column */
+  .kyt-grid{grid-template-columns:1fr}
+
+  /* Rings grid single column */
+  .rings-grid{grid-template-columns:1fr}
+
+  /* Cards full width */
+  .card-head{padding:var(--sp4)}
+  .card-body{padding:var(--sp4)}
+  .card-foot{padding:var(--sp3) var(--sp4)}
+
+  /* Modal full screen on mobile */
+  .modal{
+    width:100%;
+    max-width:100%;
+    border-radius:var(--rxl) var(--rxl) 0 0;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    max-height:90vh;
+  }
+  .modal-overlay.open{align-items:flex-end}
+
+  /* Settings full width */
+  #screen-settings>div{max-width:100%}
+  .setting-row{flex-direction:column;align-items:flex-start;gap:var(--sp3)}
+  .setting-input{width:100%;text-align:left}
+
+  /* Act buttons smaller */
+  .act-btn{font-size:11px;padding:4px 8px}
+  .act-btns{gap:var(--sp1)}
+
+  /* Tab bar scrollable */
+  .tab-bar{overflow-x:auto;padding:var(--sp3) var(--sp4);gap:var(--sp1);flex-shrink:0}
+  .tab{white-space:nowrap;font-size:12px;padding:6px var(--sp3)}
+
+  /* Login card */
+  .login-card{
+    width:100%;
+    max-width:100%;
+    border-radius:0;
+    min-height:100vh;
+    padding:var(--sp6) var(--sp5);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+
+  /* Topbar actions */
+  .topbar-actions{gap:var(--sp2)}
+
+  /* Save bar */
+  .save-bar{padding:var(--sp3) var(--sp4);flex-wrap:wrap;gap:var(--sp3)}
+  .save-bar span{font-size:12px}
+
+  /* Report cards */
+  .report-card-head{flex-wrap:wrap;gap:var(--sp2)}
+  .report-meta{gap:var(--sp3)}
+
+  /* Live session timer */
+  .live-timer{font-size:11px}
+}
+
+/* ── SMALL MOBILE: 380px ── */
+@media(max-width:380px){
+  .kpi-grid{grid-template-columns:1fr}
+  .kpi-value{font-size:20px}
 }
 </style>
 </head>
@@ -515,8 +657,14 @@ tr:hover td{background:var(--g0)}
     </div>
   </nav>
 
+  <!-- SIDEBAR OVERLAY (mobile tap-to-close) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
   <!-- TOPBAR -->
   <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Open menu">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <div>
       <div class="topbar-title" id="topbar-title">Dashboard</div>
       <div class="topbar-sub" id="topbar-sub">Overview of platform activity</div>
@@ -1247,6 +1395,16 @@ async function doLogin() {
   }
 }
 
+/* ── MOBILE SIDEBAR ── */
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
 function doLogout() {
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
@@ -1280,6 +1438,7 @@ function navTo(id, el) {
   }
   if (id === 'dashboard') drawCharts();
   if (id === 'assessments') { setTimeout(drawAssessChart, 50); renderSubjectBars(); }
+  closeSidebar(); // auto-close on mobile after navigation
 }
 
 /* ── TABS ── */
