@@ -1,0 +1,157 @@
+from rest_framework import generics, status, permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.db.models import Q
+from .models import User, TutorProfile, LearnerProfile
+from .serializers import (
+    UserSerializer, RegisterSerializer, LoginSerializer,
+    TutorProfileSerializer, LearnerProfileSerializer, PublicTutorSerializer,
+)
+
+
+class LoginView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        s = LoginSerializer(data=request.data)
+        s.is_valid(raise_exception=True)
+        user    = s.validated_data['user']
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'access':  str(refresh.access_token),
+            'refresh': str(refresh),
+            'user':    UserSerializer(user).data,
+        })
+
+
+class RegisterView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class   = RegisterSerializer
+
+    def create(self, request, *args, **kwargs):
+        s = self.get_serializer(data=request.data)
+        s.is_valid(raise_exception=True)
+        user    = s.save()
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'access':  str(refresh.access_token),
+            'refresh': str(refresh),
+            'user':    UserSerializer(user).data,
+        }, status=status.HTTP_201_CREATED)
+
+
+class MeView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+
+class UserListView(generics.ListAPIView):
+    """Admin: list all users with optional role filter."""
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+    def get_queryset(self):
+        qs   = User.objects.select_related('tutor_profile', 'learner_profile').order_by('-created_at')
+        role = self.request.query_params.get('role')
+        q    = self.request.query_params.get('q')
+        if role:
+            qs = qs.filter(role=role)
+        if q:
+            qs = qs.filter(Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q))
+        return qs
+
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class   = UserSerializer
+    permission_classes = [permissions.IsAdminUser]
+    queryset           = User.objects.select_related('tutor_profile', 'learner_profile')
+
+
+class SuspendUserView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=404)
+        user.is_suspended = not user.is_suspended
+        user.save()
+        return Response({'is_suspended': user.is_suspended})
+
+
+class TutorMatchView(generics.ListAPIView):
+    """AI match: return tutors filtered by subject and weak areas."""
+    serializer_class   = PublicTutorSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        subject    = self.request.query_params.get('subject', '')
+        weak_areas = self.request.query_params.getlist('weak_areas')
+        qs = User.objects.filter(
+            role__in=['tutor', 'both'],
+            is_suspended=False,
+            tutor_profile__isnull=False,
+        ).select_related('tutor_profile').order_by('-tutor_profile__rating')
+
+        if subject:
+            # Filter tutors whose subjects contain the requested subject
+            qs = [u for u in qs if subject in (u.tutor_profile.subjects or [])]
+
+        if weak_areas:
+            # Further filter by tutors whose specialities overlap with requested weak areas
+            def overlaps(u):
+                specs = set(u.tutor_profile.specialities or [])
+                return bool(specs & set(weak_areas))
+            qs = [u for u in qs if overlaps(u)]
+
+        return qs
+
+
+class TutorProfileUpdateView(generics.UpdateAPIView):
+    serializer_class = TutorProfileSerializer
+
+    def get_object(self):
+        return self.request.user.tutor_profile
+
+
+class LearnerProfileUpdateView(generics.UpdateAPIView):
+    serializer_class = LearnerProfileSerializer
+
+    def get_object(self):
+        return self.request.user.learner_profile
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAdminUser])
+def admin_stats(request):
+    """Quick KPI numbers for admin dashboard."""
+    from sessions_app.models import Session
+    from kyt.models import KYTApplication
+    from payments.models import Transaction
+    from django.utils import timezone
+    from django.db.models import Sum
+    import datetime
+
+    today = timezone.now().date()
+    month_start = today.replace(day=1)
+
+    total_users        = User.objects.count()
+    active_sessions    = Session.objects.filter(status='live').count()
+    kyt_pending        = KYTApplication.objects.filter(status='pending').count()
+    monthly_revenue    = Transaction.objects.filter(
+        type='session_payment',
+        created_at__date__gte=month_start,
+        status='settled',
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    return Response({
+        'total_users':     total_users,
+        'active_sessions': active_sessions,
+        'kyt_pending':     kyt_pending,
+        'monthly_revenue': float(monthly_revenue),
+    })
