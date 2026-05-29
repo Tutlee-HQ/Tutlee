@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tutlee</title>
-<script>window.TUTLEE_API_BASE = 'https://tutlee-production.up.railway.app';</script>
+<script>window.TUTLEE_API_BASE = "https://tutlee-production.up.railway.app";</script>
 <script src="api.js"></script>
 <style>
 :root{
@@ -12,7 +12,7 @@
   --a5:#F59500;--a4:#FFAA33;--a1:#FFE8BF;--a0:#FFF7EB;
   --i6:#3D30D6;--i5:#5243F5;--i1:#E0DEFE;--i0:#F2F1FF;
   --ok:#0ECB6A;--ok1:#CFFAE5;--warn:#F5C518;--warn1:#FEF3C7;--err:#F5365C;--err1:#FFD6DE;--info:#0EA5E9;--info1:#D0EFFE;
-  --g9:#0F1318;--g8:#1A2130;--g7:#263042;--g6:#3C4C65;--g5:#ececec;--g4:#7A8FA8;--g3:#A4B5C8;--g2:#CBD5E1;--g1:#E2EAF2;--g0:#F4F7FA;--w:#FFFFFF;
+  --g9:#0F1318;--g8:#1A2130;--g7:#263042;--g6:#3C4C65;--g5:#576880;--g4:#7A8FA8;--g3:#A4B5C8;--g2:#CBD5E1;--g1:#E2EAF2;--g0:#F4F7FA;--w:#FFFFFF;
   --sp2:8px;--sp3:12px;--sp4:16px;--sp5:20px;--sp6:24px;--sp8:32px;
   --r:10px;--rl:14px;--rxl:20px;--rf:9999px;
   --sh:0 1px 3px rgba(0,0,0,.06);--shm:0 4px 12px rgba(0,0,0,.08);--shl:0 10px 32px rgba(0,0,0,.12);
@@ -713,9 +713,10 @@ canvas.lc{width:100%;display:block}
       <div class="ob-step" id="ap-signin">
         <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Welcome back</h2>
         <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Sign in to your Tutlee account.</p>
-        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="you@university.edu"></div>
-        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="Your password"></div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="signin-email" placeholder="you@university.edu"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="signin-pass" placeholder="Your password"></div>
         <div style="text-align:right;margin-bottom:16px"><span style="font-size:13px;color:var(--t6);cursor:pointer;font-weight:600">Forgot password?</span></div>
+        <div id="signin-err" style="display:none;color:#9B0F2B;font-size:13px;margin-bottom:10px;padding:8px;background:#FEE;border-radius:6px"></div>
         <button class="btn-full btn-full-p" id="signin-btn" onclick="doSignIn()">Sign in</button>
         <p style="text-align:center;font-size:13px;color:var(--g5);margin-top:14px">No account? <span style="color:var(--t6);font-weight:600;cursor:pointer" onclick="closeAuth();openAuth('signup-learner')">Create one free</span></p>
       </div>
@@ -786,7 +787,7 @@ canvas.lc{width:100%;display:block}
           <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Create your account</h2>
           <p style="font-size:13px;color:var(--g5);margin-bottom:20px">You must be 18 or older to use Tutlee.</p>
           <div class="fg"><label class="fl">Full name</label><input class="fi" type="text" placeholder="Your full name" id="ob-name"></div>
-          <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" placeholder="you@university.edu"></div>
+          <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" id="signin-email" placeholder="you@university.edu"></div>
           <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="Minimum 8 characters"></div>
           <div class="fg"><label class="fl">Timezone</label>
             <select class="fi">
