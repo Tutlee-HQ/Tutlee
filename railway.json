@@ -1,9 +1,10 @@
-{
+
+json{
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd backend && python manage.py migrate && python manage.py seed_data && daphne tutlee.asgi:application --port $PORT --bind 0.0.0.0"
+    "startCommand": "python manage.py migrate && python manage.py seed_data && daphne tutlee.asgi:application --port $PORT --bind 0.0.0.0"
   }
 }
