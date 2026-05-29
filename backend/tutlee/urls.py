@@ -10,21 +10,26 @@ import os
 
 
 def serve_js_file(filename):
-    """Serve a JS file from the repo root (one level above backend/)."""
+    """Serve a JS file — checks multiple locations so it works locally and on Render."""
     def view(request):
-        filepath = os.path.join(str(settings.BASE_DIR.parent), filename)
-        try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                content = f.read()
-            resp = HttpResponse(content, content_type='application/javascript')
-            resp['Cache-Control'] = 'public, max-age=300'
-            return resp
-        except FileNotFoundError:
-            return HttpResponse(
-                f'console.error("Could not load {filename}");',
-                content_type='application/javascript',
-                status=404,
-            )
+        search_paths = [
+            os.path.join(str(settings.BASE_DIR), 'static', 'js', filename),
+            os.path.join(str(settings.BASE_DIR), 'static', filename),
+            os.path.join(str(settings.BASE_DIR.parent), filename),
+            os.path.join(str(settings.BASE_DIR), filename),
+        ]
+        for filepath in search_paths:
+            if os.path.exists(filepath):
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                resp = HttpResponse(content, content_type='application/javascript')
+                resp['Cache-Control'] = 'public, max-age=60'
+                return resp
+        return HttpResponse(
+            f'console.error("Could not load {filename}");',
+            content_type='application/javascript',
+            status=404,
+        )
     return view
 
 

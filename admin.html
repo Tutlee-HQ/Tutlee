@@ -4,7 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tutlee Admin</title>
-<script src="api.js"></script>
+<script src="api.js" onerror="
+  var s=document.createElement('script');
+  s.src='/static/js/api.js';
+  s.onerror=function(){console.error('api.js failed to load from all locations');};
+  document.head.appendChild(s);
+"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{

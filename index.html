@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tutlee</title>
 <script>window.TUTLEE_API_BASE ='https://tutlee-backend.onrender.com';</script>
-<script src="api.js"></script>
+<script src="api.js" onerror="
+  var s=document.createElement('script');
+  s.src='/static/js/api.js';
+  s.onerror=function(){console.error('api.js failed to load from all locations');};
+  document.head.appendChild(s);
+"></script>
 <style>
 :root{
   --t9:#053D38;--t8:#0A6B62;--t7:#0E8F84;--t6:#13B5A7;--t5:#17CFBF;--t4:#45D9CB;--t2:#B0F0EA;--t1:#D8F8F5;--t0:#F0FDFB;
