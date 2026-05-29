@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: tutlee-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn tutlee.wsgi --log-file -"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "tutlee-backend.onrender.com,tutlee-hq.github.io"
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tutlee-db
+          property: connectionString
+
+databases:
+  - name: tutlee-db
+    databaseName: tutlee
+    user: tutlee
