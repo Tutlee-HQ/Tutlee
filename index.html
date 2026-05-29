@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tutlee</title>
+<script>window.TUTLEE_API_BASE ='https://tutlee-backend.onrender.com';</script>
 <script src="api.js"></script>
 <style>
 :root{
@@ -712,9 +713,10 @@ canvas.lc{width:100%;display:block}
       <div class="ob-step" id="ap-signin">
         <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Welcome back</h2>
         <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Sign in to your Tutlee account.</p>
-        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="you@university.edu"></div>
-        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="Your password"></div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="signin-email" placeholder="you@university.edu"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="signin-pass" placeholder="Your password"></div>
         <div style="text-align:right;margin-bottom:16px"><span style="font-size:13px;color:var(--t6);cursor:pointer;font-weight:600">Forgot password?</span></div>
+        <div id="signin-err" style="display:none;color:#9B0F2B;font-size:13px;margin-bottom:10px;padding:8px;background:#FEE;border-radius:6px"></div>
         <button class="btn-full btn-full-p" id="signin-btn" onclick="doSignIn()">Sign in</button>
         <p style="text-align:center;font-size:13px;color:var(--g5);margin-top:14px">No account? <span style="color:var(--t6);font-weight:600;cursor:pointer" onclick="closeAuth();openAuth('signup-learner')">Create one free</span></p>
       </div>
@@ -785,7 +787,7 @@ canvas.lc{width:100%;display:block}
           <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Create your account</h2>
           <p style="font-size:13px;color:var(--g5);margin-bottom:20px">You must be 18 or older to use Tutlee.</p>
           <div class="fg"><label class="fl">Full name</label><input class="fi" type="text" placeholder="Your full name" id="ob-name"></div>
-          <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" placeholder="you@university.edu"></div>
+          <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" id="signin-email" placeholder="you@university.edu"></div>
           <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="Minimum 8 characters"></div>
           <div class="fg"><label class="fl">Timezone</label>
             <select class="fi">
