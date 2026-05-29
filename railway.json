@@ -4,6 +4,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && daphne tutlee.asgi:application --port $PORT --bind 0.0.0.0"
+    "startCommand": "python manage.py migrate && gunicorn tutlee.wsgi:application --bind 0.0.0.0:$PORT"
   }
 }
+
+
