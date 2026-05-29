@@ -89,12 +89,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-<<<<<<< HEAD
 STATICFILES_DIRS = []
 WHITENOISE_USE_FINDERS = True
-=======
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
->>>>>>> 7130fafa865ef1118d93d939362036c5de2060df
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
