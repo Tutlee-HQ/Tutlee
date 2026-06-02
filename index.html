@@ -1493,7 +1493,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ TUTOR DASHBOARD ══ -->
 <div class="screen" id="screen-tutor-dash">
-  <div class="pg-head"><div><h1>Teaching Dashboard</h1><div class="pg-sub">May 2026</div></div></div>
+  <div class="pg-head"><div><h1>Teaching Dashboard</h1><div class="pg-sub" id="tutor-dash-date"></div></div></div>
   <div class="mg mg4" style="margin-bottom:24px">
     <div class="mc mc-t"><div class="mc-lbl">This week's earnings</div><div class="mc-val" id="t-earnings">$0</div></div>
     <div class="mc mc-a"><div class="mc-lbl">Sessions this month</div><div class="mc-val" id="t-sessions">0</div></div>
@@ -1546,7 +1546,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ EARNINGS ══ -->
 <div class="screen" id="screen-earnings">
-  <div class="pg-head"><div><h1>Earnings</h1><div class="pg-sub">April 2026</div></div></div>
+  <div class="pg-head"><div><h1>Earnings</h1><div class="pg-sub" id="earnings-date"></div></div></div>
   <div class="mg mg4" style="margin-bottom:24px">
     <div class="mc mc-t"><div class="mc-lbl">Available balance</div><div class="mc-val" id="earn-balance">$0</div></div>
     <div class="mc mc-a"><div class="mc-lbl">This month</div><div class="mc-val" id="earn-month">$0</div></div>
@@ -1592,7 +1592,7 @@ canvas.lc{width:100%;display:block}
 <div class="screen" id="screen-passport">
   <div class="pg-head"><div><h1>Skill Passport</h1><div class="pg-sub">Your verified teaching credential - shareable with universities and employers</div></div></div>
   <div style="background:linear-gradient(135deg,var(--t9),var(--g8));border-radius:var(--rxl);padding:28px 32px;margin-bottom:20px;display:flex;gap:24px;align-items:center;flex-wrap:wrap">
-    <div style="width:56px;height:56px;border-radius:50%;background:var(--t8);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0" id="pp-av">AM</div>
+    <div style="width:56px;height:56px;border-radius:50%;background:var(--t8);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0" id="pp-av"></div>
     <div style="flex:1;min-width:180px">
       <div style="font-size:10px;color:var(--t4);font-weight:600;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase">Skill Passport · Tutor</div>
       <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:4px" id="pp-name"></div>
@@ -1622,28 +1622,28 @@ canvas.lc{width:100%;display:block}
   <div class="pg-head"><div><h1>Tutor Verification (KYT)</h1><div class="pg-sub">Complete all 4 steps to earn your verified tutor badge</div></div></div>
   <div class="g2">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:14px;font-weight:700">Progress</span><span class="tag tw">2 of 4 complete</span></div>
-      <div class="pbar" style="height:8px;margin-bottom:20px"><div class="pfill pft" style="width:50%"></div></div>
-      <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:14px;font-weight:700">Progress</span><span class="tag tgr" id="kyt-progress-label">0 of 4 complete</span></div>
+      <div class="pbar" style="height:8px;margin-bottom:20px"><div class="pfill pft" id="kyt-progress-bar" style="width:0%"></div></div>
+      <div style="display:flex;flex-direction:column;gap:8px" id="kyt-steps-list">
         <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--g0);border-radius:var(--r)">
-          <div style="width:34px;height:34px;border-radius:var(--r);background:var(--ok1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#077A3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+          <div style="width:34px;height:34px;border-radius:var(--r);background:var(--g1);display:flex;align-items:center;justify-content:center;flex-shrink:0" id="kyt-step-id-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--g5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
           <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--g9)">Identity Verification</div><div style="font-size:12px;color:var(--g5)">Government-issued ID</div></div>
-          <span class="tag tg">Complete</span>
+          <span class="tag tgr" id="kyt-step-id-tag">Pending</span>
         </div>
         <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--g0);border-radius:var(--r)">
-          <div style="width:34px;height:34px;border-radius:var(--r);background:var(--ok1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#077A3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+          <div style="width:34px;height:34px;border-radius:var(--r);background:var(--g1);display:flex;align-items:center;justify-content:center;flex-shrink:0" id="kyt-step-degree-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--g5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
           <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--g9)">Academic Credentials</div><div style="font-size:12px;color:var(--g5)">Degree or transcript</div></div>
-          <span class="tag tg">Complete</span>
+          <span class="tag tgr" id="kyt-step-degree-tag">Pending</span>
         </div>
         <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--g0);border-radius:var(--r)">
-          <div style="width:34px;height:34px;border-radius:var(--r);background:var(--warn1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8A6B00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <div style="width:34px;height:34px;border-radius:var(--r);background:var(--g1);display:flex;align-items:center;justify-content:center;flex-shrink:0" id="kyt-step-test-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--g5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
           <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--g9)">Subject Proficiency Test</div><div style="font-size:12px;color:var(--g5)">15-minute assessment per subject</div></div>
-          <span class="tag tw">In review</span>
+          <span class="tag tgr" id="kyt-step-test-tag">Pending</span>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--g0);border-radius:var(--r);cursor:pointer" onclick="alert('Record a 5-minute teaching demo.')">
-          <div style="width:34px;height:34px;border-radius:var(--r);background:var(--g1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--g5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--g0);border-radius:var(--r)">
+          <div style="width:34px;height:34px;border-radius:var(--r);background:var(--g1);display:flex;align-items:center;justify-content:center;flex-shrink:0" id="kyt-step-demo-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--g5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
           <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--g9)">Demo Teaching Session</div><div style="font-size:12px;color:var(--g5)">5-min concept recording</div></div>
-          <span style="font-size:12px;color:var(--t6);font-weight:600">Start →</span>
+          <span class="tag tgr" id="kyt-step-demo-tag">Pending</span>
         </div>
       </div>
     </div>
@@ -1986,9 +1986,13 @@ function launchApp(name,role){
   document.getElementById('dash-name').textContent=name;
   document.getElementById('sr-your-av').textContent=init;
   var hr=new Date().getHours();var g=hr<12?'morning':hr<17?'afternoon':'evening';
+  var now=new Date();
+  var monthLabel=now.toLocaleString('default',{month:'long',year:'numeric'});
   document.getElementById('dash-greet').textContent='Good '+g+', '+fname;
-  document.getElementById('dash-role-lbl').textContent=role==='tutor'?'Tutor · Biology, Chemistry':role==='both'?'Learner + Tutor · Biology, Chemistry':'Learner · Biology, Chemistry';
+  document.getElementById('dash-role-lbl').textContent=role==='tutor'?'Tutor':role==='both'?'Learner + Tutor':'Learner';
   document.getElementById('sb-urole').textContent=role==='tutor'?'Tutor':role==='both'?'Learner + Tutor':'Learner';
+  var tdd=document.getElementById('tutor-dash-date');if(tdd)tdd.textContent=monthLabel;
+  var edd=document.getElementById('earnings-date');if(edd)edd.textContent=monthLabel;
   var mt=document.getElementById('mode-toggle');
   if(mt)mt.classList.toggle('hidden',role!=='both');
   var nl=document.getElementById('nav-learner-group'),nt=document.getElementById('nav-tutor-group');
@@ -2481,7 +2485,7 @@ async function loadUserDashboard(user) {
     if (pendingAssess.length > 0) {
       var note = document.createElement('div');
       note.style.cssText='position:fixed;bottom:80px;right:24px;background:var(--t5);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:900;cursor:pointer';
-      note.textContent = '📋 You have ' + pendingAssess.length + ' pending assessment' + (pendingAssess.length > 1 ? 's' : '');
+      note.textContent = 'You have ' + pendingAssess.length + ' pending assessment' + (pendingAssess.length > 1 ? 's' : '');
       note.onclick = function(){ goTo('my-progress'); note.remove(); };
       document.body.appendChild(note);
       setTimeout(function(){ if(note.parentNode) note.remove(); }, 8000);
@@ -2497,9 +2501,33 @@ async function loadUserDashboard(user) {
       loadAIMatch();
     }
 
+    // KYT status for tutors
+    var role = user.role;
+    if (role === 'tutor' || role === 'both') {
+      try {
+        var kyt = await API.KYT.myApp();
+        if (kyt) {
+          var steps = kyt.steps || {};
+          var count = [steps.id, steps.degree, steps.demo, steps.interview].filter(Boolean).length;
+          var pct = (count / 4) * 100;
+          var lbl = document.getElementById('kyt-progress-label');
+          var bar = document.getElementById('kyt-progress-bar');
+          if (lbl) lbl.textContent = count + ' of 4 complete';
+          if (bar) bar.style.width = pct + '%';
+          var stepMap = {id:'id', degree:'degree', demo:'demo', interview:'test'};
+          Object.keys(stepMap).forEach(function(k) {
+            var tagEl = document.getElementById('kyt-step-' + stepMap[k] + '-tag');
+            var icEl  = document.getElementById('kyt-step-' + stepMap[k] + '-ic');
+            var done  = steps[k];
+            if (tagEl) { tagEl.textContent = done ? 'Complete' : 'Pending'; tagEl.className = done ? 'tag tg' : 'tag tgr'; }
+            if (icEl)  { icEl.style.background = done ? 'var(--ok1)' : 'var(--g1)'; }
+          });
+        }
+      } catch(e) { /* KYT not submitted yet */ }
+    }
+
   } catch(e) {
-    // Backend offline — demo data remains visible, no crash
-    console.info('Backend offline; showing demo data.', e.message);
+    console.info('Backend offline.', e.message);
   }
 }
 
