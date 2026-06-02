@@ -1962,14 +1962,6 @@ async function obCreate(){
       password2: pass||'tutlee2026',
     };
     var data=await API.Auth.register(payload);
-    // Save preferences to profile
-    var weakSel=Array.from(document.querySelectorAll('.weakness-chip.sel')).map(function(el){return el.textContent;});
-    if(selRoleVal!=='tutor'&&obSelectedSubjs.length){
-      await API.Users.updateLearnerProfile({subjects:obSelectedSubjs,weak_areas:weakSel}).catch(function(){});
-    }
-    if(selRoleVal!=='learner'&&obSelectedSubjs.length){
-      await API.Users.updateTutorProfile({subjects:obSelectedSubjs,specialities:weakSel}).catch(function(){});
-    }
     closeAuth();
     launchApp(data.user.full_name||name, data.user.role);
     loadUserDashboard(data.user);
