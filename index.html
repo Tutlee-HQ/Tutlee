@@ -2773,4 +2773,297 @@ var TOUR_TUTOR = [
   {sel:'#nav-t-sessions',    title:'Teaching Sessions',  body:'Manage your schedule and set your availability hours so learners can find you.'},
   {sel:'#nav-earnings',      title:'Earnings',           body:'Track your income, request payouts, and view your transaction history.'},
   {sel:'#nav-t-analytics',   title:'Analytics',          body:'See learner pass rates and survey feedback so you can improve your teaching.'},
-  {sel:'#nav-passport',      title:'Skill Passport',     body:'Your verified te
+  {sel:'#nav-passport',      title:'Skill Passport',     body:'Your verified teaching credential, auto-generated from your session data. Share it with universities and employers.'},
+  {sel:'#nav-create-ring',   title:'Study Rings',        body:'Create open group sessions that any learner can join for free.'},
+];ur verified te
+=======
+  {sel:'#nav-passport',      title:'Skill Passport',     body:'Your verified teaching credential, auto-generated from your session data. Share it with universities and employers.'},
+  {sel:'#nav-create-ring',   title:'Study Rings',        body:'Create open group sessions that any learner can join for free.'},
+];
+
+var tourStep = 0;
+var tourSteps = [];
+var tourOverlay = null;
+var tourTip = null;
+var tourHighlight = null;
+
+function startTour(role) {
+  tourSteps = (role === 'tutor' || role === 'both') ? TOUR_TUTOR : TOUR_LEARNER;
+  tourStep = 0;
+  tourOverlay = document.createElement('div');
+  tourOverlay.className = 'tour-overlay';
+  document.body.appendChild(tourOverlay);
+  tourHighlight = document.createElement('div');
+  tourHighlight.className = 'tour-highlight';
+  document.body.appendChild(tourHighlight);
+  tourTip = document.createElement('div');
+  tourTip.className = 'tour-tip';
+  document.body.appendChild(tourTip);
+  showTourStep(0);
+}
+
+function showTourStep(n) {
+  if (n >= tourSteps.length) { endTour(); return; }
+  var step = tourSteps[n];
+  var el = document.querySelector(step.sel);
+  if (!el) { showTourStep(n + 1); return; }
+  var r = el.getBoundingClientRect();
+  tourHighlight.style.cssText = 'position:fixed;border-radius:8px;box-shadow:0 0 0 4px var(--t5),0 0 0 9999px rgba(0,0,0,.55);z-index:800;pointer-events:none;transition:all .3s;' +
+    'left:'+(r.left-4)+'px;top:'+(r.top-4)+'px;width:'+(r.width+8)+'px;height:'+(r.height+8)+'px';
+  var dots = tourSteps.map(function(_,i){ return '<div class="tour-dot'+(i===n?' active':'')+'"></div>'; }).join('');
+  tourTip.innerHTML = '<h3>'+step.title+'</h3><p>'+step.body+'</p>' +
+    '<div class="tour-tip-foot">' +
+    '<div class="tour-dots">'+dots+'</div>' +
+    '<button class="tour-skip" onclick="endTour()">Skip tour</button>' +
+    '<button class="tour-next" onclick="showTourStep('+(n+1)+')">'+(n===tourSteps.length-1?'Done':'Next')+'</button>' +
+    '</div>';
+  var tipW = 280, tipH = 160;
+  var left = r.right + 16;
+  var top  = r.top;
+  if (left + tipW > window.innerWidth) left = r.left - tipW - 16;
+  if (left < 8) left = 8;
+  if (top + tipH > window.innerHeight) top = window.innerHeight - tipH - 16;
+  if (top < 8) top = 8;
+  tourTip.style.cssText = 'position:fixed;background:#fff;border-radius:var(--rl);padding:20px 24px;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:801;pointer-events:all;left:'+left+'px;top:'+top+'px';
+  tourStep = n;
+}
+
+function endTour() {
+  if (tourOverlay)   { tourOverlay.remove(); tourOverlay = null; }
+  if (tourHighlight) { tourHighlight.remove(); tourHighlight = null; }
+  if (tourTip)       { tourTip.remove(); tourTip = null; }
+  try { sessionStorage.setItem('tutlee_tour_done', '1'); } catch(e){}
+}
+
+// ═══ WEBRTC — SESSION ROOM ═══
+var rtcPeer = null;
+var localStream = null;
+var rtcWs = null;
+var rtcRoom = null;
+var micMuted = false;
+var camOff = false;
+
+function getWsBase() {
+  var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  var host = 'tutlee-backend.onrender.com';
+  return proto + '//' + host;
+}
+
+async function startSessionRoom(roomId) {
+  rtcRoom = roomId || 'session-' + Date.now();
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    var localVid = document.getElementById('local-video');
+    if (localVid) { localVid.srcObject = localStream; localVid.muted = true; }
+  } catch(e) {
+    console.warn('Camera/mic not available:', e.message);
+    localStream = null;
+  }
+  connectSignaling(rtcRoom);
+}
+
+function connectSignaling(room) {
+  rtcWs = new WebSocket(getWsBase() + '/ws/signal/' + room + '/');
+  rtcWs.onopen = function() {
+    sendSignal({ type: 'ready' });
+  };
+  rtcWs.onmessage = async function(ev) {
+    var msg = JSON.parse(ev.data);
+    if (msg.type === 'ready') {
+      await createOffer();
+    } else if (msg.type === 'offer') {
+      await handleOffer(msg);
+    } else if (msg.type === 'answer') {
+      if (rtcPeer) await rtcPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+    } else if (msg.type === 'ice') {
+      if (rtcPeer && msg.candidate) await rtcPeer.addIceCandidate(new RTCIceCandidate(msg.candidate));
+    } else if (msg.type === 'peer-left') {
+      var remoteVid = document.getElementById('remote-video');
+      if (remoteVid) remoteVid.srcObject = null;
+    }
+  };
+  rtcWs.onerror = function(e) { console.warn('WebSocket error', e); };
+}
+
+function sendSignal(data) {
+  if (rtcWs && rtcWs.readyState === 1) rtcWs.send(JSON.stringify(data));
+}
+
+function getRTCConfig() {
+  return { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
+}
+
+async function createOffer() {
+  rtcPeer = new RTCPeerConnection(getRTCConfig());
+  setupPeerListeners();
+  if (localStream) localStream.getTracks().forEach(function(t){ rtcPeer.addTrack(t, localStream); });
+  var offer = await rtcPeer.createOffer();
+  await rtcPeer.setLocalDescription(offer);
+  sendSignal({ type: 'offer', sdp: offer });
+}
+
+async function handleOffer(msg) {
+  rtcPeer = new RTCPeerConnection(getRTCConfig());
+  setupPeerListeners();
+  if (localStream) localStream.getTracks().forEach(function(t){ rtcPeer.addTrack(t, localStream); });
+  await rtcPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+  var answer = await rtcPeer.createAnswer();
+  await rtcPeer.setLocalDescription(answer);
+  sendSignal({ type: 'answer', sdp: answer });
+}
+
+function setupPeerListeners() {
+  rtcPeer.onicecandidate = function(e) {
+    if (e.candidate) sendSignal({ type: 'ice', candidate: e.candidate });
+  };
+  rtcPeer.ontrack = function(e) {
+    var remoteVid = document.getElementById('remote-video');
+    if (remoteVid && e.streams[0]) remoteVid.srcObject = e.streams[0];
+  };
+}
+
+function toggleMic() {
+  if (!localStream) return;
+  micMuted = !micMuted;
+  localStream.getAudioTracks().forEach(function(t){ t.enabled = !micMuted; });
+  var btn = document.getElementById('ctrl-mic');
+  if (btn) btn.style.background = micMuted ? 'var(--err)' : 'rgba(255,255,255,.1)';
+}
+
+function toggleCam() {
+  if (!localStream) return;
+  camOff = !camOff;
+  localStream.getVideoTracks().forEach(function(t){ t.enabled = !camOff; });
+  var btn = document.getElementById('ctrl-cam');
+  if (btn) btn.style.background = camOff ? 'var(--err)' : 'rgba(255,255,255,.1)';
+}
+
+async function toggleScreenShare() {
+  try {
+    var screen = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    var screenTrack = screen.getVideoTracks()[0];
+    if (rtcPeer) {
+      var sender = rtcPeer.getSenders().find(function(s){ return s.track && s.track.kind === 'video'; });
+      if (sender) sender.replaceTrack(screenTrack);
+    }
+    var localVid = document.getElementById('local-video');
+    if (localVid) localVid.srcObject = screen;
+    screenTrack.onended = function() {
+      if (localStream) {
+        var camTrack = localStream.getVideoTracks()[0];
+        if (rtcPeer) {
+          var sender = rtcPeer.getSenders().find(function(s){ return s.track && s.track.kind === 'video'; });
+          if (sender && camTrack) sender.replaceTrack(camTrack);
+        }
+        if (localVid) localVid.srcObject = localStream;
+      }
+    };
+  } catch(e) { console.warn('Screen share cancelled or failed'); }
+}
+
+function endSessionCall() {
+  if (localStream) { localStream.getTracks().forEach(function(t){ t.stop(); }); localStream = null; }
+  if (rtcPeer)  { rtcPeer.close(); rtcPeer = null; }
+  if (rtcWs)   { rtcWs.close(); rtcWs = null; }
+  goTo('sessions');
+}
+
+// ═══ WEBRTC — STUDY RING ═══
+var ringPeers = {};
+var ringStream = null;
+var ringWs = null;
+var ringRoomId = null;
+
+async function startStudyRing(ringId) {
+  ringRoomId = 'ring-' + ringId;
+  try {
+    ringStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    var localEl = document.getElementById('sg-local-video');
+    if (localEl) { localEl.srcObject = ringStream; localEl.muted = true; localEl.style.display = 'block'; }
+  } catch(e) {
+    console.warn('Media not available for ring:', e.message);
+    ringStream = null;
+  }
+  ringWs = new WebSocket(getWsBase() + '/ws/signal/' + ringRoomId + '/');
+  ringWs.onopen = function() { sendRingSignal({ type: 'join', ringId: ringId }); };
+  ringWs.onmessage = async function(ev) {
+    var msg = JSON.parse(ev.data);
+    if (msg.type === 'ready') {
+      await createRingPeer(msg.peerId);
+    } else if (msg.type === 'offer') {
+      await handleRingOffer(msg);
+    } else if (msg.type === 'answer') {
+      var peer = ringPeers[msg.peerId];
+      if (peer) await peer.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+    } else if (msg.type === 'ice') {
+      var peer = ringPeers[msg.peerId];
+      if (peer && msg.candidate) await peer.addIceCandidate(new RTCIceCandidate(msg.candidate));
+    } else if (msg.type === 'peer-left') {
+      leaveRingPeer(msg.peerId);
+    }
+  };
+}
+
+function sendRingSignal(data) {
+  if (ringWs && ringWs.readyState === 1) ringWs.send(JSON.stringify(data));
+}
+
+async function createRingPeer(peerId) {
+  var peer = new RTCPeerConnection(getRTCConfig());
+  ringPeers[peerId] = peer;
+  if (ringStream) ringStream.getTracks().forEach(function(t){ peer.addTrack(t, ringStream); });
+  peer.onicecandidate = function(e) {
+    if (e.candidate) sendRingSignal({ type: 'ice', candidate: e.candidate, peerId: peerId });
+  };
+  peer.ontrack = function(e) { addRingVideoEl(peerId, e.streams[0]); };
+  var offer = await peer.createOffer();
+  await peer.setLocalDescription(offer);
+  sendRingSignal({ type: 'offer', sdp: offer, peerId: peerId });
+}
+
+async function handleRingOffer(msg) {
+  var peerId = msg.peerId;
+  var peer = new RTCPeerConnection(getRTCConfig());
+  ringPeers[peerId] = peer;
+  if (ringStream) ringStream.getTracks().forEach(function(t){ peer.addTrack(t, ringStream); });
+  peer.onicecandidate = function(e) {
+    if (e.candidate) sendRingSignal({ type: 'ice', candidate: e.candidate, peerId: peerId });
+  };
+  peer.ontrack = function(e) { addRingVideoEl(peerId, e.streams[0]); };
+  await peer.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+  var answer = await peer.createAnswer();
+  await peer.setLocalDescription(answer);
+  sendRingSignal({ type: 'answer', sdp: answer, peerId: peerId });
+}
+
+function addRingVideoEl(peerId, stream) {
+  var container = document.getElementById('sg-video-grid');
+  if (!container) return;
+  var existing = document.getElementById('ring-vid-' + peerId);
+  if (!existing) {
+    var vid = document.createElement('video');
+    vid.id = 'ring-vid-' + peerId;
+    vid.autoplay = true;
+    vid.playsInline = true;
+    vid.style.cssText = 'width:100%;height:140px;object-fit:cover;border-radius:var(--rl);background:#0A0F1A';
+    container.appendChild(vid);
+  }
+  document.getElementById('ring-vid-' + peerId).srcObject = stream;
+}
+
+function leaveRingPeer(peerId) {
+  if (ringPeers[peerId]) { ringPeers[peerId].close(); delete ringPeers[peerId]; }
+  var el = document.getElementById('ring-vid-' + peerId);
+  if (el) el.remove();
+}
+
+function leaveStudyRing() {
+  if (ringStream) { ringStream.getTracks().forEach(function(t){ t.stop(); }); ringStream = null; }
+  Object.keys(ringPeers).forEach(leaveRingPeer);
+  ringPeers = {};
+  if (ringWs) { ringWs.close(); ringWs = null; }
+}
+</script>
+</body>
+</html>
+>>>>>>> 57df168 (Fix requirements.txt: add channels==4.1.0 and daphne==4.1.2 for WebRTC signaling)

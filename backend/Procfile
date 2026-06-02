@@ -1,1 +1,1 @@
-web: daphne -b 0.0.0.0 -p $PORT tutlee.
+web: daphne -b 0.0.0.0 -p $PORT tutlee.asgi:application
