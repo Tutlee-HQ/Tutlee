@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'channels',
     # Local apps
     'accounts',
     'sessions_app',
@@ -62,6 +63,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'tutlee.wsgi.application'
+ASGI_APPLICATION = 'tutlee.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 import dj_database_url
 
@@ -117,10 +124,4 @@ SIMPLE_JWT = {
 }
 
 # ── CORS ──
-CORS_ALLOW_ALL_ORIGINS = True          # dev only — restrict in production
-CORS_ALLOW_CREDENTIALS = True
-
-# Platform config
-PLATFORM_FEE_PERCENT   = 15
-LATE_RESCHEDULE_PENALTY = 5   # USD
-ASSESSMENT_PASS_THRESHOLD = 60  # %
+CORS_ALLOW_ALL_ORIGINS = True          # dev only — restric

@@ -704,7 +704,7 @@ tr:hover td{background:var(--g0)}
               <svg width="18" height="18" fill="none" stroke="#3B82F6" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.87V15.13a1 1 0 01-1.447.9L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
             </div>
           </div>
-          <div class="kpi-value">0</div>
+          <div class="kpi-value" id="kpi-active-sessions">0</div>
           <div class="kpi-delta up"></div>
         </div>
         <div class="kpi-card">
@@ -714,7 +714,7 @@ tr:hover td{background:var(--g0)}
               <svg width="18" height="18" fill="none" stroke="var(--ok)" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
             </div>
           </div>
-          <div class="kpi-value">$0</div>
+          <div class="kpi-value" id="kpi-monthly-revenue">$0</div>
           <div class="kpi-delta up"></div>
         </div>
         <div class="kpi-card">
@@ -724,7 +724,7 @@ tr:hover td{background:var(--g0)}
               <svg width="18" height="18" fill="none" stroke="var(--warn)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
           </div>
-          <div class="kpi-value">0</div>
+          <div class="kpi-value" id="kpi-kyt-queue">0</div>
           <div class="kpi-delta" style="color:var(--warn)">Pending review</div>
         </div>
       </div>
@@ -907,17 +907,17 @@ tr:hover td{background:var(--g0)}
       <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="kpi-card">
           <div class="kpi-label">Total Assessments</div>
-          <div class="kpi-value">2,841</div>
-          <div class="kpi-delta up">↑ 18% this month</div>
+          <div class="kpi-value" id="kpi-total-assessments">0</div>
+          <div class="kpi-delta up"></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Platform Pass Rate</div>
-          <div class="kpi-value">71%</div>
-          <div class="kpi-delta up">↑ 4% from last month</div>
+          <div class="kpi-value" id="kpi-pass-rate">0%</div>
+          <div class="kpi-delta up"></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Avg. Score</div>
-          <div class="kpi-value">68.4</div>
+          <div class="kpi-value" id="kpi-avg-score">0</div>
           <div class="kpi-delta" style="color:var(--g4)">Out of 100</div>
         </div>
       </div>
@@ -945,23 +945,23 @@ tr:hover td{background:var(--g0)}
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-label">Total Collected</div>
-          <div class="kpi-value">$18,240</div>
-          <div class="kpi-delta up">This month</div>
+          <div class="kpi-value" id="kpi-rev-total">$0</div>
+          <div class="kpi-delta up"></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Pending Payouts</div>
-          <div class="kpi-value">$7,820</div>
+          <div class="kpi-value" id="kpi-rev-pending">$0</div>
           <div class="kpi-delta" style="color:var(--warn)">Awaiting approval</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Platform Fees</div>
-          <div class="kpi-value">$2,736</div>
-          <div class="kpi-delta up">15% of sessions</div>
+          <div class="kpi-value" id="kpi-rev-fees">$0</div>
+          <div class="kpi-delta up"></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Paid Out</div>
-          <div class="kpi-value">$10,420</div>
-          <div class="kpi-delta up">To 84 tutors</div>
+          <div class="kpi-value" id="kpi-rev-paid">$0</div>
+          <div class="kpi-delta up"></div>
         </div>
       </div>
 
@@ -1842,12 +1842,19 @@ async function initApp() {
     // Dashboard KPIs from live stats
     if (stats.status === 'fulfilled') {
       const s = stats.value;
-      const cards = document.querySelectorAll('.kpi-value');
-      if (cards[0]) cards[0].textContent = s.total_users.toLocaleString();
-      if (cards[1]) cards[1].textContent = s.active_sessions;
-      if (cards[2]) cards[2].textContent = '$' + s.monthly_revenue.toLocaleString();
-      if (cards[3]) cards[3].textContent = s.kyt_pending;
-      document.getElementById('kyt-badge').textContent = s.kyt_pending;
+      var tu = document.getElementById('kpi-total-users');
+      var as = document.getElementById('kpi-active-sessions');
+      var mr = document.getElementById('kpi-monthly-revenue');
+      var kq = document.getElementById('kpi-kyt-queue');
+      if (tu) tu.textContent = (s.total_users || 0).toLocaleString();
+      if (as) as.textContent = s.active_sessions || 0;
+      if (mr) mr.textContent = '$' + (s.monthly_revenue || 0).toLocaleString();
+      if (kq) kq.textContent = s.kyt_pending || 0;
+      document.getElementById('kyt-badge').textContent = s.kyt_pending || 0;
+      var lcp = document.getElementById('live-count-pill');
+      if (lcp) lcp.textContent = (s.active_sessions || 0) + ' active';
+      var kct = document.getElementById('kyt-count-text');
+      if (kct) kct.textContent = (s.kyt_pending || 0) + ' applications awaiting review';
     }
 
     // Users tables
@@ -1978,10 +1985,12 @@ async function initApp() {
     // Assessment stats
     if (assessStats.status === 'fulfilled') {
       const a = assessStats.value;
-      const cards = document.querySelectorAll('#screen-assessments .kpi-value');
-      if (cards[0]) cards[0].textContent = a.total.toLocaleString();
-      if (cards[1]) cards[1].textContent = a.pass_rate + '%';
-      if (cards[2]) cards[2].textContent = a.avg_score;
+      var ta = document.getElementById('kpi-total-assessments');
+      var pr = document.getElementById('kpi-pass-rate');
+      var av = document.getElementById('kpi-avg-score');
+      if (ta) ta.textContent = (a.total || 0).toLocaleString();
+      if (pr) pr.textContent = (a.pass_rate || 0) + '%';
+      if (av) av.textContent = a.avg_score || 0;
       // Subject bars from live data
       if (a.by_subject?.length) {
         document.getElementById('subject-bars').innerHTML = a.by_subject.map(s => `
@@ -1996,11 +2005,39 @@ async function initApp() {
     // Revenue KPIs
     if (revenueStats.status === 'fulfilled') {
       const r = revenueStats.value;
-      const cards = document.querySelectorAll('#screen-revenue .kpi-value');
-      if (cards[0]) cards[0].textContent = '$' + r.monthly_revenue.toLocaleString();
-      if (cards[1]) cards[1].textContent = '$' + r.pending_payouts.toLocaleString();
-      if (cards[2]) cards[2].textContent = '$' + r.platform_fees.toLocaleString();
-      if (cards[3]) cards[3].textContent = '$' + r.total_paid_out.toLocaleString();
+      var rt = document.getElementById('kpi-rev-total');
+      var rp = document.getElementById('kpi-rev-pending');
+      var rf = document.getElementById('kpi-rev-fees');
+      var rpa = document.getElementById('kpi-rev-paid');
+      if (rt) rt.textContent = '$' + (r.monthly_revenue || 0).toLocaleString();
+      if (rp) rp.textContent = '$' + (r.pending_payouts || 0).toLocaleString();
+      if (rf) rf.textContent = '$' + (r.platform_fees || 0).toLocaleString();
+      if (rpa) rpa.textContent = '$' + (r.total_paid_out || 0).toLocaleString();
+    }
+
+    // Study rings count
+    if (ringsRes.status === 'fulfilled') {
+      var rct = document.getElementById('rings-count-text');
+      if (rct) {
+        var rList = ringsRes.value.results || ringsRes.value;
+        rct.textContent = rList.length + ' rings on the platform';
+      }
+    }
+
+    // Live sessions list
+    if (sessionsRes.status === 'fulfilled') {
+      var sList = sessionsRes.value.results || sessionsRes.value;
+      var liveSessions = sList.filter(function(s){ return s.status === 'live'; });
+      var liveEl = document.getElementById('live-sessions-list');
+      if (liveEl) {
+        if (liveSessions.length === 0) {
+          liveEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--g5);font-size:13px">No live sessions right now</div>';
+        } else {
+          liveEl.innerHTML = liveSessions.map(function(s){
+            return '<div class="live-item"><div class="live-dot"></div><div class="live-info"><div class="live-names">'+s.learner_name+' → '+s.tutor_name+'</div><div class="live-meta">'+s.subject+'</div></div><div class="live-timer">Live</div></div>';
+          }).join('');
+        }
+      }
     }
 
   } catch(e) {
@@ -2054,3 +2091,4 @@ async function approveAllPayouts() {
 </script>
 </body>
 </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
