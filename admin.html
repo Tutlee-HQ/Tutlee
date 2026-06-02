@@ -566,7 +566,7 @@ tr:hover td{background:var(--g0)}
       <span class="login-logo-badge">Admin</span>
     </div>
     <div class="login-title">Admin Portal</div>
-    <div class="login-sub">Enter any email and password to access the admin panel.</div>
+    <div class="login-sub">Sign in with your administrator credentials to access the Tutlee admin panel.</div>
     <div class="login-err" id="login-err">Invalid email or password. Please try again.</div>
     <div class="form-group">
       <label>Email address</label>
@@ -694,8 +694,8 @@ tr:hover td{background:var(--g0)}
               <svg width="18" height="18" fill="none" stroke="var(--t5)" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
           </div>
-          <div class="kpi-value">3,482</div>
-          <div class="kpi-delta up">↑ 12% from last month</div>
+          <div class="kpi-value" id="kpi-total-users">0</div>
+          <div class="kpi-delta up"></div>
         </div>
         <div class="kpi-card">
           <div style="display:flex;align-items:flex-start;justify-content:space-between">
@@ -704,8 +704,8 @@ tr:hover td{background:var(--g0)}
               <svg width="18" height="18" fill="none" stroke="#3B82F6" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.87V15.13a1 1 0 01-1.447.9L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
             </div>
           </div>
-          <div class="kpi-value">47</div>
-          <div class="kpi-delta up">↑ 8 from yesterday</div>
+          <div class="kpi-value">0</div>
+          <div class="kpi-delta up"></div>
         </div>
         <div class="kpi-card">
           <div style="display:flex;align-items:flex-start;justify-content:space-between">
@@ -714,8 +714,8 @@ tr:hover td{background:var(--g0)}
               <svg width="18" height="18" fill="none" stroke="var(--ok)" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
             </div>
           </div>
-          <div class="kpi-value">$18,240</div>
-          <div class="kpi-delta up">↑ 24% from last month</div>
+          <div class="kpi-value">$0</div>
+          <div class="kpi-delta up"></div>
         </div>
         <div class="kpi-card">
           <div style="display:flex;align-items:flex-start;justify-content:space-between">
@@ -724,7 +724,7 @@ tr:hover td{background:var(--g0)}
               <svg width="18" height="18" fill="none" stroke="var(--warn)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
           </div>
-          <div class="kpi-value">4</div>
+          <div class="kpi-value">0</div>
           <div class="kpi-delta" style="color:var(--warn)">Pending review</div>
         </div>
       </div>
@@ -747,41 +747,10 @@ tr:hover td{background:var(--g0)}
           <div class="card-head">
             <svg width="16" height="16" fill="none" stroke="var(--ok)" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.87V15.13a1 1 0 01-1.447.9L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
             <h3>Live Sessions</h3>
-            <span class="pill green" style="margin-left:auto">47 active</span>
+            <span class="pill green" style="margin-left:auto" id="live-count-pill">0 active</span>
           </div>
           <div class="card-body">
-            <div class="live-item">
-              <div class="live-dot"></div>
-              <div class="live-info">
-                <div class="live-names">Amara Osei → Dr. Kwame Adu</div>
-                <div class="live-meta">Mathematics · Advanced Calculus</div>
-              </div>
-              <div class="live-timer">32:14</div>
-            </div>
-            <div class="live-item">
-              <div class="live-dot"></div>
-              <div class="live-info">
-                <div class="live-names">Zara Mensah → Prof. Nana Boateng</div>
-                <div class="live-meta">Physics · Thermodynamics</div>
-              </div>
-              <div class="live-timer">18:05</div>
-            </div>
-            <div class="live-item">
-              <div class="live-dot"></div>
-              <div class="live-info">
-                <div class="live-names">Kofi Asante → Mrs. Ama Sarpong</div>
-                <div class="live-meta">English · Essay Writing</div>
-              </div>
-              <div class="live-timer">44:52</div>
-            </div>
-            <div class="live-item">
-              <div class="live-dot"></div>
-              <div class="live-info">
-                <div class="live-names">Efua Darko → Mr. Joseph Owusu</div>
-                <div class="live-meta">Chemistry · Organic Reactions</div>
-              </div>
-              <div class="live-timer">09:31</div>
-            </div>
+            <div id="live-sessions-list"><div style="padding:24px;text-align:center;color:var(--g5);font-size:13px">No live sessions right now</div></div>
           </div>
           <div class="card-foot">
             <button class="act-btn ghost" onclick="navTo('sessions',document.querySelector('[onclick*=sessions]'))">View all sessions →</button>
@@ -794,41 +763,7 @@ tr:hover td{background:var(--g0)}
             <h3>Recent Activity</h3>
           </div>
           <div class="card-body">
-            <div class="feed-item">
-              <div class="feed-dot" style="background:var(--ok)"></div>
-              <div class="feed-content">
-                <div class="feed-text">New tutor <strong>Dr. Ama Kyei</strong> submitted KYT documents</div>
-                <div class="feed-time">2 minutes ago</div>
-              </div>
-            </div>
-            <div class="feed-item">
-              <div class="feed-dot" style="background:var(--t5)"></div>
-              <div class="feed-content">
-                <div class="feed-text"><strong>47 learners</strong> completed their first session this week</div>
-                <div class="feed-time">15 minutes ago</div>
-              </div>
-            </div>
-            <div class="feed-item">
-              <div class="feed-dot" style="background:var(--warn)"></div>
-              <div class="feed-content">
-                <div class="feed-text">Report filed against tutor <strong>Mr. B. Asante</strong> — harassment</div>
-                <div class="feed-time">1 hour ago</div>
-              </div>
-            </div>
-            <div class="feed-item">
-              <div class="feed-dot" style="background:var(--ok)"></div>
-              <div class="feed-content">
-                <div class="feed-text">Payout of <strong>$3,200</strong> processed to 18 tutors</div>
-                <div class="feed-time">3 hours ago</div>
-              </div>
-            </div>
-            <div class="feed-item">
-              <div class="feed-dot" style="background:var(--i5)"></div>
-              <div class="feed-content">
-                <div class="feed-text">Study Ring <strong>"WASSCE Prep 2026"</strong> reached 200 members</div>
-                <div class="feed-time">5 hours ago</div>
-              </div>
-            </div>
+            <div id="activity-feed"><div style="padding:24px;text-align:center;color:var(--g5);font-size:13px">No recent activity</div></div>
           </div>
         </div>
       </div>
@@ -911,7 +846,7 @@ tr:hover td{background:var(--g0)}
     <!-- ═══ KYT VERIFICATION ═══ -->
     <div class="screen" id="screen-kyt">
       <div style="margin-bottom:var(--sp5);display:flex;align-items:center;gap:var(--sp4)">
-        <div style="font-size:13px;color:var(--g5)">4 applications awaiting review</div>
+        <div id="kyt-count-text" style="font-size:13px;color:var(--g5)">0 applications awaiting review</div>
         <select class="filter-select" style="margin-left:auto">
           <option>All applications</option>
           <option>Submitted today</option>
@@ -1079,7 +1014,7 @@ tr:hover td{background:var(--g0)}
     <!-- ═══ STUDY RINGS ═══ -->
     <div class="screen" id="screen-rings">
       <div style="display:flex;align-items:center;gap:var(--sp3);margin-bottom:var(--sp5)">
-        <div style="font-size:13px;color:var(--g5)">24 rings active on the platform</div>
+        <span id="rings-count-text" style="font-size:13px;color:var(--g5)">0 rings on the platform</span>
         <div style="margin-left:auto;display:flex;gap:var(--sp3)">
           <select class="filter-select">
             <option>All subjects</option>
@@ -1473,80 +1408,15 @@ function toast(msg, color) {
 }
 
 /* ── DATA ── */
-const learners = [
-  {id:1, name:'Amara Osei',     email:'amara@gmail.com',   joined:'Jan 12, 2026', sessions:14, last:'2h ago',    status:'Active'},
-  {id:2, name:'Zara Mensah',    email:'zara@gmail.com',    joined:'Feb 3, 2026',  sessions:8,  last:'Yesterday', status:'Active'},
-  {id:3, name:'Kofi Asante',    email:'kofi@gmail.com',    joined:'Mar 7, 2026',  sessions:3,  last:'3 days ago',status:'Inactive'},
-  {id:4, name:'Efua Darko',     email:'efua@gmail.com',    joined:'Mar 18, 2026', sessions:21, last:'1h ago',    status:'Active'},
-  {id:5, name:'Kwabena Oppong', email:'kwabena@gmail.com', joined:'Apr 2, 2026',  sessions:0,  last:'Never',     status:'Inactive'},
-  {id:6, name:'Abena Frimpong', email:'abena@gmail.com',   joined:'Apr 15, 2026', sessions:6,  last:'5h ago',    status:'Active'},
-  {id:7, name:'Nana Poku',      email:'nana@gmail.com',    joined:'May 1, 2026',  sessions:1,  last:'4 days ago',status:'Suspended'},
-];
-
-const tutors = [
-  {id:1, name:'Dr. Kwame Adu',    email:'kwame@gmail.com',   joined:'Nov 5, 2025',  kyt:'Verified', sessions:142, rating:4.9, passRate:82, status:'Active'},
-  {id:2, name:'Prof. Nana Boateng',email:'nana.b@gmail.com', joined:'Dec 1, 2025',  kyt:'Verified', sessions:98,  rating:4.7, passRate:76, status:'Active'},
-  {id:3, name:'Mrs. Ama Sarpong', email:'ama@gmail.com',     joined:'Jan 20, 2026', kyt:'Verified', sessions:67,  rating:4.8, passRate:79, status:'Active'},
-  {id:4, name:'Mr. Joseph Owusu', email:'joseph@gmail.com',  joined:'Feb 10, 2026', kyt:'Verified', sessions:34,  rating:4.5, passRate:71, status:'Active'},
-  {id:5, name:'Dr. Ama Kyei',     email:'ama.k@gmail.com',   joined:'May 20, 2026', kyt:'Pending',  sessions:0,   rating:'-', passRate:'-', status:'Pending KYT'},
-  {id:6, name:'Mr. B. Asante',    email:'b.asante@gmail.com',joined:'Apr 8, 2026',  kyt:'Verified', sessions:22,  rating:3.1, passRate:48, status:'Suspended'},
-];
-
-const kytApps = [
-  {id:1, name:'Dr. Ama Kyei',     subject:'Chemistry',   score:82, steps:{id:true,  degree:true,  demo:false, interview:false}},
-  {id:2, name:'Mr. Felix Yeboah', subject:'Mathematics', score:91, steps:{id:true,  degree:true,  demo:true,  interview:false}},
-  {id:3, name:'Ms. Lydia Acheampong', subject:'English', score:74, steps:{id:true,  degree:false, demo:false, interview:false}},
-  {id:4, name:'Mr. Kweku Djan',   subject:'Physics',     score:68, steps:{id:false, degree:false, demo:false, interview:false}},
-];
-
-const sessionsData = [
-  {id:'S-1024', learner:'Amara Osei',     tutor:'Dr. Kwame Adu',     subject:'Mathematics', date:'May 28, 2026', duration:'60 min', amount:'$40',  status:'Completed'},
-  {id:'S-1025', learner:'Efua Darko',     tutor:'Prof. Nana Boateng',subject:'Physics',      date:'May 28, 2026', duration:'45 min', amount:'$35',  status:'Live'},
-  {id:'S-1026', learner:'Zara Mensah',    tutor:'Mrs. Ama Sarpong',  subject:'English',      date:'May 27, 2026', duration:'60 min', amount:'$30',  status:'Completed'},
-  {id:'S-1027', learner:'Kofi Asante',    tutor:'Mr. Joseph Owusu',  subject:'Chemistry',    date:'May 27, 2026', duration:'30 min', amount:'$25',  status:'Cancelled'},
-  {id:'S-1028', learner:'Abena Frimpong', tutor:'Dr. Kwame Adu',     subject:'Mathematics',  date:'May 26, 2026', duration:'60 min', amount:'$40',  status:'Completed'},
-  {id:'S-1029', learner:'Nana Poku',      tutor:'Mrs. Ama Sarpong',  subject:'Biology',      date:'May 25, 2026', duration:'45 min', amount:'$30',  status:'No-show'},
-];
-
-const payoutsData = [
-  {tutor:'Dr. Kwame Adu',      sessions:18, gross:'$720', fee:'$108', net:'$612', requested:'May 26, 2026'},
-  {tutor:'Prof. Nana Boateng', sessions:12, gross:'$480', fee:'$72',  net:'$408', requested:'May 26, 2026'},
-  {tutor:'Mrs. Ama Sarpong',   sessions:9,  gross:'$310', fee:'$46',  net:'$264', requested:'May 27, 2026'},
-  {tutor:'Mr. Joseph Owusu',   sessions:6,  gross:'$210', fee:'$31',  net:'$179', requested:'May 27, 2026'},
-];
-
-const transactionsData = [
-  {id:'TXN-4201', type:'Session Payment', user:'Amara Osei',     amount:'+$40',   date:'May 28, 2026', status:'Settled'},
-  {id:'TXN-4200', type:'Payout',          user:'Dr. Kwame Adu',  amount:'-$612',  date:'May 27, 2026', status:'Processed'},
-  {id:'TXN-4199', type:'Platform Fee',    user:'System',          amount:'+$6',    date:'May 27, 2026', status:'Settled'},
-  {id:'TXN-4198', type:'Session Payment', user:'Efua Darko',     amount:'+$35',   date:'May 27, 2026', status:'Settled'},
-  {id:'TXN-4197', type:'Penalty',         user:'Kofi Asante',    amount:'+$5',    date:'May 27, 2026', status:'Settled'},
-  {id:'TXN-4196', type:'Payout',          user:'Mrs. Ama Sarpong',amount:'-$264', date:'May 26, 2026', status:'Processed'},
-];
-
-const ringsData = [
-  {id:1, name:'WASSCE Prep 2026',  subject:'Multi-subject', members:214, sessions:38, status:'Featured'},
-  {id:2, name:'A-Level Maths Hub', subject:'Mathematics',   members:89,  sessions:22, status:'Active'},
-  {id:3, name:'IGCSE Science',     subject:'Sciences',      members:141, sessions:51, status:'Featured'},
-  {id:4, name:'Creative Writing',  subject:'English',       members:46,  sessions:11, status:'Active'},
-  {id:5, name:'BECE Bootcamp',     subject:'Multi-subject', members:98,  sessions:19, status:'Active'},
-  {id:6, name:'French for Beginners',subject:'Languages',   members:31,  sessions:7,  status:'Inactive'},
-];
-
-const reportsData = [
-  {id:1, reporter:'Amara Osei', accused:'Mr. B. Asante', type:'harassment', description:'Tutor made inappropriate remarks during the session and continued after being asked to stop. Very uncomfortable experience.', date:'May 27, 2026', status:'Open'},
-  {id:2, reporter:'Kofi Asante',accused:'Zara Mensah',   type:'fraud',      description:'Learner paid for a session but the tutor marked it as no-show and collected payment without attending.', date:'May 26, 2026', status:'Under review'},
-  {id:3, reporter:'Nana Poku',  accused:'Anonymous',     type:'content',    description:'Shared external links during session messages that appeared to be phishing sites.', date:'May 25, 2026', status:'Resolved'},
-];
-
-const subjects = [
-  {name:'Mathematics', pct:78},
-  {name:'Physics',     pct:65},
-  {name:'Chemistry',   pct:71},
-  {name:'English',     pct:84},
-  {name:'Biology',     pct:69},
-  {name:'Economics',   pct:73},
-];
+let learners = [];
+let tutors = [];
+let kytApps = [];
+let sessionsData = [];
+let payoutsData = [];
+let transactionsData = [];
+let ringsData = [];
+let reportsData = [];
+let subjects = [];
 
 /* ── RENDER LEARNERS ── */
 function renderLearners(data) {
@@ -2184,3 +2054,4 @@ async function approveAllPayouts() {
 </script>
 </body>
 </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
