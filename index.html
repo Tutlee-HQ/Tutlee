@@ -1935,7 +1935,7 @@ canvas.lc{width:100%;display:block}
 
 <script>
 // ═══ STATE ═══
-var S={role:'learner',isPro:false,curMode:'learner',availOn:true,wbColor:'#1A2130',sgWbColor:'#1A2130',timerInt:null};
+var S={role:'learner',isPro:false,curMode:'learner',availOn:true,wbColor:'#1A2130',sgWbColor:'#1A2130',timerInt:null,currentSurveySessionId:null};
 var obStep=1, selRoleVal='learner', assessAnswers={};
 var assCorrect=[1,2,1];
 var curSelPlan='m';
@@ -2104,6 +2104,7 @@ var NAV_MAP={
   'book':'sessions','session-room':'sessions','ai-summary':'sessions'
 };
 function goTo(id){
+  try { sessionStorage.setItem('_t_screen', id); } catch(e){}
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
   var el=document.getElementById('screen-'+id);if(el)el.classList.add('active');
   document.querySelectorAll('.sbi').forEach(function(e){e.classList.remove('active')});
@@ -2490,23 +2491,52 @@ function selScale(btn,grp,val){
   document.querySelectorAll('#'+grp+' .scale-btn').forEach(function(b){b.classList.remove('sel')});
   btn.classList.add('sel');
 }
-function submitSurvey(){
-  closeModal('survey-modal');
-  var toast=document.createElement('div');
-  toast.style.cssText='position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--g9);color:#fff;padding:12px 24px;border-radius:var(--rf);font-size:14px;font-weight:600;z-index:999;box-shadow:var(--shl)';
-  toast.textContent='✓ Rating submitted — thank you!';
-  document.body.appendChild(toast);
-  setTimeout(function(){toast.remove();},3000);
+async function submitSurvey() {
+  var sessionId = S.currentSurveySessionId;
+  if (!sessionId) { closeModal('survey-modal'); return; }
+  var sv1 = document.querySelector('#sv-1 .sel')?.textContent;
+  var sv2 = document.querySelector('#sv-2 .sel')?.textContent;
+  var sv3 = document.querySelector('#sv-3 .sel')?.textContent;
+  var comment = document.querySelector('#survey-modal textarea')?.value;
+  try {
+    await API.Sessions.rate(sessionId, { punctuality: parseInt(sv1) || 3, clarity: parseInt(sv2) || 3, confidence: parseInt(sv3) || 3, comment });
+    closeModal('survey-modal');
+    showToast('Rating submitted. Thank you!');
+  } catch(e) { showToast('Failed to submit rating'); }
 }
 
 // ═══ TUTOR ACTIONS ═══
-function acceptReq(btn){var p=btn.closest('div[style*="background:var(--g0)"]');if(p){p.innerHTML='<div style="display:flex;align-items:center;gap:10px;padding:4px 0"><div style="width:28px;height:28px;border-radius:50%;background:var(--ok1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#077A3E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span style="font-size:13px;font-weight:600;color:var(--ok)">Session confirmed</span></div>';}}
-function declineReq(btn){var p=btn.closest('div[style*="background:var(--g0)"]');if(p){p.innerHTML='<div style="display:flex;align-items:center;gap:10px;padding:4px 0"><div style="width:28px;height:28px;border-radius:50%;background:var(--err1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--err)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><span style="font-size:13px;font-weight:600;color:var(--err)">Request declined</span></div>';}}
-function toggleAvail(){
-  S.availOn=!S.availOn;
-  var t=document.getElementById('avail-t'),k=document.getElementById('avail-k');
-  if(t)t.style.background=S.availOn?'var(--t5)':'var(--g3)';
-  if(k)k.style.left=S.availOn?'23px':'3px';
+async function acceptReq(btn, sessionId) {
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    await API.Sessions.update(sessionId, { status: 'confirmed' });
+    var card = btn.closest('[data-req-id]') || btn.closest('div[style]');
+    if (card) card.innerHTML = '<div style="font-size:13px;color:var(--ok);font-weight:600;padding:8px 0">Booking confirmed</div>';
+    showToast('Booking accepted');
+    loadTutorData();
+  } catch(e) { showToast(e.message || 'Failed to accept'); btn.disabled = false; btn.textContent = 'Accept'; }
+}
+
+async function declineReq(btn, sessionId) {
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    await API.Sessions.update(sessionId, { status: 'cancelled' });
+    var card = btn.closest('[data-req-id]') || btn.closest('div[style]');
+    if (card) card.remove();
+    showToast('Booking declined');
+    loadTutorData();
+  } catch(e) { showToast(e.message || 'Failed to decline'); btn.disabled = false; btn.textContent = 'Decline'; }
+}
+async function toggleAvail() {
+  S.availOn = !S.availOn;
+  var t = document.getElementById('avail-t');
+  var k = document.getElementById('avail-k');
+  if (t) t.style.background = S.availOn ? 'var(--t5)' : 'var(--g4)';
+  if (k) k.style.left = S.availOn ? '23px' : '3px';
+  try {
+    await API.Users.updateTutorProfile({ is_available: S.availOn });
+    showToast(S.availOn ? 'You are now visible to learners' : 'You are now offline');
+  } catch(e) { showToast('Failed to update availability'); }
 }
 
 // ═══ MODALS ═══
@@ -2525,12 +2555,14 @@ function activatePro(){
   document.body.appendChild(toast);
   setTimeout(function(){toast.remove();},3500);
 }
-function saveSettings(){
-  var toast=document.createElement('div');
-  toast.style.cssText='position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--g9);color:#fff;padding:12px 24px;border-radius:var(--rf);font-size:14px;font-weight:600;z-index:999;box-shadow:var(--shl)';
-  toast.textContent='✓ Settings saved';
-  document.body.appendChild(toast);
-  setTimeout(function(){toast.remove();},2500);
+async function saveSettings() {
+  var name  = document.getElementById('set-name')?.value?.trim();
+  var parts = (name || '').split(/\s+/);
+  var tz    = document.querySelector('#screen-settings select.fi')?.value;
+  try {
+    await API.Users.updateMe({ first_name: parts[0] || '', last_name: parts.slice(1).join(' ') || '', timezone: tz });
+    showToast('Settings saved');
+  } catch(e) { showToast('Failed to save settings'); }
 }
 
 // ═══════════════════════════════════════════════════
@@ -2999,24 +3031,4 @@ function addRingVideo(peerId, stream) {
     vid = document.createElement('video');
     vid.id = 'ring-vid-' + peerId;
     vid.autoplay = true; vid.playsInline = true;
-    vid.style.cssText = 'width:100%;height:140px;object-fit:cover;border-radius:var(--rl);background:#0A0F1A';
-    grid.appendChild(vid);
-  }
-  vid.srcObject = stream;
-}
-
-function leaveRingPeer(peerId) {
-  if (ringPeers[peerId]) { ringPeers[peerId].close(); delete ringPeers[peerId]; }
-  var el = document.getElementById('ring-vid-' + peerId);
-  if (el) el.remove();
-}
-
-function leaveStudyRing() {
-  if (ringStream) { ringStream.getTracks().forEach(function(t) { t.stop(); }); ringStream = null; }
-  Object.keys(ringPeers).forEach(leaveRingPeer);
-  ringPeers = {};
-  if (ringWs) { ringWs.close(); ringWs = null; }
-}
-</script>
-</body>
-</html>
+    vid.style.cssText = 'width:100%;height:140px;object-fit:cover;bo
