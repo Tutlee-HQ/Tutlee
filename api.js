@@ -96,7 +96,6 @@ const TutleeAPI = (() => {
       _refresh = data.refresh;
       _user    = data.user;
       if (_onAuthChange) _onAuthChange(_user);
-      try { sessionStorage.setItem('_t_a', data.access); sessionStorage.setItem('_t_r', data.refresh); sessionStorage.setItem('_t_u', JSON.stringify(data.user)); } catch(e){}
       return data;
     },
 
@@ -106,30 +105,12 @@ const TutleeAPI = (() => {
       _refresh = data.refresh;
       _user    = data.user;
       if (_onAuthChange) _onAuthChange(_user);
-      try { sessionStorage.setItem('_t_a', data.access); sessionStorage.setItem('_t_r', data.refresh); sessionStorage.setItem('_t_u', JSON.stringify(data.user)); } catch(e){}
       return data;
     },
 
     logout() {
       _access = _refresh = _user = null;
       if (_onAuthChange) _onAuthChange(null);
-      try { sessionStorage.removeItem('_t_a'); sessionStorage.removeItem('_t_r'); sessionStorage.removeItem('_t_u'); } catch(e){}
-    },
-
-    restoreSession() {
-      try {
-        var a = sessionStorage.getItem('_t_a');
-        var r = sessionStorage.getItem('_t_r');
-        var u = sessionStorage.getItem('_t_u');
-        if (a && u) {
-          _access  = a;
-          _refresh = r || null;
-          _user    = JSON.parse(u);
-          if (_onAuthChange) _onAuthChange(_user);
-          return _user;
-        }
-      } catch(e) {}
-      return null;
     },
 
     currentUser() { return _user; },
