@@ -55,3 +55,25 @@ class LearnerProfile(models.Model):
 
     def __str__(self):
         return f'LearnerProfile({self.user.full_name})'
+
+
+class EmailOTP(models.Model):
+    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otps')
+    code       = models.CharField(max_length=6)
+    is_used    = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'OTP({self.user.email}, {self.code})'
+
+
+class SiteContent(models.Model):
+    key        = models.CharField(max_length=100, unique=True)
+    content    = models.TextField()
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'SiteContent({self.key})'

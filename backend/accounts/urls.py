@@ -4,6 +4,7 @@ from .views import (
     UserListView, UserDetailView, SuspendUserView,
     TutorMatchView, TutorProfileUpdateView, LearnerProfileUpdateView,
     admin_stats,
+    SendOTPView, VerifyOTPView, SiteContentView,
 )
 
 urlpatterns = [
@@ -18,4 +19,7 @@ urlpatterns = [
     path('users/<int:pk>/',    UserDetailView.as_view(),        name='user-detail'),
     path('users/<int:pk>/suspend/', SuspendUserView.as_view(), name='user-suspend'),
     path('stats/',             admin_stats,                     name='admin-stats'),
+    path('otp/send/',          SendOTPView.as_view(),         name='otp-send'),
+    path('otp/verify/',        VerifyOTPView.as_view(),       name='otp-verify'),
 ]
+

@@ -562,10 +562,10 @@ canvas.lc{width:100%;display:block}
     <div class="hero-in">
       <div>
         <div class="hero-lbl">Peer-to-peer · 24/7</div>
-        <h1 class="hero-h1">Learn from students<br>who've been <span>exactly</span><br>where you are</h1>
-        <p class="hero-p">Tutlee matches you with verified peer tutors on your specific weak areas, not just the broad subject. Real students. Real understanding.</p>
+        <h1 class="hero-h1" id="cms-hp-title">Learn from students<br>who've been <span>exactly</span><br>where you are</h1>
+        <p class="hero-p" id="cms-hp-sub">Tutlee matches you with verified peer tutors on your specific weak areas, not just the broad subject. Real students. Real understanding.</p>
         <div class="hero-btns">
-          <button class="btn-hp" onclick="openAuth('signup-learner')">Start learning free</button>
+          <button class="btn-hp" id="cms-hp-cta" onclick="openAuth('signup-learner')">Start learning free</button>
           <button class="btn-hs" onclick="openAuth('signup-tutor')">Become a tutor</button>
         </div>
       </div>
@@ -762,6 +762,19 @@ canvas.lc{width:100%;display:block}
           <button class="btn-full btn-full-p" id="ob-create-btn" onclick="obCreate()">Create account</button>
           <button class="btn-full btn-full-s" id="ob-back-btn" onclick="obBack()">Back</button>
           <p style="text-align:center;font-size:13px;color:var(--g5);margin-top:12px">Already have an account? <span style="color:var(--t6);font-weight:600;cursor:pointer" onclick="closeAuth();openAuth('signin')">Sign in</span></p>
+        </div>
+
+        <!-- OTP VERIFICATION STEP -->
+        <div class="ob-step" id="ob-otp">
+          <div style="text-align:center;margin-bottom:20px">
+            <div style="width:52px;height:52px;border-radius:50%;background:var(--t1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--t6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Verify your email</h2>
+            <p style="font-size:13px;color:var(--g5)">We sent a 6-digit code to <strong id="otp-email-display"></strong></p>
+          </div>
+          <div class="fg"><label class="fl">Verification code</label><input class="fi" type="text" id="otp-code-input" placeholder="000000" maxlength="6" style="text-align:center;font-size:22px;letter-spacing:8px;font-weight:700" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+          <div id="otp-err" style="display:none;color:#9B0F2B;font-size:13px;margin-bottom:10px;padding:8px;background:#FEE;border-radius:6px"></div>
+          <button class="btn-full btn-full-p" id="otp-verify-btn" onclick="verifyOTP()">Verify &amp; continue</button>
+          <p style="text-align:center;font-size:13px;color:var(--g5);margin-top:14px">Didn't receive it? <span id="otp-resend-btn" style="color:var(--t6);font-weight:600;cursor:pointer" onclick="resendOTP()">Resend code</span></p>
         </div>
       </div>
     </div>
@@ -1563,9 +1576,10 @@ canvas.lc{width:100%;display:block}
     <div class="card">
       <div class="ct">Set Availability</div>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="padding:12px;background:var(--g0);border-radius:var(--r)"><div style="font-size:13px;font-weight:600;margin-bottom:8px">Weekdays</div><div style="display:flex;gap:8px"><select class="fi" style="flex:1;padding:7px 10px;font-size:12px"><option>8 PM EAT</option><option>7 PM EAT</option></select><span style="align-self:center;color:var(--g5)">to</span><select class="fi" style="flex:1;padding:7px 10px;font-size:12px"><option>11 PM EAT</option><option>10 PM EAT</option></select></div></div>
-        <div style="padding:12px;background:var(--g0);border-radius:var(--r)"><div style="font-size:13px;font-weight:600;margin-bottom:8px">Weekends</div><div style="display:flex;gap:8px"><select class="fi" style="flex:1;padding:7px 10px;font-size:12px"><option>2 PM EAT</option><option>10 AM EAT</option></select><span style="align-self:center;color:var(--g5)">to</span><select class="fi" style="flex:1;padding:7px 10px;font-size:12px"><option>8 PM EAT</option><option>6 PM EAT</option></select></div></div>
-        <button class="btn-lg p" style="width:100%;justify-content:center;font-size:13px" onclick="alert('Availability saved!')">Save availability</button>
+        <div style="padding:12px;background:var(--g0);border-radius:var(--r)"><div style="font-size:13px;font-weight:600;margin-bottom:8px">Weekdays</div><div style="display:flex;gap:8px"><select id="avail-wd-start" class="fi" style="flex:1;padding:7px 10px;font-size:12px"><option value="20:00">8 PM EAT</option><option value="19:00">7 PM EAT</option><option value="18:00">6 PM EAT</option><option value="08:00">8 AM EAT</option></select><span style="align-self:center;color:var(--g5)">to</span><select id="avail-wd-end" class="fi" style="flex:1;padding:7px 10px;font-size:12px"><option value="23:00">11 PM EAT</option><option value="22:00">10 PM EAT</option><option value="21:00">9 PM EAT</option></select></div></div>
+        <div style="padding:12px;background:var(--g0);border-radius:var(--r)"><div style="font-size:13px;font-weight:600;margin-bottom:8px">Weekends</div><div style="display:flex;gap:8px"><select id="avail-we-start" class="fi" style="flex:1;padding:7px 10px;font-size:12px"><option value="14:00">2 PM EAT</option><option value="10:00">10 AM EAT</option><option value="08:00">8 AM EAT</option></select><span style="align-self:center;color:var(--g5)">to</span><select id="avail-we-end" class="fi" style="flex:1;padding:7px 10px;font-size:12px"><option value="20:00">8 PM EAT</option><option value="18:00">6 PM EAT</option><option value="22:00">10 PM EAT</option></select></div></div>
+        <div id="avail-save-status" style="display:none;font-size:12px;color:var(--ok2);font-weight:600;text-align:center;padding:4px 0">✓ Availability saved</div>
+        <button id="avail-save-btn" class="btn-lg p" style="width:100%;justify-content:center;font-size:13px" onclick="saveAvailability()">Save availability</button>
       </div>
     </div>
   </div>
@@ -2052,9 +2066,17 @@ async function obCreate(){
       password2: pass||'tutlee2026',
     };
     var data=await API.Auth.register(payload);
-    closeAuth();
-    launchApp(data.user.full_name||name, data.user.role);
-    loadUserDashboard(data.user);
+    S._pendingUser=data.user;
+    S._pendingEmail=email||payload.email;
+    if(data.email_verification_required){
+      document.querySelectorAll('.ob-step').forEach(function(el){el.classList.remove('active');});
+      var otpStep=document.getElementById('ob-otp');
+      if(otpStep){otpStep.classList.add('active');var ed=document.getElementById('otp-email-display');if(ed)ed.textContent=S._pendingEmail;}
+    }else{
+      closeAuth();
+      launchApp(data.user.full_name||name,data.user.role);
+      loadUserDashboard(data.user);
+    }
   }catch(e){
     var errEl=document.getElementById('ob-err');
     if(errEl){errEl.textContent=e.message||'Registration failed.';errEl.style.display='block';}
@@ -2062,6 +2084,34 @@ async function obCreate(){
   }finally{
     btn.textContent='Create account';btn.classList.remove('loading');btn.disabled=false;
   }
+}
+
+async function verifyOTP(){
+  var btn=document.getElementById('otp-verify-btn');
+  var code=(document.getElementById('otp-code-input')||{}).value||'';
+  var errEl=document.getElementById('otp-err');
+  if(!code||code.length<6){if(errEl){errEl.textContent='Enter the 6-digit code.';errEl.style.display='block';}return;}
+  if(btn){btn.disabled=true;btn.textContent='Verifying…';}
+  try{
+    var res=await fetch('/api/accounts/otp/verify/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:S._pendingEmail,code:code})});
+    var data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Invalid code');
+    try{sessionStorage.setItem('_t_a',data.access);sessionStorage.setItem('_t_r',data.refresh);sessionStorage.setItem('_t_u',JSON.stringify(data.user));}catch(e){}
+    closeAuth();
+    launchApp(data.user.full_name||(data.user.first_name+' '+data.user.last_name).trim(),data.user.role);
+    loadUserDashboard(data.user);
+  }catch(e){if(errEl){errEl.textContent=e.message||'Verification failed.';errEl.style.display='block';}}
+  finally{if(btn){btn.disabled=false;btn.textContent='Verify & continue';}}
+}
+
+async function resendOTP(){
+  var btn=document.getElementById('otp-resend-btn');
+  if(btn){btn.textContent='Sending…';btn.style.pointerEvents='none';}
+  try{
+    await fetch('/api/accounts/otp/send/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:S._pendingEmail})});
+    showToast('New code sent to '+S._pendingEmail);
+  }catch(e){showToast('Could not resend — try again');}
+  finally{if(btn){btn.textContent='Resend code';btn.style.pointerEvents='';}}
 }
 
 function launchApp(name,role){
@@ -2136,11 +2186,12 @@ function goTo(id){
   var c=document.getElementById('content');if(c)c.scrollTop=0;
   closeNotifs();closeDots();
   if(id==='book')buildBookCal();
-  if(id==='session-room'){startTimer();setTimeout(initWB,100);}
+  if(id==='session-room'){startTimer();setTimeout(initWB,100);var activeSession=S.activeSessionId||'session';setTimeout(function(){startSessionRoom(activeSession);},300);}
   if(id==='ai-summary')loadSummary();
   if(id==='study-groups'){curRingTab='live';document.querySelectorAll('.ring-tab').forEach(function(t){t.classList.remove('active')});var rt=document.getElementById('rtab-live');if(rt)rt.classList.add('active');buildSGGrid();}
   if(id==='ring-detail'){buildSGMembers();setTimeout(initSGWB,100);}
   if(id==='earnings'||id==='t-analytics'||id==='progress')setTimeout(initCharts,100);
+  if(id==='settings')populateSettingsForm();
 }
 function goHome(){goTo(S.curMode==='tutor'?'tutor-dash':'dashboard');}
 function setMode(m){
@@ -2424,6 +2475,9 @@ function startTimer(){
   var s=0;S.timerInt=setInterval(function(){s++;var m=Math.floor(s/60),sec=s%60;var el=document.getElementById('sess-timer');if(el)el.textContent=(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;},1000);
 }
 function endSess(){
+  if(typeof rtcStream!=='undefined'&&rtcStream)rtcStream.getTracks().forEach(function(t){t.stop();});
+  if(typeof rtcPeer!=='undefined'&&rtcPeer){rtcPeer.close();rtcPeer=null;}
+  if(typeof rtcWS!=='undefined'&&rtcWS){rtcWS.close();rtcWS=null;}
   if(S.timerInt){clearInterval(S.timerInt);S.timerInt=null;}
   goTo('ai-summary');
   setTimeout(function(){showModal('survey-modal');},1200);
@@ -2638,6 +2692,25 @@ async function loadTutorData() {
     if (earnEl) earnEl.textContent = weekSessions.length ? weekSessions.length + ' upcoming' : '0 this week';
 
     await loadTutorEarnings();
+
+    // Restore availability state from user profile
+    try{
+      var _u=API.Auth.currentUser()||{};
+      var profile=_u.tutor_profile||_u;
+      var isAvail=profile.is_available!==false;
+      S.availOn=isAvail;
+      var at=document.getElementById('avail-t'),ak=document.getElementById('avail-k');
+      if(at)at.style.background=isAvail?'var(--t5)':'var(--g4)';
+      if(ak)ak.style.left=isAvail?'23px':'3px';
+      var avail=profile.availability||{};
+      if(avail.weekdays){var wds=document.getElementById('avail-wd-start'),wde=document.getElementById('avail-wd-end');if(wds)wds.value=avail.weekdays.start||'20:00';if(wde)wde.value=avail.weekdays.end||'23:00';}
+      if(avail.weekends){var wes=document.getElementById('avail-we-start'),wee=document.getElementById('avail-we-end');if(wes)wes.value=avail.weekends.start||'14:00';if(wee)wee.value=avail.weekends.end||'20:00';}
+      var tutUpcoming=document.getElementById('tutor-upcoming-list');
+      if(tutUpcoming&&upcoming.length){
+        tutUpcoming.innerHTML=upcoming.map(function(s){var dt=new Date(s.scheduled_at);return '<div style="padding:12px;background:var(--g0);border-radius:var(--r);margin-bottom:8px"><div style="font-size:13px;font-weight:600">'+s.subject+'</div><div style="font-size:12px;color:var(--g5)">'+(s.learner_name||'Learner')+' · '+dt.toLocaleDateString()+' at '+dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</div><span class="tag" style="margin-top:6px;background:var(--t1);color:var(--t7)">'+s.status+'</span></div>';}).join('');
+      }
+    }catch(pe){}
+
   } catch(e) {
     console.info('loadTutorData offline:', e.message);
   }
@@ -2730,13 +2803,46 @@ function activatePro(){
   setTimeout(function(){toast.remove();},3500);
 }
 async function saveSettings() {
-  var name  = document.getElementById('set-name')?.value?.trim();
+  var btn  = document.querySelector('#screen-settings .btn-lg.p');
+  var name = document.getElementById('set-name')?.value?.trim();
   var parts = (name || '').split(/\s+/);
-  var tz    = document.querySelector('#screen-settings select.fi')?.value;
+  var tz   = document.querySelector('#screen-settings select.fi')?.value;
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
   try {
     await API.Users.updateMe({ first_name: parts[0] || '', last_name: parts.slice(1).join(' ') || '', timezone: tz });
-    showToast('Settings saved');
+    var sbName=document.getElementById('sb-uname');if(sbName&&name)sbName.textContent=name;
+    showToast('Settings saved ✓');
   } catch(e) { showToast('Failed to save settings'); }
+  finally{if(btn){btn.disabled=false;btn.textContent='Save changes';}}
+}
+
+function populateSettingsForm(){
+  try{
+    var user=API.Auth.currentUser();if(!user)return;
+    var nameEl=document.getElementById('set-name');
+    if(nameEl)nameEl.value=user.full_name||((user.first_name||'')+' '+(user.last_name||'')).trim();
+    var profileInputs=document.querySelectorAll('#screen-settings .card input.fi');
+    if(profileInputs[1]&&user.email)profileInputs[1].value=user.email;
+    var subjWrap=document.getElementById('settings-subjects-wrap');
+    var subjects=(user.learner_profile&&user.learner_profile.subjects)||(user.tutor_profile&&user.tutor_profile.subjects)||[];
+    if(subjWrap&&subjects.length){
+      subjWrap.innerHTML=subjects.map(function(s){
+        return '<span class="subj-tag" style="display:inline-flex;align-items:center;gap:6px;background:var(--g1);border:1px solid var(--g2);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;margin:3px">'
+          +s+'<span onclick="removeSubjectSetting(\''+s+'\')" style="cursor:pointer;opacity:.5;font-size:14px;line-height:1">×</span></span>';
+      }).join('');
+    }
+  }catch(e){}
+}
+
+function removeSubjectSetting(subj){
+  try{
+    var user=API.Auth.currentUser()||{};
+    var profile=user.learner_profile||user.tutor_profile||{};
+    var subjects=(profile.subjects||[]).filter(function(s){return s!==subj;});
+    API.Users.updateLearnerProfile({subjects:subjects}).catch(function(){});
+    API.Users.updateTutorProfile({subjects:subjects}).catch(function(){});
+    populateSettingsForm();showToast('Subject removed');
+  }catch(e){}
 }
 
 // ═══════════════════════════════════════════════════
@@ -2760,11 +2866,12 @@ async function loadUserDashboard(user) {
       upcomingEl.innerHTML = upcoming.map(function(s){
         var other = (user.role === 'learner' || user.role === 'both') ? s.tutor_name : s.learner_name;
         var dt    = new Date(s.scheduled_at);
+        var joinBtn = '<button class="btn-sm p" style="margin-top:10px;width:100%;justify-content:center" onclick="S.activeSessionId=\''+s.id+'\';goTo(\'session-room\')">Join Now →</button>';
         return '<div class="sess-card">' +
           '<div class="sess-subj">' + s.subject + '</div>' +
           '<div class="sess-with">with ' + other + '</div>' +
           '<div class="sess-dt">' + dt.toLocaleDateString() + ' · ' + dt.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + '</div>' +
-          (s.status === 'live' ? '<span class="live-badge">Live</span>' : '') +
+          (s.status === 'live' ? '<span class="live-badge">● Live</span>' + joinBtn : joinBtn) +
           '</div>';
       }).join('');
     }
@@ -3184,14 +3291,14 @@ async function handleRTCOffer(msg){
 function toggleMic(){
   micOn=!micOn;
   if(rtcStream)rtcStream.getAudioTracks().forEach(function(t){t.enabled=micOn;});
-  var btn=document.getElementById('mic-btn');
-  if(btn)btn.style.background=micOn?'rgba(255,255,255,.15)':'var(--err)';
+  var btn=document.getElementById('mic-btn')||document.getElementById('ctrl-mic');
+  if(btn){btn.style.background=micOn?'':'var(--err)';btn.classList.toggle('ctrl-off',!micOn);}
 }
 function toggleCam(){
   camOn=!camOn;
   if(rtcStream)rtcStream.getVideoTracks().forEach(function(t){t.enabled=camOn;});
-  var btn=document.getElementById('cam-btn');
-  if(btn)btn.style.background=camOn?'rgba(255,255,255,.15)':'var(--err)';
+  var btn=document.getElementById('cam-btn')||document.getElementById('ctrl-cam');
+  if(btn){btn.style.background=camOn?'':'var(--err)';btn.classList.toggle('ctrl-off',!camOn);}
 }
 async function toggleScreenShare(){
   if(!screenSharing){
@@ -3470,6 +3577,35 @@ async function createRing(){
         if(safeScreens.indexOf(lastScreen)!==-1)setTimeout(function(){goTo(lastScreen);},200);
       }
     }
+  }catch(e){}
+})();
+
+// ─── CMS: load homepage content from backend ─────────────────────────────────
+(function loadCMSHomepage(){
+  try{
+    fetch('/api/content/homepage/')
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(data){
+        if(!data||!data.content)return;
+        try{
+          var cms=JSON.parse(data.content);
+          if(cms.hero){
+            var ht=document.getElementById('cms-hp-title');if(ht&&cms.hero.title)ht.textContent=cms.hero.title;
+            var hs=document.getElementById('cms-hp-sub');if(hs&&cms.hero.sub)hs.textContent=cms.hero.sub;
+            var hc=document.getElementById('cms-hp-cta');if(hc&&cms.hero.cta)hc.textContent=cms.hero.cta;
+          }
+          if(cms.banner&&cms.banner.text){
+            var existing=document.getElementById('cms-banner-bar');
+            if(!existing){
+              var bar=document.createElement('div');
+              bar.id='cms-banner-bar';
+              bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;color:#fff;background:'+(cms.banner.color||'#0D9488');
+              bar.textContent=cms.banner.text;
+              document.body.prepend(bar);
+            }
+          }
+        }catch(e){}
+      }).catch(function(){});
   }catch(e){}
 })();
 </script></body></html>

@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.http import HttpResponse
 from rest_framework_simplejwt.views import TokenRefreshView
-from accounts.views import LoginView
+from accounts.views import LoginView, SiteContentView
 import os
 
 
@@ -56,4 +56,6 @@ urlpatterns = [
     path('api/rings/',        include('study_rings.urls')),
     path('api/reports/',      include('reports.urls')),
     path('api/payments/',     include('payments.urls')),
+    path('api/content/<str:key>/', SiteContentView.as_view(), name='site-content'),
+    path('api/content/',           SiteContentView.as_view(), name='site-content-default'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -125,3 +125,15 @@ SIMPLE_JWT = {
 
 # ── CORS ──
 CORS_ALLOW_ALL_ORIGINS = True          # dev only — restric
+# ── EMAIL ──
+import os as _os
+EMAIL_BACKEND = _os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend'   # console in dev; set SMTP vars in prod
+)
+EMAIL_HOST          = _os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT          = int(_os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS       = True
+EMAIL_HOST_USER     = _os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = _os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL  = _os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@tutlee.com')

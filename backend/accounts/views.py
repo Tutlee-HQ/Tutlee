@@ -33,12 +33,29 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         s = self.get_serializer(data=request.data)
         s.is_valid(raise_exception=True)
-        user    = s.save()
+        user = s.save()
+        # Send OTP for email verification
+        try:
+            from .models import EmailOTP
+            import random, string, django.conf
+            code = ''.join(random.choices(string.digits, k=6))
+            EmailOTP.objects.create(user=user, code=code)
+            from django.core.mail import send_mail
+            send_mail(
+                subject='Welcome to Tutlee — verify your email',
+                message=f'Hi {user.first_name},\n\nYour verification code is: {code}\n\nEnter this in the app to complete signup.',
+                from_email=django.conf.settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass  # never block registration if email fails
         refresh = RefreshToken.for_user(user)
         return Response({
             'access':  str(refresh.access_token),
             'refresh': str(refresh),
             'user':    UserSerializer(user).data,
+            'email_verification_required': True,
         }, status=status.HTTP_201_CREATED)
 
 
@@ -155,3 +172,91 @@ def admin_stats(request):
         'kyt_pending':     kyt_pending,
         'monthly_revenue': float(monthly_revenue),
     })
+
+
+# ─── OTP VERIFICATION ────────────────────────────────────────────────────────
+import random
+import string
+from django.core.mail import send_mail
+from django.conf import settings as django_settings
+from .models import EmailOTP, SiteContent
+
+
+def generate_otp():
+    return ''.join(random.choices(string.digits, k=6))
+
+
+class SendOTPView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').strip().lower()
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'No account found with that email.'}, status=404)
+        code = generate_otp()
+        EmailOTP.objects.create(user=user, code=code)
+        try:
+            send_mail(
+                subject='Your Tutlee verification code',
+                message=f'Your verification code is: {code}\n\nThis code expires in 10 minutes.',
+                from_email=django_settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            # Still return code in dev if email fails (console backend)
+            return Response({'detail': 'OTP sent', 'dev_code': str(code) if django_settings.DEBUG else None})
+        return Response({'detail': 'OTP sent to ' + email})
+
+
+class VerifyOTPView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').strip().lower()
+        code  = request.data.get('code', '').strip()
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'No account found.'}, status=404)
+        from django.utils import timezone
+        import datetime
+        cutoff = timezone.now() - datetime.timedelta(minutes=10)
+        otp = EmailOTP.objects.filter(user=user, code=code, is_used=False, created_at__gte=cutoff).first()
+        if not otp:
+            return Response({'error': 'Invalid or expired code.'}, status=400)
+        otp.is_used = True
+        otp.save()
+        user.is_active = True
+        user.save()
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'detail': 'Email verified',
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': UserSerializer(user).data,
+        })
+
+
+# ─── SITE CONTENT (CMS) ─────────────────────────────────────────────────────
+class SiteContentView(APIView):
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+    def get(self, request, key='homepage'):
+        try:
+            obj = SiteContent.objects.get(key=key)
+            return Response({'key': obj.key, 'content': obj.content, 'updated_at': obj.updated_at})
+        except SiteContent.DoesNotExist:
+            return Response({'key': key, 'content': '{}'})
+
+    def post(self, request, key='homepage'):
+        key = request.data.get('key', key)
+        content = request.data.get('content', '{}')
+        obj, _ = SiteContent.objects.update_or_create(key=key, defaults={'content': content})
+        return Response({'key': obj.key, 'updated_at': obj.updated_at})
+
