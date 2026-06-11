@@ -1096,7 +1096,7 @@ canvas.lc{width:100%;display:block}
     <div class="sr-main">
       <div class="sr-top">
         <div><div style="font-size:13px;font-weight:700;color:#fff" id="sess-room-title">Session in progress</div><div style="font-size:11px;color:rgba(255,255,255,.4)" id="sess-timer">00:00</div></div>
-        <div style="display:flex;gap:8px;align-items:center"><span class="tag tr2">● LIVE</span><button onclick="goTo('ai-summary')" style="padding:6px 12px;background:rgba(23,207,191,.1);border:1px solid rgba(23,207,191,.25);border-radius:var(--r);font-size:12px;font-weight:700;color:var(--t4);cursor:pointer;font-family:var(--f)">AI Summary</button><button onclick="endSess()" style="padding:6px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);font-size:12px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;font-family:var(--f)">End session</button></div>
+        <div style="display:flex;gap:8px;align-items:center"><span class="tag tr2">● LIVE</span><button onclick="goTo('ai-summary')" style="padding:6px 12px;background:rgba(23,207,191,.1);border:1px solid rgba(23,207,191,.25);border-radius:var(--r);font-size:12px;font-weight:700;color:var(--t4);cursor:pointer;font-family:var(--f)">AI Summary</button><button onclick="endSess()" style="padding:6px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);font-size:12px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;font-family:var(--f)">End session</button><button onclick="endSess();goTo('sessions')" style="padding:6px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);font-size:12px;font-weight:600;color:rgba(255,255,255,.35);cursor:pointer;font-family:var(--f)" title="Leave session">← Back</button></div>
       </div>
       <div class="sr-vids">
         <div class="sr-vp"><video id="remote-video" autoplay playsinline style="width:100%;height:100%;object-fit:cover;border-radius:var(--rl)"></video><div style="width:56px;height:56px;border-radius:50%;background:var(--t8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;position:absolute" id="sr-tutor-av">??</div><div class="sr-vlbl" id="sr-tutor-name">Tutor</div><div style="position:absolute;top:8px;right:8px;background:var(--err);border-radius:5px;padding:2px 7px;font-size:10px;color:#fff;font-weight:700">● REC</div></div>
@@ -2186,7 +2186,7 @@ function goTo(id){
   var c=document.getElementById('content');if(c)c.scrollTop=0;
   closeNotifs();closeDots();
   if(id==='book')buildBookCal();
-  if(id==='session-room'){startTimer();setTimeout(initWB,100);var activeSession=S.activeSessionId||'session';setTimeout(function(){startSessionRoom(activeSession);},300);}
+  if(id==='session-room'){startTimer();setTimeout(initWB,100);if(S.activeSessionId){setTimeout(function(){startSessionRoom(S.activeSessionId);},300);}}
   if(id==='ai-summary')loadSummary();
   if(id==='study-groups'){curRingTab='live';document.querySelectorAll('.ring-tab').forEach(function(t){t.classList.remove('active')});var rt=document.getElementById('rtab-live');if(rt)rt.classList.add('active');buildSGGrid();}
   if(id==='ring-detail'){buildSGMembers();setTimeout(initSGWB,100);}
@@ -2784,6 +2784,25 @@ async function toggleAvail() {
     await API.Users.updateTutorProfile({ is_available: S.availOn });
     showToast(S.availOn ? 'You are now visible to learners' : 'You are now offline');
   } catch(e) { showToast('Failed to update availability'); }
+}
+
+
+async function saveAvailability(){
+  var btn=document.getElementById('avail-save-btn');
+  var status=document.getElementById('avail-save-status');
+  var g=function(id){var el=document.getElementById(id);return el?el.value:'';};
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  try{
+    await API.Users.updateTutorProfile({
+      availability:{
+        weekdays:{start:g('avail-wd-start'),end:g('avail-wd-end')},
+        weekends:{start:g('avail-we-start'),end:g('avail-we-end')}
+      }
+    });
+    if(status){status.style.display='block';setTimeout(function(){status.style.display='none';},3000);}
+    showToast('Availability saved ✓');
+  }catch(e){showToast('Could not save — check connection');}
+  finally{if(btn){btn.disabled=false;btn.textContent='Save availability';}}
 }
 
 // ═══ MODALS ═══
