@@ -173,6 +173,7 @@ textarea.fi{resize:none}
 .ni-ic{width:36px;height:36px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 
 /* SHARED COMPONENTS */
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--g5);font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;margin-bottom:12px;background:none;border:none;font-family:var(--f);transition:color .15s}.back-btn:hover{color:var(--g8)}
 .pg-head{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .pg-head h1{font-size:22px;font-weight:700;color:var(--g9);letter-spacing:-.3px;margin-bottom:2px}
 .pg-sub{font-size:13px;color:var(--g5)}
@@ -940,6 +941,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ AI MATCH ══ -->
 <div class="screen" id="screen-ai-match">
+  <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>AI Match</h1><div class="pg-sub">Search for a subject, describe what you struggle with, and we match you to the right tutor</div></div></div>
   <div class="g65">
     <div>
@@ -999,6 +1001,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ SESSIONS ══ -->
 <div class="screen" id="screen-sessions">
+  <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>My Sessions</h1><div class="pg-sub">Manage upcoming sessions and view your history</div></div>
     <button class="btn-lg p" onclick="goTo('book')">+ Book a Session</button>
   </div>
@@ -1130,6 +1133,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ AI SUMMARY ══ -->
 <div class="screen" id="screen-ai-summary">
+  <button class="back-btn" onclick="goTo('sessions')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back to Sessions</button>
   <div class="pg-head"><div><h1>Session Summary</h1><div class="pg-sub">AI-generated · Organic Chemistry with Kwame Osei</div></div></div>
   <div class="g2">
     <div>
@@ -1177,6 +1181,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ ASSESSMENTS ══ -->
 <div class="screen" id="screen-assessments">
+  <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>Assessments</h1><div class="pg-sub">Automatically triggered after every session - whether or not your tutor assigns one</div></div></div>
 
   <!-- Assessment tabs -->
@@ -1254,6 +1259,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ MESSAGES ══ -->
 <div class="screen" id="screen-messages">
+  <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>Messages</h1><div class="pg-sub">Chat opens when you book a session - closes 3 days after it ends</div></div></div>
   <div class="card" style="padding:64px 24px;text-align:center;max-width:480px;margin:0 auto">
     <div style="width:56px;height:56px;border-radius:var(--rxl);background:var(--t1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
@@ -1267,6 +1273,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ STUDY RINGS ══ -->
 <div class="screen" id="screen-study-groups">
+  <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head">
     <div><h1>Study Rings</h1><div class="pg-sub">Open group sessions - free to join, free to contribute</div></div>
     <button class="btn-lg p" onclick="showModal('ring-modal')">+ Create Ring</button>
@@ -1284,21 +1291,19 @@ canvas.lc{width:100%;display:block}
 <!-- ══ RING DETAIL ══ -->
 <div class="screen" id="screen-ring-detail">
   <!-- Back nav -->
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;cursor:pointer;color:var(--g5)" onclick="goTo('study-groups')">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-    <span style="font-size:14px;font-weight:500">All Study Rings</span>
-  </div>
+  <button class="back-btn" onclick="goTo('study-groups')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>All Study Rings</button>
 
   <!-- Ring header -->
   <div style="background:var(--w);border:1px solid var(--g1);border-radius:var(--rxl);padding:24px;margin-bottom:20px;display:flex;align-items:flex-start;gap:20px">
-    <div style="width:72px;height:72px;border-radius:var(--rl);background:var(--t1);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0">🧬</div>
+    <div style="width:72px;height:72px;border-radius:var(--rl);background:var(--t1);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0" id="ring-detail-icon">📚</div>
     <div style="flex:1;min-width:0">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
         <h1 style="font-size:20px;font-weight:700;color:var(--g9)" id="ring-detail-title"></h1>
-        <span class="tag tt">Biology</span>
-        <span class="bdg bt" style="font-size:11px">● Live now · 11 active</span>
+        <span class="tag tt" id="ring-detail-subj"></span>
+        <span class="bdg bt" style="font-size:11px" id="ring-detail-live-badge"></span>
       </div>
-      <div style="font-size:13px;color:var(--g5);margin-bottom:16px">Hosted by <strong style="color:var(--g7);font-weight:600" id="ring-detail-host"></strong></div>
+      <div style="font-size:13px;color:var(--g5);margin-bottom:4px">Hosted by <strong style="color:var(--g7);font-weight:600" id="ring-detail-host"></strong> &middot; <span id="ring-detail-members" style="color:var(--g5)"></span></div>
+      <div style="font-size:13px;color:var(--g5);margin-bottom:16px" id="ring-detail-desc"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-lg p" onclick="startStudyRing(currentRingId||'demo')">Join live session</button>
         <button class="btn-lg s" onclick="alert('Following this ring.')">Follow ring</button>
@@ -1401,6 +1406,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ PROGRESS ══ -->
 <div class="screen" id="screen-progress">
+  <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>My Progress</h1><div class="pg-sub">Assessment-based tracking - updates after every completed session</div></div></div>
   <div class="mg mg3" style="margin-bottom:24px">
     <div class="mc mc-t"><div class="mc-lbl">Sessions completed</div><div class="mc-val">0</div></div>
@@ -1451,6 +1457,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ PAYMENTS ══ -->
 <div class="screen" id="screen-payments">
+  <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>Payments</h1><div class="pg-sub">Your session spending history</div></div></div>
   <div class="mg mg3" style="margin-bottom:24px">
     <div class="mc mc-t"><div class="mc-lbl">Spent this month</div><div class="mc-val">$0.00</div></div>
@@ -1472,6 +1479,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ SETTINGS ══ -->
 <div class="screen" id="screen-settings">
+  <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>Settings</h1><div class="pg-sub">Account preferences, roles, and subjects</div></div></div>
   <div class="g2">
     <div>
@@ -1545,6 +1553,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ TUTOR SESSIONS ══ -->
 <div class="screen" id="screen-t-sessions">
+  <button class="back-btn" onclick="goTo('tutor-dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>Teaching Sessions</h1><div class="pg-sub">Upcoming sessions and availability management</div></div></div>
   <div class="g2">
     <div class="card">
@@ -1564,6 +1573,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ EARNINGS ══ -->
 <div class="screen" id="screen-earnings">
+  <button class="back-btn" onclick="goTo('tutor-dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>Earnings</h1><div class="pg-sub" id="earnings-date"></div></div></div>
   <div class="mg mg4" style="margin-bottom:24px">
     <div class="mc mc-t"><div class="mc-lbl">Available balance</div><div class="mc-val" id="earn-balance">$0</div></div>
@@ -1589,6 +1599,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ TEACHING ANALYTICS ══ -->
 <div class="screen" id="screen-t-analytics">
+  <button class="back-btn" onclick="goTo('tutor-dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>Teaching Analytics</h1><div class="pg-sub">Learner outcomes and survey feedback</div></div></div>
   <div class="g2" style="margin-bottom:20px">
     <div class="card"><div class="ct">Learner pass rate trend</div><canvas id="pass-chart" class="lc" height="90"></canvas></div>
@@ -1608,6 +1619,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ SKILL PASSPORT (tutor only) ══ -->
 <div class="screen" id="screen-passport">
+  <button class="back-btn" onclick="goTo('tutor-dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>Skill Passport</h1><div class="pg-sub">Your verified teaching credential - shareable with universities and employers</div></div></div>
   <div style="background:linear-gradient(135deg,var(--t9),var(--g8));border-radius:var(--rxl);padding:28px 32px;margin-bottom:20px;display:flex;gap:24px;align-items:center;flex-wrap:wrap">
     <div style="width:56px;height:56px;border-radius:50%;background:var(--t8);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0" id="pp-av"></div>
@@ -1637,6 +1649,7 @@ canvas.lc{width:100%;display:block}
 
 <!-- ══ VERIFICATION ══ -->
 <div class="screen" id="screen-verification">
+  <button class="back-btn" onclick="goTo('tutor-dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
   <div class="pg-head"><div><h1>Tutor Verification (KYT)</h1><div class="pg-sub">Complete all 4 steps to earn your verified tutor badge</div></div></div>
   <div class="g2">
     <div class="card">
@@ -1747,6 +1760,13 @@ canvas.lc{width:100%;display:block}
 
   <div id="kyt-submit-err" style="display:none;color:#9B0F2B;font-size:13px;margin-bottom:12px;padding:8px;background:#FEE;border-radius:6px"></div>
   <div id="kyt-submit-success" style="display:none;background:var(--ok1);color:#077A3E;font-size:13px;padding:12px 16px;border-radius:var(--r);margin-bottom:12px">Documents submitted successfully. You will be notified within 48 hours.</div>
+  <div id="kyt-upload-progress" style="display:none;margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:12px;color:var(--g6);font-weight:600" id="kyt-upload-label">Uploading...</span>
+      <span style="font-size:12px;color:var(--g5)" id="kyt-upload-pct">0%</span>
+    </div>
+    <div class="pbar" style="height:6px"><div class="pfill pft" id="kyt-upload-bar" style="width:0%;transition:width .3s"></div></div>
+  </div>
 
   <button class="btn-lg p" style="width:100%;justify-content:center" id="kyt-submit-btn" onclick="submitKYT()">Submit for verification</button>
   <p style="font-size:12px;color:var(--g5);text-align:center;margin-top:10px">You can still access your dashboard while awaiting verification. Unverified tutors cannot receive bookings.</p>
@@ -1923,19 +1943,19 @@ canvas.lc{width:100%;display:block}
     <div class="mcl" onclick="closeModal('ring-modal')">✕</div>
     <h2 style="font-size:18px;font-weight:800;margin-bottom:4px">Create a Study Ring</h2>
     <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Open group sessions - anyone on Tutlee can join</p>
-    <div class="fg"><label class="fl">Ring name</label><input class="fi" placeholder="e.g. Integration by Parts Deep Dive"></div>
-    <div class="fg"><label class="fl">Subject</label><select class="fi"><option>Biology</option><option>Chemistry</option><option>Mathematics</option><option>French</option><option>Economics</option><option>Physics</option></select></div>
-    <div class="fg"><label class="fl">Topic / description</label><textarea class="fi" rows="2" placeholder="What will you cover?"></textarea></div>
+    <div class="fg"><label class="fl">Ring name</label><input class="fi" id="ring-name-inp" placeholder="e.g. Integration by Parts Deep Dive"></div>
+    <div class="fg"><label class="fl">Subject</label><input class="fi" id="ring-subj-inp" placeholder="e.g. Mathematics, Chemistry"></div>
+    <div class="fg"><label class="fl">Topic / description</label><textarea class="fi" id="ring-desc-inp" rows="2" placeholder="What will you cover?"></textarea></div>
     <div class="fg"><label class="fl">Scheduled date & time</label><input class="fi" type="datetime-local"></div>
     <div class="fg"><label class="fl">Max participants</label><select class="fi"><option>10</option><option>20</option><option>30</option><option>Unlimited</option></select></div>
-    <button class="btn-full btn-full-p" style="margin-bottom:8px" onclick="alert('Study Ring created!');closeModal('ring-modal')">Create Ring</button>
+    <button class="btn-full btn-full-p" style="margin-bottom:8px" id="ring-create-btn" onclick="createRing()">Create Ring</button>
     <button class="btn-full btn-full-s" onclick="closeModal('ring-modal')">Cancel</button>
   </div>
 </div>
 
 <script>
 // ═══ STATE ═══
-var S={role:'learner',isPro:false,curMode:'learner',availOn:true,wbColor:'#1A2130',sgWbColor:'#1A2130',timerInt:null,currentSurveySessionId:null};
+var S={role:'learner',isPro:false,curMode:'learner',availOn:true,wbColor:'#1A2130',sgWbColor:'#1A2130',timerInt:null,currentSurveySessionId:null,chartsHaveData:false};
 var obStep=1, selRoleVal='learner', assessAnswers={};
 var assCorrect=[1,2,1];
 var curSelPlan='m';
@@ -2083,6 +2103,8 @@ function launchApp(name,role){
       buildMsgList();buildSGGrid();buildSGMembers();buildBookCal();
       goTo('verification'); // Always start tutors on KYT page
       if (!tourDone) { setTimeout(function(){ startTour(role); }, 600); }
+      setTimeout(loadNotifications, 1000);
+      setTimeout(function(){ loadTutorData(); loadUserDashboard(user); }, 800);
     });
   } else {
     requestAnimationFrame(function(){
@@ -2090,6 +2112,7 @@ function launchApp(name,role){
       buildMsgList();buildSGGrid();buildSGMembers();buildBookCal();
       goTo('dashboard');
       if (!tourDone) { setTimeout(function(){ startTour(role); }, 600); }
+      setTimeout(loadNotifications, 1000);
     });
   }
 }
@@ -2136,6 +2159,33 @@ function signOut(){
 function toggleNotifs(){document.getElementById('notif-panel').classList.toggle('hidden');}
 function closeNotifs(){var p=document.getElementById('notif-panel');if(p)p.classList.add('hidden');}
 function markAllRead(){document.querySelectorAll('.ni.unread').forEach(function(el){el.classList.remove('unread')});var d=document.getElementById('ndot');if(d)d.style.display='none';}
+async function loadNotifications() {
+  var dot = document.getElementById('ndot');
+  var panel = document.getElementById('notif-panel');
+  if (!dot || !panel) return;
+  try {
+    var sessions = await API.Sessions.list();
+    var list = sessions.results || sessions;
+    var unread = list.filter(function(s){ return s.status === 'scheduled' && !s.learner_notified; });
+    if (unread.length > 0) {
+      dot.style.display = 'block';
+      // Build notification items
+      var body = panel.querySelector('[style*="padding:40px"]');
+      if (body) {
+        body.innerHTML = unread.map(function(s){
+          var dt = new Date(s.scheduled_at);
+          return '<div class="ni unread" style="padding:12px 16px;display:flex;gap:10px;align-items:flex-start;border-bottom:1px solid var(--g1)">' +
+            '<div style="width:8px;height:8px;border-radius:50%;background:var(--t5);flex-shrink:0;margin-top:5px"></div>' +
+            '<div><div style="font-size:13px;font-weight:600;color:var(--g9)">' + s.subject + ' session confirmed</div>' +
+            '<div style="font-size:12px;color:var(--g5)">' + dt.toLocaleDateString() + ' · ' + dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) + '</div></div>' +
+            '</div>';
+        }).join('');
+      }
+    } else {
+      dot.style.display = 'none';
+    }
+  } catch(e) { /* offline — no dot shown */ }
+}
 document.addEventListener('click',function(e){
   var nb=document.getElementById('notif-btn'),p=document.getElementById('notif-panel');
   if(p&&!p.classList.contains('hidden')&&!p.contains(e.target)&&nb&&!nb.contains(e.target))p.classList.add('hidden');
@@ -2305,7 +2355,7 @@ function buildSGGrid(){
     var avs=AV_BG.slice(0,Math.min(3,sg.members)).map(function(bg){return'<div class="sg-av-sm" style="background:'+bg+'"></div>';}).join('');
     if(sg.members>3)avs+='<div class="sg-av-sm" style="background:var(--g5);font-size:7px">+'+( sg.members-3)+'</div>';
     var isLive=sg.status==='Live now';
-    return'<div class="sg-card" onclick="goTo(\'ring-detail\')">'
+    return'<div class="sg-card" onclick="openRingDetail(sg)">'
       +'<div class="sg-banner" style="background:'+sg.bg+'"><span style="font-size:34px">'+sg.icon+'</span>'
       +(isLive?'<span class="bdg bt" style="position:absolute;top:10px;right:10px;font-size:10px">● Live</span>':'<span class="bdg bs" style="position:absolute;top:10px;right:10px;font-size:10px">'+sg.status+'</span>')
       +'</div>'
@@ -2317,7 +2367,7 @@ function buildSGGrid(){
       +'<div style="font-size:11px;color:var(--g4);margin-bottom:14px">Hosted by '+sg.host+'</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between">'
       +'<div style="display:flex;align-items:center;gap:6px"><div class="sg-av-stack">'+avs+'</div><span style="font-size:11px;color:var(--g5)">'+sg.members+' members</span></div>'
-      +'<button class="btn-sm p" onclick="event.stopPropagation();goTo(\'ring-detail\')">'+(isLive?'Join live':'RSVP')+'</button>'
+      +'<button class="btn-sm p" onclick="event.stopPropagation();openRingDetail(sg)">'+(isLive?'Join live':'RSVP')+'</button>'
       +'</div></div></div>';
   }).join('');
 }
@@ -2441,11 +2491,45 @@ function loadSummary(){
 
 // ═══ CHARTS (line graphs) ═══
 function initCharts(){
-  drawLine('earn-chart',['W1','W2','W3','W4','W5'],[42,78,95,134,186],'var(--t5)');
-  drawLine('pass-chart',['Jan','Feb','Mar','Apr','May'],[72,75,80,85,87],'var(--ok)');
-  drawLine('comp-chart',['Jan','Feb','Mar','Apr','May'],[88,90,92,94,96],'var(--i5)');
-  drawLine('prog-chart',['Jan','Feb','Mar','Apr','May'],[58,62,67,70,72],'var(--t5)');
-  drawLine('sess-chart',['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],[1,2,0,2,1,3,2],'var(--a5)');
+  // Charts start empty and are populated by loadTutorEarnings / loadUserDashboard
+  // Only draw placeholders if there's no real data
+  var earnCanvas = document.getElementById('earn-chart');
+  var passCanvas = document.getElementById('pass-chart');
+  var compCanvas = document.getElementById('comp-chart');
+  var progCanvas = document.getElementById('prog-chart');
+  var sessCanvas = document.getElementById('sess-chart');
+  // Show empty state text on chart containers if no data loaded
+  function emptyChart(canvas, msg) {
+    if (!canvas) return;
+    var parent = canvas.parentElement;
+    if (parent && !canvas.dataset.hasData) {
+      canvas.style.display = 'none';
+      var em = parent.querySelector('.chart-empty');
+      if (!em) {
+        em = document.createElement('div');
+        em.className = 'chart-empty';
+        em.style.cssText = 'padding:32px 16px;text-align:center;font-size:12px;color:var(--g4)';
+        em.textContent = msg || 'No data yet';
+        parent.appendChild(em);
+      }
+    }
+  }
+  if (!S.chartsHaveData) {
+    emptyChart(earnCanvas, 'Earnings data will appear after your first session');
+    emptyChart(passCanvas, 'Pass rate data will appear after assessments are completed');
+    emptyChart(compCanvas, 'Completion data will appear after sessions are completed');
+    emptyChart(progCanvas, 'Progress data will appear after assessments are completed');
+    emptyChart(sessCanvas, 'Session data will appear after your first booking');
+  }
+}
+function drawChartData(id, labels, data, color) {
+  var c = document.getElementById(id);
+  if (!c) return;
+  c.style.display = 'block';
+  c.dataset.hasData = '1';
+  var em = c.parentElement && c.parentElement.querySelector('.chart-empty');
+  if (em) em.remove();
+  drawLine(id, labels, data, color);
 }
 function drawLine(id,labels,data,color){
   var c=document.getElementById(id);if(!c)return;
@@ -2503,6 +2587,96 @@ async function submitSurvey() {
     closeModal('survey-modal');
     showToast('Rating submitted. Thank you!');
   } catch(e) { showToast('Failed to submit rating'); }
+}
+
+// ═══ TUTOR DATA LOADERS ═══
+async function loadTutorData() {
+  if (!API || !API.Auth.isLoggedIn()) return;
+  try {
+    // Sessions
+    var sessions = await API.Sessions.list();
+    var list = sessions.results || sessions;
+    var upcoming = list.filter(function(s){ return s.status === 'scheduled' || s.status === 'confirmed'; });
+    var requests  = list.filter(function(s){ return s.status === 'pending'; });
+
+    var schedEl = document.getElementById('tutor-schedule-list');
+    if (schedEl) {
+      if (!upcoming.length) {
+        schedEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--g5);font-size:13px">No upcoming sessions</div>';
+      } else {
+        schedEl.innerHTML = upcoming.map(function(s){
+          var dt = new Date(s.scheduled_at);
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--g1)">' +
+            '<div><div style="font-size:13px;font-weight:600;color:var(--g9)">' + s.subject + '</div>' +
+            '<div style="font-size:12px;color:var(--g5)">' + dt.toLocaleDateString() + ' · ' + dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) + ' · ' + (s.learner_name || 'Learner') + '</div></div>' +
+            '<span class="tag" style="background:var(--t1);color:var(--t7)">' + s.status + '</span>' +
+            '</div>';
+        }).join('');
+      }
+    }
+
+    var reqEl = document.getElementById('tutor-requests-list');
+    if (reqEl) {
+      if (!requests.length) {
+        reqEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--g5);font-size:13px">No pending booking requests</div>';
+      } else {
+        reqEl.innerHTML = requests.map(function(s){
+          return '<div data-req-id="' + s.id + '" style="padding:12px;background:var(--g0);border-radius:var(--r);margin-bottom:8px">' +
+            '<div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:4px">' + s.subject + ' — ' + (s.learner_name || 'Learner') + '</div>' +
+            '<div style="font-size:12px;color:var(--g5);margin-bottom:10px">' + new Date(s.scheduled_at).toLocaleDateString() + '</div>' +
+            '<div style="display:flex;gap:8px">' +
+            '<button class="btn-sm p" onclick="acceptReq(this,' + s.id + ')">Accept</button>' +
+            '<button class="btn-sm d" onclick="declineReq(this,' + s.id + ')">Decline</button>' +
+            '</div></div>';
+        }).join('');
+      }
+    }
+
+    // Earnings summary on tutor dash
+    var earnEl = document.getElementById('t-earnings');
+    var weekSessions = upcoming.filter(function(s){ var d=new Date(s.scheduled_at); var now=new Date(); var diff=d-now; return diff>0&&diff<7*86400000; });
+    if (earnEl) earnEl.textContent = weekSessions.length ? weekSessions.length + ' upcoming' : '0 this week';
+
+    await loadTutorEarnings();
+  } catch(e) {
+    console.info('loadTutorData offline:', e.message);
+  }
+}
+
+async function loadTutorEarnings() {
+  if (!API || !API.Auth.isLoggedIn()) return;
+  try {
+    var stats = await API.Payments.revenueStats();
+    var balEl = document.getElementById('earn-balance');
+    var monEl = document.getElementById('earn-month');
+    var sesEl = document.getElementById('earn-sessions');
+    var avgEl = document.getElementById('earn-avg');
+    if (balEl) balEl.textContent = '$' + (stats.available_balance || 0).toFixed(2);
+    if (monEl) monEl.textContent = '$' + (stats.this_month || 0).toFixed(2);
+    if (sesEl) sesEl.textContent = stats.session_count || 0;
+    if (avgEl) avgEl.textContent = stats.avg_per_session ? '$' + stats.avg_per_session.toFixed(2) : '$0';
+
+    // Transactions table
+    var tx = await API.Payments.transactions();
+    var txList = tx.results || tx;
+    var tbody = document.getElementById('earn-tbody');
+    if (tbody) {
+      if (!txList.length) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:32px;color:var(--g5)">No transactions yet</td></tr>';
+      } else {
+        tbody.innerHTML = txList.map(function(t){
+          return '<tr><td>' + t.description + '</td><td>' + new Date(t.created_at).toLocaleDateString() + '</td><td style="font-weight:600;color:var(--ok)">+$' + parseFloat(t.amount).toFixed(2) + '</td></tr>';
+        }).join('');
+        // Draw earnings chart with real data
+        var labels = txList.slice(-8).map(function(t){ return new Date(t.created_at).toLocaleDateString('en',{month:'short',day:'numeric'}); });
+        var data   = txList.slice(-8).map(function(t){ return parseFloat(t.amount); });
+        S.chartsHaveData = true;
+        drawChartData('earn-chart', labels, data, 'var(--t5)');
+      }
+    }
+  } catch(e) {
+    console.info('loadTutorEarnings offline:', e.message);
+  }
 }
 
 // ═══ TUTOR ACTIONS ═══
@@ -2607,10 +2781,29 @@ async function loadUserDashboard(user) {
       setTimeout(function(){ if(note.parentNode) note.remove(); }, 8000);
     }
 
-    // Study Rings
+    // Study Rings — populate SG_DATA from API
     const rings = await API.Rings.list();
     var ringList = rings.results || rings;
     var myRings  = ringList.filter(function(r){ return r.is_member; });
+    var bgPalette=['linear-gradient(135deg,#0E8F84,#17CFBF)','linear-gradient(135deg,#5243F5,#8B7CF7)','linear-gradient(135deg,#B85F00,#F5A623)','linear-gradient(135deg,#7B3F9E,#B06CD9)'];
+    var iconPalette=['📚','🔬','📐','🎯','🌍','⚗️','💡','🧬'];
+    if(ringList.length){
+      SG_DATA = ringList.map(function(r,i){
+        return{
+          id:r.id,
+          title:r.name,
+          subj:r.subject,
+          desc:r.description||'',
+          host:r.host_name||'Tutor',
+          members:r.member_count||0,
+          mine:r.is_member||false,
+          status:r.is_live?'Live now':(r.scheduled_at?new Date(r.scheduled_at).toLocaleDateString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'Upcoming'),
+          bg:bgPalette[i%bgPalette.length],
+          icon:iconPalette[i%iconPalette.length],
+        };
+      });
+      buildSGGrid();
+    }
 
     // Refresh AI match tutors if on that screen
     if (document.getElementById('ai-match') && document.getElementById('ai-match').classList.contains('active')) {
@@ -2722,10 +2915,14 @@ function showToast(msg) {
 }
 
 // ═══ KYT SUBMIT ═══
-async function submitKYT() {
+function submitKYT() {
   var btn = document.getElementById('kyt-submit-btn');
   var errEl = document.getElementById('kyt-submit-err');
   var succEl = document.getElementById('kyt-submit-success');
+  var progWrap = document.getElementById('kyt-upload-progress');
+  var progBar  = document.getElementById('kyt-upload-bar');
+  var progPct  = document.getElementById('kyt-upload-pct');
+  var progLbl  = document.getElementById('kyt-upload-label');
   var subjects = (document.getElementById('kyt-subjects-input').value || '').trim();
   var topics   = (document.getElementById('kyt-topics-input').value || '').trim();
   var rate     = (document.getElementById('kyt-rate-input').value || '').trim();
@@ -2735,42 +2932,75 @@ async function submitKYT() {
     errEl.style.display = 'block'; return;
   }
   errEl.style.display = 'none';
-  btn.textContent = 'Submitting...'; btn.disabled = true;
+  btn.textContent = 'Uploading...'; btn.disabled = true;
 
-  try {
-    var fd = new FormData();
-    var idFile     = document.getElementById('kyt-id-file').files[0];
-    var degreeFile = document.getElementById('kyt-degree-file').files[0];
-    var demoFile   = document.getElementById('kyt-demo-file').files[0];
-    var scoreFile  = document.getElementById('kyt-score-file').files[0];
+  var fd = new FormData();
+  var idFile     = document.getElementById('kyt-id-file').files[0];
+  var degreeFile = document.getElementById('kyt-degree-file').files[0];
+  var demoFile   = document.getElementById('kyt-demo-file').files[0];
+  var scoreFile  = document.getElementById('kyt-score-file').files[0];
 
-    if (idFile)     fd.append('id_document', idFile);
-    if (degreeFile) fd.append('degree_document', degreeFile);
-    if (demoFile)   fd.append('demo_video', demoFile);
-    if (scoreFile)  fd.append('proficiency_score_doc', scoreFile);
+  if (idFile)     fd.append('id_document', idFile);
+  if (degreeFile) fd.append('degree_document', degreeFile);
+  if (demoFile)   fd.append('demo_video', demoFile);
+  if (scoreFile)  fd.append('proficiency_score_doc', scoreFile);
 
-    fd.append('subjects', subjects);
-    fd.append('specialist_topics', topics);
-    if (rate) fd.append('hourly_rate', rate);
+  fd.append('subjects', subjects);
+  fd.append('specialist_topics', topics);
+  if (rate) fd.append('hourly_rate', rate);
 
-    await API.KYT.submit(fd);
+  // Use XHR for real upload progress
+  var xhr = new XMLHttpRequest();
+  var token = window.API && window.API.Auth && (sessionStorage.getItem('_t_a'));
 
-    // Also update tutor profile with subjects
-    var subjList = subjects.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
-    await API.Users.updateTutorProfile({ subjects: subjList, hourly_rate: rate }).catch(function(){});
+  progWrap.style.display = 'block';
 
-    succEl.style.display = 'block';
-    document.getElementById('kyt-submit-card').style.opacity = '0.6';
-    btn.textContent = 'Submitted';
+  xhr.upload.onprogress = function(e) {
+    if (e.lengthComputable) {
+      var pct = Math.round(e.loaded / e.total * 100);
+      progBar.style.width = pct + '%';
+      progPct.textContent = pct + '%';
+      if (pct < 100) {
+        progLbl.textContent = 'Uploading documents...';
+      } else {
+        progLbl.textContent = 'Processing...';
+      }
+    }
+  };
 
-    // Refresh KYT status display
-    loadUserDashboard(API.Auth.currentUser());
+  xhr.onload = function() {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      progBar.style.width = '100%';
+      progPct.textContent = '100%';
+      progLbl.textContent = 'Upload complete';
+      succEl.style.display = 'block';
+      document.getElementById('kyt-submit-card').style.opacity = '0.6';
+      btn.textContent = 'Submitted';
+      // Update tutor profile subjects
+      var subjList = subjects.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+      window.API.Users.updateTutorProfile({ subjects: subjList, hourly_rate: rate }).catch(function(){});
+      loadUserDashboard(window.API.Auth.currentUser());
+    } else {
+      var msg = 'Submission failed. Please try again.';
+      try { var r = JSON.parse(xhr.responseText); msg = r.detail || msg; } catch(e2){}
+      errEl.textContent = msg;
+      errEl.style.display = 'block';
+      progWrap.style.display = 'none';
+      btn.textContent = 'Submit for verification'; btn.disabled = false;
+    }
+  };
 
-  } catch(e) {
-    errEl.textContent = e.message || 'Submission failed. Please try again.';
+  xhr.onerror = function() {
+    errEl.textContent = 'Network error. Check your connection and try again.';
     errEl.style.display = 'block';
+    progWrap.style.display = 'none';
     btn.textContent = 'Submit for verification'; btn.disabled = false;
-  }
+  };
+
+  var base = 'https://tutlee-backend.onrender.com';
+  xhr.open('POST', base + '/api/kyt/submit/');
+  if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+  xhr.send(fd);
 }
 
 // ═══ BOOKING GUARD ═══
@@ -2798,7 +3028,6 @@ var TOUR_LEARNER = [
   {sel:'#nav-study-groups', title:'Study Rings',     body:'Free group sessions hosted by tutors. Drop in, ask questions, and learn with others.'},
   {sel:'#nav-messages',     title:'Messages',        body:'Chat opens when you book a session and closes 3 days after it ends.'},
 ];
-
 var TOUR_TUTOR = [
   {sel:'#nav-tutor-dash',    title:'Teaching Dashboard', body:'Your overview: earnings, upcoming sessions, booking requests, and your availability toggle.'},
   {sel:'#nav-verification',  title:'KYT Verification',   body:'Submit your documents here to get verified. Unverified tutors cannot receive bookings.'},
@@ -2808,258 +3037,439 @@ var TOUR_TUTOR = [
   {sel:'#nav-passport',      title:'Skill Passport',     body:'Your verified teaching credential, auto-generated from your session data. Share it with universities and employers.'},
   {sel:'#nav-create-ring',   title:'Study Rings',        body:'Create open group sessions that any learner can join for free.'},
 ];
-
-var tourStep = 0;
-var tourSteps = [];
-var tourOverlay = null;
-var tourTip = null;
-var tourHighlight = null;
-
-function startTour(role) {
-  tourSteps = (role === 'tutor' || role === 'both') ? TOUR_TUTOR : TOUR_LEARNER;
-  tourStep = 0;
-  tourOverlay = document.createElement('div');
-  tourOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;pointer-events:none';
+var tourStep=0,tourSteps=[],tourOverlay=null,tourTip=null,tourHighlight=null;
+function startTour(role){
+  tourSteps=(role==='tutor'||role==='both')?TOUR_TUTOR:TOUR_LEARNER;
+  tourStep=0;
+  tourOverlay=document.createElement('div');
+  tourOverlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;pointer-events:none';
   document.body.appendChild(tourOverlay);
-  tourHighlight = document.createElement('div');
-  tourHighlight.style.cssText = 'position:fixed;z-index:800;pointer-events:none;transition:all .3s;border-radius:8px;box-shadow:0 0 0 4px #17CFBF,0 0 0 9999px rgba(0,0,0,.55)';
+  tourHighlight=document.createElement('div');
+  tourHighlight.style.cssText='position:fixed;z-index:800;pointer-events:none;transition:all .3s;border-radius:8px;box-shadow:0 0 0 4px #17CFBF,0 0 0 9999px rgba(0,0,0,.55)';
   document.body.appendChild(tourHighlight);
-  tourTip = document.createElement('div');
-  tourTip.style.cssText = 'position:fixed;background:#fff;border-radius:14px;padding:20px 24px;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:801;pointer-events:all';
+  tourTip=document.createElement('div');
+  tourTip.style.cssText='position:fixed;background:#fff;border-radius:14px;padding:20px 24px;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:801;pointer-events:all';
   document.body.appendChild(tourTip);
   showTourStep(0);
 }
-
-function showTourStep(n) {
-  if (n >= tourSteps.length) { endTour(); return; }
-  var step = tourSteps[n];
-  var el = document.querySelector(step.sel);
-  if (!el) { showTourStep(n + 1); return; }
-  var r = el.getBoundingClientRect();
-  tourHighlight.style.left   = (r.left - 4) + 'px';
-  tourHighlight.style.top    = (r.top - 4) + 'px';
-  tourHighlight.style.width  = (r.width + 8) + 'px';
-  tourHighlight.style.height = (r.height + 8) + 'px';
-  var dots = tourSteps.map(function(_, i) {
-    return '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + (i === n ? '#17CFBF' : '#CBD5E1') + ';margin:0 2px"></span>';
-  }).join('');
-  tourTip.innerHTML =
-    '<div style="font-size:15px;font-weight:700;color:#0F1318;margin-bottom:6px">' + step.title + '</div>' +
-    '<p style="font-size:13px;color:#576880;line-height:1.6;margin-bottom:16px">' + step.body + '</p>' +
-    '<div style="display:flex;align-items:center;justify-content:space-between">' +
-      '<div>' + dots + '</div>' +
-      '<div style="display:flex;gap:8px">' +
-        '<button onclick="endTour()" style="padding:7px 14px;background:none;border:none;font-size:12px;color:#7A8FA8;cursor:pointer;font-family:inherit">Skip</button>' +
-        '<button onclick="showTourStep(' + (n + 1) + ')" style="padding:7px 16px;background:#17CFBF;color:#0F1318;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">' + (n === tourSteps.length - 1 ? 'Done' : 'Next') + '</button>' +
-      '</div>' +
-    '</div>';
-  var tipW = 280, tipH = 170;
-  var left = r.right + 16;
-  var top  = r.top;
-  if (left + tipW > window.innerWidth - 8)  left = r.left - tipW - 16;
-  if (left < 8) left = 8;
-  if (top + tipH > window.innerHeight - 8)  top = window.innerHeight - tipH - 16;
-  if (top < 8) top = 8;
-  tourTip.style.left = left + 'px';
-  tourTip.style.top  = top + 'px';
-  tourStep = n;
+function showTourStep(n){
+  if(n>=tourSteps.length){endTour();return;}
+  var step=tourSteps[n];
+  var el=document.querySelector(step.sel);
+  if(!el){showTourStep(n+1);return;}
+  var r=el.getBoundingClientRect();
+  tourHighlight.style.left=(r.left-4)+'px';
+  tourHighlight.style.top=(r.top-4)+'px';
+  tourHighlight.style.width=(r.width+8)+'px';
+  tourHighlight.style.height=(r.height+8)+'px';
+  var tipLeft=r.right+16;
+  var tipTop=r.top;
+  if(tipLeft+290>window.innerWidth)tipLeft=r.left-306;
+  if(tipLeft<8)tipLeft=8;
+  tourTip.style.left=tipLeft+'px';
+  tourTip.style.top=Math.max(8,Math.min(tipTop,window.innerHeight-200))+'px';
+  tourTip.innerHTML='<div style="font-size:11px;color:var(--t5);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">'+(n+1)+' of '+tourSteps.length+'</div>'
+    +'<div style="font-size:15px;font-weight:700;color:var(--g9);margin-bottom:6px">'+step.title+'</div>'
+    +'<div style="font-size:13px;color:var(--g5);line-height:1.5;margin-bottom:16px">'+step.body+'</div>'
+    +'<div style="display:flex;gap:8px;justify-content:flex-end">'
+    +(n>0?'<button onclick="showTourStep('+(n-1)+')" style="padding:7px 14px;border:1px solid var(--g2);border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;background:var(--w);font-family:var(--f)">Back</button>':'')
+    +(n<tourSteps.length-1
+      ?'<button onclick="showTourStep('+(n+1)+')" style="padding:7px 14px;background:var(--t5);border:none;border-radius:var(--r);font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--f)">Next</button>'
+      :'<button onclick="endTour()" style="padding:7px 14px;background:var(--t5);border:none;border-radius:var(--r);font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--f)">Done</button>')
+    +'<button onclick="endTour()" style="padding:7px 10px;border:none;background:none;font-size:12px;color:var(--g4);cursor:pointer;font-family:var(--f)">Skip</button>'
+    +'</div>';
+}
+function endTour(){
+  if(tourOverlay)tourOverlay.remove();
+  if(tourHighlight)tourHighlight.remove();
+  if(tourTip)tourTip.remove();
+  tourOverlay=tourHighlight=tourTip=null;
+  try{sessionStorage.setItem('tutlee_tour_done','1');}catch(e){}
 }
 
-function endTour() {
-  if (tourOverlay)   { tourOverlay.remove();   tourOverlay = null; }
-  if (tourHighlight) { tourHighlight.remove();  tourHighlight = null; }
-  if (tourTip)       { tourTip.remove();        tourTip = null; }
-  try { sessionStorage.setItem('tutlee_tour_done', '1'); } catch(e) {}
+// ═══ WHITEBOARD ═══
+function initWB(){
+  var c=document.getElementById('wb');if(!c)return;
+  var ctx=c.getContext('2d');var drawing=false;var lastX=0,lastY=0;
+  c.width=c.offsetWidth;c.height=c.offsetHeight;
+  function pos(e){var r=c.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return[src.clientX-r.left,src.clientY-r.top];}
+  c.onmousedown=c.ontouchstart=function(e){drawing=true;var p=pos(e);lastX=p[0];lastY=p[1];e.preventDefault();};
+  c.onmousemove=c.ontouchmove=function(e){if(!drawing)return;var p=pos(e);ctx.beginPath();ctx.strokeStyle=S.wbColor;ctx.lineWidth=2.5;ctx.lineCap='round';ctx.moveTo(lastX,lastY);ctx.lineTo(p[0],p[1]);ctx.stroke();lastX=p[0];lastY=p[1];e.preventDefault();};
+  c.onmouseup=c.ontouchend=function(){drawing=false;};
+}
+function setWBColor(color){S.wbColor=color;}
+function clearWB(){var c=document.getElementById('wb');if(c){var ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);}}
+function initSGWB(){
+  var c=document.getElementById('sg-wb');if(!c)return;
+  var ctx=c.getContext('2d');var drawing=false;var lastX=0,lastY=0;
+  c.width=c.offsetWidth;c.height=c.offsetHeight;
+  function pos(e){var r=c.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return[src.clientX-r.left,src.clientY-r.top];}
+  c.onmousedown=c.ontouchstart=function(e){drawing=true;var p=pos(e);lastX=p[0];lastY=p[1];e.preventDefault();};
+  c.onmousemove=c.ontouchmove=function(e){if(!drawing)return;var p=pos(e);ctx.beginPath();ctx.strokeStyle=S.sgWbColor;ctx.lineWidth=2.5;ctx.lineCap='round';ctx.moveTo(lastX,lastY);ctx.lineTo(p[0],p[1]);ctx.stroke();lastX=p[0];lastY=p[1];e.preventDefault();};
+  c.onmouseup=c.ontouchend=function(){drawing=false;};
 }
 
-// WEBRTC SESSION ROOM
-var rtcPeer = null, localStream = null, rtcWs = null, rtcRoom = null;
-var micMuted = false, camOff = false;
-
-function getWsBase() {
-  var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return proto + '//tutlee-backend.onrender.com';
+// ═══ SESSION TIMER ═══
+function startTimer(){
+  if(S.timerInt)clearInterval(S.timerInt);
+  var start=Date.now();
+  S.timerInt=setInterval(function(){
+    var el=document.getElementById('session-timer');
+    if(!el){clearInterval(S.timerInt);return;}
+    var s=Math.floor((Date.now()-start)/1000);
+    var m=Math.floor(s/60);s=s%60;
+    el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  },1000);
 }
 
-async function startSessionRoom(roomId) {
-  rtcRoom = roomId || 'session-' + Date.now();
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    var lv = document.getElementById('local-video');
-    if (lv) { lv.srcObject = localStream; lv.muted = true; }
-  } catch(e) { console.warn('Camera/mic unavailable:', e.message); }
-  connectRTCSignaling(rtcRoom);
-}
+// ═══ WEBRTC — SESSION ROOM ═══
+var rtcPeer=null,rtcStream=null,rtcWS=null,micOn=true,camOn=true,screenSharing=false;
 
-function connectRTCSignaling(room) {
-  rtcWs = new WebSocket(getWsBase() + '/ws/signal/' + room + '/');
-  rtcWs.onopen = function() { sendSignal({ type: 'ready' }); };
-  rtcWs.onmessage = async function(ev) {
-    var msg = JSON.parse(ev.data);
-    if (msg.type === 'ready')  { await createRTCOffer(); }
-    else if (msg.type === 'offer')  { await handleRTCOffer(msg); }
-    else if (msg.type === 'answer' && rtcPeer) { await rtcPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp)); }
-    else if (msg.type === 'ice' && rtcPeer && msg.candidate) { await rtcPeer.addIceCandidate(new RTCIceCandidate(msg.candidate)); }
-    else if (msg.type === 'peer-left') { var rv = document.getElementById('remote-video'); if (rv) rv.srcObject = null; }
+async function startSessionRoom(roomId){
+  var localVid=document.getElementById('local-video');
+  try{
+    rtcStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    if(localVid){localVid.srcObject=rtcStream;localVid.muted=true;}
+  }catch(e){
+    showToast('Camera/mic access denied. Check browser permissions.');
+    return;
+  }
+  var wsBase='wss://tutlee-backend.onrender.com';
+  rtcWS=new WebSocket(wsBase+'/ws/signal/'+(roomId||'session')+'/');
+  rtcWS.onopen=function(){rtcWS.send(JSON.stringify({type:'join',room:roomId}));createRTCOffer(roomId);};
+  rtcWS.onmessage=function(e){
+    var msg=JSON.parse(e.data);
+    if(msg.type==='offer')handleRTCOffer(msg);
+    else if(msg.type==='answer'&&rtcPeer)rtcPeer.setRemoteDescription(new RTCSessionDescription(msg));
+    else if(msg.type==='ice'&&rtcPeer)rtcPeer.addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(function(){});
   };
+  rtcWS.onerror=function(){showToast('Signaling connection failed. Retrying...');};
 }
 
-function sendSignal(d) { if (rtcWs && rtcWs.readyState === 1) rtcWs.send(JSON.stringify(d)); }
-function getRTCConfig() { return { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }; }
-
-async function createRTCOffer() {
-  rtcPeer = new RTCPeerConnection(getRTCConfig());
-  setupRTCListeners();
-  if (localStream) localStream.getTracks().forEach(function(t) { rtcPeer.addTrack(t, localStream); });
-  var offer = await rtcPeer.createOffer();
+async function createRTCOffer(roomId){
+  rtcPeer=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
+  rtcStream.getTracks().forEach(function(t){rtcPeer.addTrack(t,rtcStream);});
+  rtcPeer.ontrack=function(e){
+    var rv=document.getElementById('remote-video');
+    if(rv&&e.streams[0])rv.srcObject=e.streams[0];
+  };
+  rtcPeer.onicecandidate=function(e){
+    if(e.candidate&&rtcWS&&rtcWS.readyState===1)
+      rtcWS.send(JSON.stringify({type:'ice',candidate:e.candidate,room:roomId}));
+  };
+  var offer=await rtcPeer.createOffer();
   await rtcPeer.setLocalDescription(offer);
-  sendSignal({ type: 'offer', sdp: offer });
+  if(rtcWS&&rtcWS.readyState===1)rtcWS.send(JSON.stringify({type:'offer',sdp:offer.sdp,room:roomId}));
 }
 
-async function handleRTCOffer(msg) {
-  rtcPeer = new RTCPeerConnection(getRTCConfig());
-  setupRTCListeners();
-  if (localStream) localStream.getTracks().forEach(function(t) { rtcPeer.addTrack(t, localStream); });
-  await rtcPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp));
-  var answer = await rtcPeer.createAnswer();
-  await rtcPeer.setLocalDescription(answer);
-  sendSignal({ type: 'answer', sdp: answer });
-}
-
-function setupRTCListeners() {
-  rtcPeer.onicecandidate = function(e) { if (e.candidate) sendSignal({ type: 'ice', candidate: e.candidate }); };
-  rtcPeer.ontrack = function(e) { var rv = document.getElementById('remote-video'); if (rv && e.streams[0]) rv.srcObject = e.streams[0]; };
-}
-
-function toggleMic() {
-  if (!localStream) return;
-  micMuted = !micMuted;
-  localStream.getAudioTracks().forEach(function(t) { t.enabled = !micMuted; });
-  var b = document.getElementById('ctrl-mic');
-  if (b) b.style.background = micMuted ? 'var(--err)' : 'rgba(255,255,255,.1)';
-}
-
-function toggleCam() {
-  if (!localStream) return;
-  camOff = !camOff;
-  localStream.getVideoTracks().forEach(function(t) { t.enabled = !camOff; });
-  var b = document.getElementById('ctrl-cam');
-  if (b) b.style.background = camOff ? 'var(--err)' : 'rgba(255,255,255,.1)';
-}
-
-async function toggleScreenShare() {
-  try {
-    var screen = await navigator.mediaDevices.getDisplayMedia({ video: true });
-    var track = screen.getVideoTracks()[0];
-    if (rtcPeer) {
-      var sender = rtcPeer.getSenders().find(function(s) { return s.track && s.track.kind === 'video'; });
-      if (sender) sender.replaceTrack(track);
-    }
-    var lv = document.getElementById('local-video');
-    if (lv) lv.srcObject = screen;
-    track.onended = function() {
-      if (localStream) {
-        var cam = localStream.getVideoTracks()[0];
-        if (rtcPeer) { var s = rtcPeer.getSenders().find(function(x) { return x.track && x.track.kind === 'video'; }); if (s && cam) s.replaceTrack(cam); }
-        if (lv) lv.srcObject = localStream;
-      }
+async function handleRTCOffer(msg){
+  if(!rtcPeer){
+    rtcPeer=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
+    if(rtcStream)rtcStream.getTracks().forEach(function(t){rtcPeer.addTrack(t,rtcStream);});
+    rtcPeer.ontrack=function(e){
+      var rv=document.getElementById('remote-video');
+      if(rv&&e.streams[0])rv.srcObject=e.streams[0];
     };
-  } catch(e) { console.warn('Screen share cancelled'); }
+    rtcPeer.onicecandidate=function(e){
+      if(e.candidate&&rtcWS&&rtcWS.readyState===1)
+        rtcWS.send(JSON.stringify({type:'ice',candidate:e.candidate}));
+    };
+  }
+  await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:'offer',sdp:msg.sdp}));
+  var answer=await rtcPeer.createAnswer();
+  await rtcPeer.setLocalDescription(answer);
+  if(rtcWS&&rtcWS.readyState===1)rtcWS.send(JSON.stringify({type:'answer',sdp:answer.sdp}));
 }
 
-function endSessionCall() {
-  if (localStream) { localStream.getTracks().forEach(function(t) { t.stop(); }); localStream = null; }
-  if (rtcPeer) { rtcPeer.close(); rtcPeer = null; }
-  if (rtcWs) { rtcWs.close(); rtcWs = null; }
+function toggleMic(){
+  micOn=!micOn;
+  if(rtcStream)rtcStream.getAudioTracks().forEach(function(t){t.enabled=micOn;});
+  var btn=document.getElementById('mic-btn');
+  if(btn)btn.style.background=micOn?'rgba(255,255,255,.15)':'var(--err)';
+}
+function toggleCam(){
+  camOn=!camOn;
+  if(rtcStream)rtcStream.getVideoTracks().forEach(function(t){t.enabled=camOn;});
+  var btn=document.getElementById('cam-btn');
+  if(btn)btn.style.background=camOn?'rgba(255,255,255,.15)':'var(--err)';
+}
+async function toggleScreenShare(){
+  if(!screenSharing){
+    try{
+      var screenStream=await navigator.mediaDevices.getDisplayMedia({video:true});
+      var screenTrack=screenStream.getVideoTracks()[0];
+      if(rtcPeer){
+        var sender=rtcPeer.getSenders().find(function(s){return s.track&&s.track.kind==='video';});
+        if(sender)sender.replaceTrack(screenTrack);
+      }
+      var lv=document.getElementById('local-video');
+      if(lv)lv.srcObject=screenStream;
+      screenTrack.onended=function(){toggleScreenShare();};
+      screenSharing=true;
+      var btn=document.getElementById('screen-btn');
+      if(btn)btn.style.background='var(--t5)';
+    }catch(e){showToast('Screen share cancelled.');}
+  }else{
+    if(rtcStream){
+      var vt=rtcStream.getVideoTracks()[0];
+      if(rtcPeer){
+        var sender2=rtcPeer.getSenders().find(function(s){return s.track&&s.track.kind==='video';});
+        if(sender2&&vt)sender2.replaceTrack(vt);
+      }
+      var lv2=document.getElementById('local-video');
+      if(lv2)lv2.srcObject=rtcStream;
+    }
+    screenSharing=false;
+    var btn2=document.getElementById('screen-btn');
+    if(btn2)btn2.style.background='rgba(255,255,255,.15)';
+  }
+}
+function endSessionCall(){
+  if(rtcStream)rtcStream.getTracks().forEach(function(t){t.stop();});
+  if(rtcPeer){rtcPeer.close();rtcPeer=null;}
+  if(rtcWS){rtcWS.close();rtcWS=null;}
+  if(S.timerInt){clearInterval(S.timerInt);S.timerInt=null;}
+  showToast('Session ended');
+  setTimeout(function(){
+    closeModal('survey-modal');
+    S.currentSurveySessionId=null;
+    showModal('survey-modal');
+  },500);
   goTo('sessions');
 }
+function loadSummary(){
+  var el=document.getElementById('ai-summary-body');
+  if(!el)return;
+  el.innerHTML='<div style="padding:32px;text-align:center;color:var(--g5);font-size:13px">Generating AI summary…</div>';
+  setTimeout(function(){
+    el.innerHTML='<div style="font-size:13px;color:var(--g7);line-height:1.8">'
+      +'<strong style="display:block;margin-bottom:8px;color:var(--g9)">Key topics covered</strong>'
+      +'<p style="margin-bottom:12px">The session covered the fundamentals of the subject discussed. Please complete your assessment to generate a personalised summary.</p>'
+      +'<button class="btn-lg p" onclick="goTo(\'assessments\')" style="justify-content:center;width:100%;max-width:300px">Take your assessment now</button>'
+      +'</div>';
+  },1200);
+}
 
-// WEBRTC STUDY RING
-var ringPeers = {}, ringStream = null, ringWs = null;
+// ═══ WEBRTC — STUDY RINGS (multi-party mesh) ═══
+var sgPeers={},sgStream=null,sgWS=null,sgRoomId=null,sgMicOn=true,sgCamOn=true;
+var currentRingId=null;
 
-async function startStudyRing(ringId) {
-  var room = 'ring-' + ringId;
-  try {
-    ringStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    var lv = document.getElementById('sg-local-video');
-    if (lv) { lv.srcObject = ringStream; lv.muted = true; lv.style.display = 'block'; }
-  } catch(e) { console.warn('Ring media unavailable'); }
-  ringWs = new WebSocket(getWsBase() + '/ws/signal/' + room + '/');
-  ringWs.onopen = function() { sendRingSignal({ type: 'join', ringId: ringId }); };
-  ringWs.onmessage = async function(ev) {
-    var msg = JSON.parse(ev.data);
-    var pid = msg.peerId || 'p' + Date.now();
-    if (msg.type === 'ready')  { await createRingPeer(pid); }
-    else if (msg.type === 'offer')  { await handleRingOffer(msg); }
-    else if (msg.type === 'answer') { var p = ringPeers[msg.peerId]; if (p) await p.setRemoteDescription(new RTCSessionDescription(msg.sdp)); }
-    else if (msg.type === 'ice')    { var p = ringPeers[msg.peerId]; if (p && msg.candidate) await p.addIceCandidate(new RTCIceCandidate(msg.candidate)); }
-    else if (msg.type === 'peer-left') { leaveRingPeer(msg.peerId); }
+async function startStudyRing(ringId){
+  sgRoomId=ringId;
+  var grid=document.getElementById('sg-video-grid');
+  if(grid)grid.innerHTML='';
+
+  // Get local media
+  try{
+    sgStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    // Add local tile
+    addRingVideo('local',sgStream,true);
+  }catch(e){
+    showToast('Camera/mic access denied. Check browser permissions.');
+    return;
+  }
+
+  // Tell API we joined
+  if(API&&API.Auth.isLoggedIn()){
+    API.Rings.join(ringId).catch(function(){});
+  }
+
+  // Open WebSocket signaling
+  var wsBase='wss://tutlee-backend.onrender.com';
+  sgWS=new WebSocket(wsBase+'/ws/signal/ring-'+ringId+'/');
+  sgWS.onopen=function(){
+    sgWS.send(JSON.stringify({type:'join',room:'ring-'+ringId,user:API.Auth.currentUser()?.id||'guest'}));
   };
+  sgWS.onmessage=function(e){
+    var msg=JSON.parse(e.data);
+    if(msg.type==='peer_joined'&&msg.peerId!=='local'){
+      createRingPeer(msg.peerId,true); // we are polite — send offer
+    }else if(msg.type==='offer'){
+      handleRingOffer(msg);
+    }else if(msg.type==='answer'&&sgPeers[msg.peerId]){
+      sgPeers[msg.peerId].setRemoteDescription(new RTCSessionDescription(msg)).catch(function(){});
+    }else if(msg.type==='ice'&&sgPeers[msg.peerId]){
+      sgPeers[msg.peerId].addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(function(){});
+    }else if(msg.type==='peer_left'){
+      leaveRingPeer(msg.peerId);
+    }
+  };
+  sgWS.onerror=function(){showToast('Ring connection failed.');};
+
+  // Update join button
+  var btn=document.querySelector('#screen-ring-detail .btn-lg.p');
+  if(btn){btn.textContent='Leave Ring';btn.onclick=function(){leaveStudyRing();};}
+  showToast('Joined study ring — camera and mic are live');
 }
 
-function sendRingSignal(d) { if (ringWs && ringWs.readyState === 1) ringWs.send(JSON.stringify(d)); }
+function createRingPeer(peerId,sendOffer){
+  if(sgPeers[peerId])return;
+  var pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
+  sgPeers[peerId]=pc;
 
-async function createRingPeer(peerId) {
-  var peer = new RTCPeerConnection(getRTCConfig());
-  ringPeers[peerId] = peer;
-  if (ringStream) ringStream.getTracks().forEach(function(t) { peer.addTrack(t, ringStream); });
-  peer.onicecandidate = function(e) { if (e.candidate) sendRingSignal({ type: 'ice', candidate: e.candidate, peerId: peerId }); };
-  peer.ontrack = function(e) { addRingVideo(peerId, e.streams[0]); };
-  var offer = await peer.createOffer();
-  await peer.setLocalDescription(offer);
-  sendRingSignal({ type: 'offer', sdp: offer, peerId: peerId });
-}
+  if(sgStream)sgStream.getTracks().forEach(function(t){pc.addTrack(t,sgStream);});
 
-async function handleRingOffer(msg) {
-  var peerId = msg.peerId;
-  var peer = new RTCPeerConnection(getRTCConfig());
-  ringPeers[peerId] = peer;
-  if (ringStream) ringStream.getTracks().forEach(function(t) { peer.addTrack(t, ringStream); });
-  peer.onicecandidate = function(e) { if (e.candidate) sendRingSignal({ type: 'ice', candidate: e.candidate, peerId: peerId }); };
-  peer.ontrack = function(e) { addRingVideo(peerId, e.streams[0]); };
-  await peer.setRemoteDescription(new RTCSessionDescription(msg.sdp));
-  var answer = await peer.createAnswer();
-  await peer.setLocalDescription(answer);
-  sendRingSignal({ type: 'answer', sdp: answer, peerId: peerId });
-}
+  pc.ontrack=function(e){
+    if(e.streams&&e.streams[0])addRingVideo(peerId,e.streams[0],false);
+  };
+  pc.onicecandidate=function(e){
+    if(e.candidate&&sgWS&&sgWS.readyState===1)
+      sgWS.send(JSON.stringify({type:'ice',candidate:e.candidate,peerId:peerId,room:'ring-'+sgRoomId}));
+  };
+  pc.onconnectionstatechange=function(){
+    if(pc.connectionState==='disconnected'||pc.connectionState==='failed')leaveRingPeer(peerId);
+  };
 
-function addRingVideo(peerId, stream) {
-  var grid = document.getElementById('sg-video-grid');
-  if (!grid) return;
-  var vid = document.getElementById('ring-vid-' + peerId);
-  if (!vid) {
-    vid = document.createElement('video');
-    vid.id = 'ring-vid-' + peerId;
-    vid.autoplay = true; vid.playsInline = true;
-    vid.style.cssText = 'width:100%;height:140px;object-fit:cover;border-radius:var(--rl);background:#0A0F1A';
-    grid.appendChild(vid);
+  if(sendOffer){
+    pc.createOffer().then(function(offer){
+      return pc.setLocalDescription(offer).then(function(){
+        if(sgWS&&sgWS.readyState===1)
+          sgWS.send(JSON.stringify({type:'offer',sdp:offer.sdp,peerId:peerId,room:'ring-'+sgRoomId}));
+      });
+    }).catch(function(){});
   }
-  vid.srcObject = stream;
 }
 
-function leaveRingPeer(peerId) {
-  if (ringPeers[peerId]) { ringPeers[peerId].close(); delete ringPeers[peerId]; }
-  var el = document.getElementById('ring-vid-' + peerId);
-  if (el) el.remove();
-}
-
-function leaveStudyRing() {
-  if (ringStream) { ringStream.getTracks().forEach(function(t) { t.stop(); }); ringStream = null; }
-  Object.keys(ringPeers).forEach(leaveRingPeer);
-  ringPeers = {};
-  if (ringWs) { ringWs.close(); ringWs = null; }
-}
-
-// SESSION RESTORE ON LOAD
-(function() {
-  var user = API.Auth.restoreSession ? API.Auth.restoreSession() : null;
-  if (user) {
-    var savedScreen = sessionStorage.getItem('_t_screen') || (user.role === 'tutor' ? 'verification' : 'dashboard');
-    launchApp(user.full_name || ((user.first_name || '') + ' ' + (user.last_name || '')).trim() || user.email, user.role);
-    setTimeout(function() { goTo(savedScreen); }, 150);
-    loadUserDashboard(user);
+async function handleRingOffer(msg){
+  var peerId=msg.peerId;
+  if(!sgPeers[peerId]){
+    var pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
+    sgPeers[peerId]=pc;
+    if(sgStream)sgStream.getTracks().forEach(function(t){pc.addTrack(t,sgStream);});
+    pc.ontrack=function(e){if(e.streams&&e.streams[0])addRingVideo(peerId,e.streams[0],false);};
+    pc.onicecandidate=function(e){
+      if(e.candidate&&sgWS&&sgWS.readyState===1)
+        sgWS.send(JSON.stringify({type:'ice',candidate:e.candidate,peerId:peerId,room:'ring-'+sgRoomId}));
+    };
   }
+  var pc=sgPeers[peerId];
+  await pc.setRemoteDescription(new RTCSessionDescription({type:'offer',sdp:msg.sdp}));
+  var answer=await pc.createAnswer();
+  await pc.setLocalDescription(answer);
+  if(sgWS&&sgWS.readyState===1)
+    sgWS.send(JSON.stringify({type:'answer',sdp:answer.sdp,peerId:peerId,room:'ring-'+sgRoomId}));
+}
+
+function addRingVideo(peerId,stream,isLocal){
+  var grid=document.getElementById('sg-video-grid');if(!grid)return;
+  if(document.getElementById('rv-'+peerId))return;
+  var wrap=document.createElement('div');
+  wrap.id='rv-'+peerId;
+  wrap.style.cssText='position:relative;background:#1A2130;border-radius:10px;overflow:hidden;aspect-ratio:16/9';
+  var vid=document.createElement('video');
+  vid.autoplay=true;vid.playsInline=true;
+  if(isLocal)vid.muted=true;
+  vid.srcObject=stream;
+  vid.style.cssText='width:100%;height:100%;object-fit:cover';
+  var lbl=document.createElement('div');
+  lbl.textContent=isLocal?'You':'Participant';
+  lbl.style.cssText='position:absolute;bottom:8px;left:10px;font-size:11px;font-weight:600;color:rgba(255,255,255,.85);background:rgba(0,0,0,.45);padding:2px 8px;border-radius:20px';
+  wrap.appendChild(vid);wrap.appendChild(lbl);
+  grid.appendChild(wrap);
+}
+
+function leaveRingPeer(peerId){
+  if(sgPeers[peerId]){sgPeers[peerId].close();delete sgPeers[peerId];}
+  var el=document.getElementById('rv-'+peerId);if(el)el.remove();
+}
+
+function leaveStudyRing(){
+  // Stop local tracks
+  if(sgStream)sgStream.getTracks().forEach(function(t){t.stop();});
+  // Close all peers
+  Object.keys(sgPeers).forEach(function(id){leaveRingPeer(id);});
+  sgPeers={};sgStream=null;
+  if(sgWS){sgWS.close();sgWS=null;}
+  var grid=document.getElementById('sg-video-grid');if(grid)grid.innerHTML='';
+  // Tell API
+  if(currentRingId&&API&&API.Auth.isLoggedIn())API.Rings.leave(currentRingId).catch(function(){});
+  showToast('You have left the study ring');
+  // Reset join button
+  var btn=document.querySelector('#screen-ring-detail .btn-lg.p');
+  if(btn){btn.textContent='Join live session';btn.onclick=function(){startStudyRing(currentRingId||'demo');};}
+  goTo('study-groups');
+}
+
+// ═══ OPEN RING DETAIL ═══
+function openRingDetail(sg){
+  currentRingId = sg.id || sg;
+  var titleEl  = document.getElementById('ring-detail-title');
+  var hostEl   = document.getElementById('ring-detail-host');
+  var subjEl   = document.getElementById('ring-detail-subj');
+  var descEl   = document.getElementById('ring-detail-desc');
+  var membEl   = document.getElementById('ring-detail-members');
+  if(titleEl) titleEl.textContent  = sg.title || 'Study Ring';
+  if(hostEl)  hostEl.textContent   = sg.host  || '';
+  if(subjEl)  subjEl.textContent   = sg.subj  || '';
+  if(descEl)  descEl.textContent   = sg.desc  || '';
+  if(membEl)  membEl.textContent   = (sg.members||0) + ' members';
+  var iconEl  = document.getElementById('ring-detail-icon');
+  var badgeEl = document.getElementById('ring-detail-live-badge');
+  if(iconEl)  iconEl.textContent   = sg.icon || '📚';
+  if(badgeEl){
+    var isLive = sg.status === 'Live now';
+    badgeEl.textContent = isLive ? '● Live now · ' + (sg.members||0) + ' active' : sg.status||'';
+    badgeEl.style.display = badgeEl.textContent ? 'inline-flex' : 'none';
+  }
+  // Reset join button
+  var btn = document.querySelector('#screen-ring-detail .btn-lg.p');
+  if(btn){
+    btn.textContent = 'Join live session';
+    btn.onclick = function(){ startStudyRing(currentRingId); };
+  }
+  goTo('ring-detail');
+}
+
+// ═══ CREATE RING ═══
+async function createRing(){
+  var btn=document.getElementById('ring-create-btn');
+  var name=document.getElementById('ring-name-inp')?.value?.trim();
+  var subj=document.getElementById('ring-subj-inp')?.value?.trim();
+  var desc=document.getElementById('ring-desc-inp')?.value?.trim();
+  var maxSel=document.querySelector('#ring-modal select.fi');
+  var max=maxSel?maxSel.value:'20';
+
+  if(!name||!subj){showToast('Please enter a ring name and subject.');return;}
+  if(btn){btn.textContent='Creating...';btn.disabled=true;}
+
+  try{
+    var ring=await API.Rings.create({name:name,subject:subj,description:desc,max_participants:max==='Unlimited'?0:parseInt(max)});
+    // Add to local SG_DATA so it shows immediately
+    SG_DATA.unshift({
+      id:ring.id,
+      title:ring.name,
+      subj:ring.subject,
+      desc:ring.description||'',
+      host:API.Auth.currentUser()?.full_name||'You',
+      members:1,
+      mine:true,
+      status:'Live now',
+      bg:'linear-gradient(135deg,var(--t8),var(--t7))',
+      icon:'📚',
+    });
+    currentRingId=ring.id;
+    closeModal('ring-modal');
+    buildSGGrid();
+    showToast('Study ring created! Joining now...');
+    setTimeout(function(){goTo('ring-detail');startStudyRing(ring.id);},400);
+  }catch(e){
+    showToast(e.message||'Failed to create ring. Please try again.');
+    if(btn){btn.textContent='Create Ring';btn.disabled=false;}
+  }
+}
+
+// ═══ SESSION RESTORE ═══
+(function(){
+  try{
+    var user=API.Auth.restoreSession();
+    if(user){
+      launchApp(user);
+      var lastScreen=sessionStorage.getItem('_t_screen');
+      if(lastScreen){
+        var safeScreens=['dashboard','ai-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
+        if(safeScreens.indexOf(lastScreen)!==-1)setTimeout(function(){goTo(lastScreen);},200);
+      }
+    }
+  }catch(e){}
 })();
-</script>
-</body>
-</html>
+</script></body></html>

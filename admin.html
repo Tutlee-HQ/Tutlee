@@ -1466,12 +1466,13 @@ function renderTutors(data) {
 }
 
 function filterTutors(q) {
-  renderTutors(tutors.filter(t => t.name.toLowerCase().includes(q.toLowerCase())));
+  var src = window.tutors || tutors;
+  renderTutors(q ? src.filter(t => t.name.toLowerCase().includes(q.toLowerCase()) || t.email.toLowerCase().includes(q.toLowerCase())) : src);
 }
 
 /* ── VIEW USER MODAL ── */
 function viewUser(id, role) {
-  const u = role === 'learner' ? learners.find(x => x.id === id) : tutors.find(x => x.id === id);
+  const u = role === 'learner' ? learners.find(x => x.id === id) : (window.tutors || tutors).find(x => x.id === id);
   if (!u) return;
   document.getElementById('modal-user-title').textContent = u.name;
   document.getElementById('modal-user-body').innerHTML = `
@@ -1641,7 +1642,13 @@ function renderTransactions() {
 
 /* ── SUBJECT BARS ── */
 function renderSubjectBars() {
-  document.getElementById('subject-bars').innerHTML = subjects.map(s => `
+  var el = document.getElementById('subject-bars');
+  if (!el) return;
+  if (!subjects || !subjects.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--g4);font-size:13px">No assessment data yet. Subject pass rates will appear after learners complete assessments.</div>';
+    return;
+  }
+  el.innerHTML = subjects.map(s => `
     <div class="subject-bar" style="margin-bottom:12px">
       <div class="subject-bar-label">${s.name}</div>
       <div class="subject-bar-track"><div class="subject-bar-fill" style="width:${s.pct}%"></div></div>
@@ -1800,34 +1807,47 @@ function drawLine(canvasId, labels, data, color) {
   });
 }
 
+function showEmptyChart(canvasId, msg) {
+  var c = document.getElementById(canvasId);
+  if (!c) return;
+  var p = c.parentElement;
+  c.style.display = 'none';
+  if (!p.querySelector('.chart-empty-msg')) {
+    var em = document.createElement('div');
+    em.className = 'chart-empty-msg';
+    em.style.cssText = 'padding:32px 16px;text-align:center;font-size:12px;color:var(--g4)';
+    em.textContent = msg || 'No data yet';
+    p.appendChild(em);
+  }
+}
 function drawCharts() {
+  // Show empty state — charts will be populated from API data
   setTimeout(() => {
-    drawLine('chart-signups',
-      ['May 21','May 22','May 23','May 24','May 25','May 26','May 27','May 28'],
-      [24, 31, 28, 42, 38, 55, 49, 61],
-      '#0D9488');
-    drawLine('chart-revenue',
-      ['May 21','May 22','May 23','May 24','May 25','May 26','May 27','May 28'],
-      [820, 1040, 960, 1380, 1260, 1740, 1520, 1820],
-      '#6366F1');
+    showEmptyChart('chart-signups', 'Signup data will appear as users join');
+    showEmptyChart('chart-revenue', 'Revenue data will appear as sessions are paid');
   }, 50);
 }
 
 function drawAssessChart() {
-  drawLine('chart-assess',
-    ['Dec','Jan','Feb','Mar','Apr','May'],
-    [62, 65, 67, 69, 70, 71],
-    '#0D9488');
+  showEmptyChart('chart-assess', 'Assessment trend data will appear after learners complete assessments');
+}
+
+function populateCharts(signupLabels, signupData, revenueLabels, revenueData) {
+  var sc = document.getElementById('chart-signups');
+  var rc = document.getElementById('chart-revenue');
+  if (sc) { sc.style.display = 'block'; var em = sc.parentElement.querySelector('.chart-empty-msg'); if(em)em.remove(); drawLine('chart-signups', signupLabels, signupData, '#0D9488'); }
+  if (rc) { rc.style.display = 'block'; var em2 = rc.parentElement.querySelector('.chart-empty-msg'); if(em2)em2.remove(); drawLine('chart-revenue', revenueLabels, revenueData, '#6366F1'); }
 }
 
 /* ── INIT ── */
 async function initApp() {
-  drawCharts();   // draw with demo data immediately; refresh below
+  drawCharts();   // show empty state; charts populated after API loads
   // Load all live data in parallel
   try {
-    const [usersRes, kytRes, sessionsRes, ringsRes, reportsRes, payoutsRes, txRes, stats, assessStats, revenueStats] =
+    const [usersRes, tutorsRes, kytRes, sessionsRes, ringsRes, reportsRes, payoutsRes, txRes, stats, assessStats, revenueStats] =
       await Promise.allSettled([
         API.Users.list('?role=learner'),
+        API.Users.list('?role=tutor'),
         API.KYT.list('pending'),
         API.Sessions.list(),
         API.Rings.list(),
@@ -1857,31 +1877,33 @@ async function initApp() {
       if (kct) kct.textContent = (s.kyt_pending || 0) + ' applications awaiting review';
     }
 
-    // Users tables
+    // Users tables — learners from usersRes, tutors from tutorsRes (separate API calls)
     if (usersRes.status === 'fulfilled') {
       const all = usersRes.value.results || usersRes.value;
-      const lrn = all.filter(u => ['learner','both'].includes(u.role));
-      const ttr = all.filter(u => ['tutor','both'].includes(u.role));
-      renderLearners(lrn.map(u => ({
+      renderLearners(all.map(u => ({
         id: u.id,
-        name: u.full_name,
+        name: u.full_name || u.email,
         email: u.email,
         joined: new Date(u.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
         sessions: u.learner_profile?.total_sessions || 0,
-        last: 'N/A',
+        last: u.last_login ? new Date(u.last_login).toLocaleDateString() : 'Never',
         status: u.is_suspended ? 'Suspended' : 'Active',
       })));
-      renderTutors(ttr.map(u => ({
+    }
+    if (tutorsRes.status === 'fulfilled') {
+      const all = tutorsRes.value.results || tutorsRes.value;
+      window.tutors = all.map(u => ({
         id: u.id,
-        name: u.full_name,
+        name: u.full_name || u.email,
         email: u.email,
         joined: new Date(u.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
-        kyt: 'Verified',
+        kyt: u.tutor_profile?.is_verified ? 'Verified' : 'Pending',
         sessions: u.tutor_profile?.total_sessions || 0,
         rating: u.tutor_profile?.rating || '-',
-        passRate: u.tutor_profile?.pass_rate || '-',
+        passRate: u.tutor_profile?.pass_rate != null ? u.tutor_profile.pass_rate : '-',
         status: u.is_suspended ? 'Suspended' : 'Active',
-      })));
+      }));
+      renderTutors(window.tutors);
     }
 
     // KYT queue
@@ -2041,19 +2063,22 @@ async function initApp() {
     }
 
   } catch(e) {
-    console.warn('Backend not reachable — running in demo mode.', e.message);
-    // Fall back to in-memory demo data already rendered by fallback below
+    console.warn('Backend not reachable:', e.message);
   }
 
-  // Always render demo data as fallback if tbody is still empty
-  if (!document.getElementById('learners-tbody').innerHTML) {
-    renderLearners(learners);
-    renderTutors(tutors);
-  }
+  // Render empty states for any tables not yet populated
+  if (!document.getElementById('learners-tbody').innerHTML) renderLearners([]);
+  if (!document.getElementById('tutors-tbody').innerHTML) renderTutors([]);
   if (!document.getElementById('kyt-grid').innerHTML) renderKYT();
-  if (!document.getElementById('sessions-tbody').innerHTML) renderSessions();
-  if (!document.getElementById('payouts-tbody').innerHTML) renderPayouts();
-  if (!document.getElementById('transactions-tbody').innerHTML) renderTransactions();
+  if (!document.getElementById('sessions-tbody').innerHTML) {
+    document.getElementById('sessions-tbody').innerHTML = '<tr><td colspan="9"><div class="empty"><h4>No sessions yet</h4><p>Sessions will appear here once learners start booking.</p></div></td></tr>';
+  }
+  if (!document.getElementById('payouts-tbody').innerHTML) {
+    document.getElementById('payouts-tbody').innerHTML = '<tr><td colspan="7"><div class="empty"><h4>No pending payouts</h4><p>Payout requests from tutors will appear here.</p></div></td></tr>';
+  }
+  if (!document.getElementById('transactions-tbody').innerHTML) {
+    document.getElementById('transactions-tbody').innerHTML = '<tr><td colspan="6"><div class="empty"><h4>No transactions yet</h4><p>Payment transactions will appear here.</p></div></td></tr>';
+  }
   if (!document.getElementById('rings-grid').innerHTML) renderRings();
   if (!document.getElementById('reports-list').innerHTML) renderReports('all');
 }
