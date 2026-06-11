@@ -1688,10 +1688,6 @@ function renderPayouts() {
     </tr>`).join('');
 }
 
-function approveAllPayouts() {
-  toast('All pending payouts approved and queued for processing.', 'var(--ok)');
-}
-
 function renderTransactions() {
   document.getElementById('transactions-tbody').innerHTML = transactionsData.map(t => `
     <tr>
@@ -2255,7 +2251,7 @@ function renderCMSMedia() {
     var isVideo = m.url && (m.url.includes('youtube') || m.url.includes('youtu.be') || m.url.includes('.mp4'));
     var preview = isVideo
       ? '<div style="height:80px;background:var(--g1);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--g5);font-size:11px">▶ Video</div>'
-      : '<img src="' + m.url + '" style="width:100%;height:80px;object-fit:cover;border-radius:6px" onerror="this.style.display='none'">';
+      : '<img src="' + m.url + '" style="width:100%;height:80px;object-fit:cover;border-radius:6px" onerror="this.style.display=\'none\'">';
     return '<div style="position:relative">' + preview
       + '<div style="font-size:11px;color:var(--g6);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (m.caption||m.url) + '</div>'
       + '<button onclick="removeCMSMedia(' + i + ')" style="position:absolute;top:2px;right:2px;background:var(--err);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:11px;cursor:pointer">×</button>'
@@ -2318,3 +2314,4 @@ async function saveCMSContent() {
 </script>
 </body>
 </html>
+                                                                                                                 
