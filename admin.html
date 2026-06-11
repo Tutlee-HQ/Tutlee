@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tutlee Admin</title>
-<script src="/api.js"></script>
+<script src="api.js" onerror="var s=document.createElement('script');s.src='https://tutlee-backend.onrender.com/api.js';document.head.appendChild(s);"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -2309,12 +2309,4 @@ async function saveCMSContent() {
     if (status) { status.style.opacity = '1'; setTimeout(function(){ status.style.opacity = '0'; }, 3000); }
     toast('Homepage updated and published ✓', 'var(--ok)');
   } catch(e) {
-    toast('Could not save — check backend connection', 'var(--err)');
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Save & Publish'; }
-  }
-}
-
-</script>
-</body>
-</html>
+    toast('Could not save — check backend connection', 'var(--e

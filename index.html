@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tutlee</title>
 <script>window.TUTLEE_API_BASE ='https://tutlee-backend.onrender.com';</script>
-<script src="/api.js" onerror="
+<script src="api.js" onerror="
   var s=document.createElement('script');
   s.src='/static/js/api.js';
-  s.onerror=function(){console.error('api.js failed to load from all locations');};
+  s.onerror=function(){s.src='https://tutlee-backend.onrender.com/api.js';s.onerror=function(){console.error('api.js failed to load');};document.head.appendChild(s);};
   document.head.appendChild(s);
 "></script>
 <style>
@@ -2154,7 +2154,7 @@ function launchApp(name,role){
       goTo('verification'); // Always start tutors on KYT page
       if (!tourDone) { setTimeout(function(){ startTour(role); }, 600); }
       setTimeout(loadNotifications, 1000);
-      setTimeout(function(){ loadTutorData(); loadUserDashboard(user); }, 800);
+      setTimeout(function(){ loadTutorData(); var u=API.Auth.currentUser();if(u)loadUserDashboard(u); }, 800);
     });
   } else {
     requestAnimationFrame(function(){
@@ -2532,16 +2532,7 @@ function sgWbClr(c){S.sgWbColor=c;}
 function clearSGWB(){var c=document.getElementById('sg-wb');if(c){var ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);}}
 
 // ═══ AI SUMMARY ═══
-function loadSummary(){
-  var ld=document.getElementById('sum-loading'),done=document.getElementById('sum-done');
-  if(ld)ld.classList.remove('hidden');if(done)done.classList.add('hidden');
-  setTimeout(function(){
-    if(ld)ld.classList.add('hidden');if(done)done.classList.remove('hidden');
-    var t=document.getElementById('sum-text');if(t)t.textContent='Today\'s session covered SN1 and SN2 nucleophilic substitution mechanisms. Kwame focused on the key differences in stereochemistry — SN2 gives inversion of configuration (Walden inversion) while SN1 gives a racemic mixture. Four problems were solved on the whiteboard.';
-    var cw=document.getElementById('sum-concepts');
-    if(cw)cw.innerHTML=['SN1 mechanism','SN2 mechanism','Walden inversion','Stereochemistry','Racemic mixture','Carbocation stability'].map(function(c){return'<span class="tag tt">'+c+'</span>';}).join('');
-  },2000);
-}
+// loadSummary defined below
 
 // ═══ CHARTS (line graphs) ═══
 function initCharts(){
@@ -3213,40 +3204,7 @@ function endTour(){
   try{sessionStorage.setItem('tutlee_tour_done','1');}catch(e){}
 }
 
-// ═══ WHITEBOARD ═══
-function initWB(){
-  var c=document.getElementById('wb');if(!c)return;
-  var ctx=c.getContext('2d');var drawing=false;var lastX=0,lastY=0;
-  c.width=c.offsetWidth;c.height=c.offsetHeight;
-  function pos(e){var r=c.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return[src.clientX-r.left,src.clientY-r.top];}
-  c.onmousedown=c.ontouchstart=function(e){drawing=true;var p=pos(e);lastX=p[0];lastY=p[1];e.preventDefault();};
-  c.onmousemove=c.ontouchmove=function(e){if(!drawing)return;var p=pos(e);ctx.beginPath();ctx.strokeStyle=S.wbColor;ctx.lineWidth=2.5;ctx.lineCap='round';ctx.moveTo(lastX,lastY);ctx.lineTo(p[0],p[1]);ctx.stroke();lastX=p[0];lastY=p[1];e.preventDefault();};
-  c.onmouseup=c.ontouchend=function(){drawing=false;};
-}
-function setWBColor(color){S.wbColor=color;}
-function clearWB(){var c=document.getElementById('wb');if(c){var ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);}}
-function initSGWB(){
-  var c=document.getElementById('sg-wb');if(!c)return;
-  var ctx=c.getContext('2d');var drawing=false;var lastX=0,lastY=0;
-  c.width=c.offsetWidth;c.height=c.offsetHeight;
-  function pos(e){var r=c.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return[src.clientX-r.left,src.clientY-r.top];}
-  c.onmousedown=c.ontouchstart=function(e){drawing=true;var p=pos(e);lastX=p[0];lastY=p[1];e.preventDefault();};
-  c.onmousemove=c.ontouchmove=function(e){if(!drawing)return;var p=pos(e);ctx.beginPath();ctx.strokeStyle=S.sgWbColor;ctx.lineWidth=2.5;ctx.lineCap='round';ctx.moveTo(lastX,lastY);ctx.lineTo(p[0],p[1]);ctx.stroke();lastX=p[0];lastY=p[1];e.preventDefault();};
-  c.onmouseup=c.ontouchend=function(){drawing=false;};
-}
-
-// ═══ SESSION TIMER ═══
-function startTimer(){
-  if(S.timerInt)clearInterval(S.timerInt);
-  var start=Date.now();
-  S.timerInt=setInterval(function(){
-    var el=document.getElementById('session-timer');
-    if(!el){clearInterval(S.timerInt);return;}
-    var s=Math.floor((Date.now()-start)/1000);
-    var m=Math.floor(s/60);s=s%60;
-    el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
-  },1000);
-}
+// (initWB, clearWB, initSGWB, startTimer defined above — duplicates removed)
 
 // ═══ WEBRTC — SESSION ROOM ═══
 var rtcPeer=null,rtcStream=null,rtcWS=null,micOn=true,camOn=true,screenSharing=false;
@@ -3589,7 +3547,8 @@ async function createRing(){
   try{
     var user=API.Auth.restoreSession();
     if(user){
-      launchApp(user);
+      var _name=(user.full_name||(user.first_name||'')+' '+(user.last_name||'')).trim()||'User';
+      launchApp(_name,user.role);
       var lastScreen=sessionStorage.getItem('_t_screen');
       if(lastScreen){
         var safeScreens=['dashboard','ai-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
@@ -3628,3 +3587,4 @@ async function createRing(){
   }catch(e){}
 })();
 </script></body></html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
