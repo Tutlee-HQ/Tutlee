@@ -2309,4 +2309,12 @@ async function saveCMSContent() {
     if (status) { status.style.opacity = '1'; setTimeout(function(){ status.style.opacity = '0'; }, 3000); }
     toast('Homepage updated and published ✓', 'var(--ok)');
   } catch(e) {
-    toast('Could not save — check backend connection', 'var(--e
+    toast('Could not save — check backend connection', 'var(--err)');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save & Publish'; }
+  }
+}
+
+</script>
+</body>
+</html>
