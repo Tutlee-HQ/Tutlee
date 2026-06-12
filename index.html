@@ -1981,7 +1981,7 @@ function _ensureServer(onTick){
         var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
         var tid=ctrl?setTimeout(function(){ctrl.abort();},10000):null;
         fetch('https://tutlee-backend.onrender.com/api/health/',
-          {method:'GET',signal:ctrl?ctrl.signal:undefined})
+          {method:'GET',headers:{'Content-Type':'application/json'},signal:ctrl?ctrl.signal:undefined})
           .then(function(){
             if(tid)clearTimeout(tid);
             _srv.ready=true;
@@ -2100,6 +2100,8 @@ async function obCreate(){
     btn.textContent='Starting up… ('+elapsed+'s)';
   });
 
+  // Brief settle after health check — Gunicorn may need a moment to fully init
+  await new Promise(function(r){setTimeout(r,1500);});
   btn.textContent='Creating account…';
   var payload={
     email:email,
@@ -2166,10 +2168,23 @@ async function obCreate(){
       // Request was sent — account was likely created. Show OTP screen.
       _showOTP(null);
     }else if(isNetwork){
-      // True network failure (couldn't reach server) — reset and let user retry
+      // Health check passed but register still failed — server not fully ready
+      // Reset and re-ping with a confirmed CORS preflight, then retry once
       _srv.ready=false;_srv.promise=null;
-      _showErr('Could not reach the server. Please try again in a moment.');
-      _resetBtn();
+      btn.textContent='Reconnecting…';
+      await _ensureServer(function(el){btn.textContent='Reconnecting… ('+el+'s)';});
+      await new Promise(function(r){setTimeout(r,2000);});
+      btn.textContent='Creating account…';
+      // Retry — backend is idempotent so no double-account risk
+      try{
+        var dr=await API.Auth.register(payload);
+        S._pendingUser=dr.user;_showOTP(dr.dev_otp_code||null);
+      }catch(er){
+        if(_isExists(er)){
+          try{var dr2=await API.Auth.register(payload);S._pendingUser=dr2.user;_showOTP(dr2.dev_otp_code||null);}
+          catch(er2){_showErr('This email is registered. Please sign in.');_resetBtn();}
+        }else{_showErr(er.message||'Registration failed. Please try again.');_resetBtn();}
+      }
     }else if(_isExists(e)){
       // Unverified account — re-register resends OTP (backend is idempotent)
       try{
