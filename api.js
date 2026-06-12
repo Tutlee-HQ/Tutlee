@@ -142,6 +142,20 @@ const TutleeAPI = (() => {
       _user = await get('/api/accounts/me/');
       return _user;
     },
+
+    async verifyOTP(email, code) {
+      const data = await post('/api/accounts/otp/verify/', { email, code }, { noAuth: true });
+      _access  = data.access;
+      _refresh = data.refresh;
+      _user    = data.user;
+      if (_onAuthChange) _onAuthChange(_user);
+      try { sessionStorage.setItem('_t_a', data.access); sessionStorage.setItem('_t_r', data.refresh); sessionStorage.setItem('_t_u', JSON.stringify(data.user)); } catch(e){}
+      return data;
+    },
+
+    async sendOTP(email) {
+      return post('/api/accounts/otp/send/', { email }, { noAuth: true });
+    },
   };
 
   // ── USERS ────────────────────────────────────────────────────────────────────
@@ -223,21 +237,4 @@ const TutleeAPI = (() => {
     payouts:        (status='')=> get(`/api/payments/payouts/${status ? '?status='+status : ''}`),
     approvePayout:  (id)     => post(`/api/payments/payouts/${id}/approve/`),
     declinePayout:  (id)     => post(`/api/payments/payouts/${id}/decline/`),
-    revenueStats:   ()       => get('/api/payments/stats/'),
-  };
-
-  // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
-  async function ping() {
-    try {
-      const r = await fetch(`${BASE}/api/accounts/me/`, { method: 'GET' });
-      return r.status !== 0;
-    } catch { return false; }
-  }
-
-  // Public surface
-  return { Auth, Users, Sessions, Assessments, KYT, Rings, Reports, Payments, ping, APIError };
-
-})();
-
-// Global shorthand
-window.API = TutleeAPI;
+    revenueStats:   ()       => get('/api/paym

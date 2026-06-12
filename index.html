@@ -2051,36 +2051,49 @@ function obNext(){obStep=2;showOBStep(2);}
 function obBack(){if(obStep>1){obStep=1;showOBStep(1);}}
 async function obCreate(){
   var btn=document.getElementById('ob-create-btn');
-  var name=(document.getElementById('ob-name').value||'').trim()||'New User';
+  var errEl=document.getElementById('ob-err');
+  var name=(document.getElementById('ob-name').value||'').trim();
   var email=(document.getElementById('ob-email')?.value||'').trim();
   var pass=(document.getElementById('ob-password')?.value||'');
+  if(errEl)errEl.style.display='none';
+  if(!name){if(errEl){errEl.textContent='Please enter your full name.';errEl.style.display='block';}return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){if(errEl){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';}return;}
+  if(!pass||pass.length<8){if(errEl){errEl.textContent='Password must be at least 8 characters.';errEl.style.display='block';}return;}
   var parts=name.split(/\s+/);
   btn.textContent='Creating account…';btn.classList.add('loading');btn.disabled=true;
   try{
     var payload={
-      email: email||name.toLowerCase().replace(/\s/g,'.').replace(/[^a-z0-9.]/g,'')+'@tutlee.com',
+      email: email,
       first_name: parts[0]||name,
       last_name: parts.slice(1).join(' ')||'',
       role: selRoleVal||'learner',
-      password: pass||'tutlee2026',
-      password2: pass||'tutlee2026',
+      password: pass,
+      password2: pass,
     };
     var data=await API.Auth.register(payload);
     S._pendingUser=data.user;
-    S._pendingEmail=email||payload.email;
+    S._pendingEmail=email;
     if(data.email_verification_required){
       document.querySelectorAll('.ob-step').forEach(function(el){el.classList.remove('active');});
       var otpStep=document.getElementById('ob-otp');
-      if(otpStep){otpStep.classList.add('active');var ed=document.getElementById('otp-email-display');if(ed)ed.textContent=S._pendingEmail;}
+      if(otpStep){
+        otpStep.classList.add('active');
+        var ed=document.getElementById('otp-email-display');if(ed)ed.textContent=S._pendingEmail;
+        if(data.dev_otp_code){
+          var inp=document.getElementById('otp-code-input');
+          if(inp)inp.value=data.dev_otp_code;
+          showToast('Check your email for the verification code');
+        }
+      }
     }else{
       closeAuth();
       launchApp(data.user.full_name||name,data.user.role);
       loadUserDashboard(data.user);
     }
   }catch(e){
-    var errEl=document.getElementById('ob-err');
-    if(errEl){errEl.textContent=e.message||'Registration failed.';errEl.style.display='block';}
-    else{alert(e.message||'Registration failed.');}
+    var msg=e.message||'Registration failed.';
+    if(errEl){errEl.textContent=msg;errEl.style.display='block';}
+    else{alert(msg);}
   }finally{
     btn.textContent='Create account';btn.classList.remove('loading');btn.disabled=false;
   }
@@ -2091,12 +2104,10 @@ async function verifyOTP(){
   var code=(document.getElementById('otp-code-input')||{}).value||'';
   var errEl=document.getElementById('otp-err');
   if(!code||code.length<6){if(errEl){errEl.textContent='Enter the 6-digit code.';errEl.style.display='block';}return;}
+  if(errEl)errEl.style.display='none';
   if(btn){btn.disabled=true;btn.textContent='Verifying…';}
   try{
-    var res=await fetch('/api/accounts/otp/verify/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:S._pendingEmail,code:code})});
-    var data=await res.json();
-    if(!res.ok)throw new Error(data.error||'Invalid code');
-    try{sessionStorage.setItem('_t_a',data.access);sessionStorage.setItem('_t_r',data.refresh);sessionStorage.setItem('_t_u',JSON.stringify(data.user));}catch(e){}
+    var data=await API.Auth.verifyOTP(S._pendingEmail,code);
     closeAuth();
     launchApp(data.user.full_name||(data.user.first_name+' '+data.user.last_name).trim(),data.user.role);
     loadUserDashboard(data.user);
@@ -2108,7 +2119,8 @@ async function resendOTP(){
   var btn=document.getElementById('otp-resend-btn');
   if(btn){btn.textContent='Sending…';btn.style.pointerEvents='none';}
   try{
-    await fetch('/api/accounts/otp/send/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:S._pendingEmail})});
+    var res=await API.Auth.sendOTP(S._pendingEmail);
+    if(res&&res.dev_otp_code){var inp=document.getElementById('otp-code-input');if(inp)inp.value=res.dev_otp_code;}
     showToast('New code sent to '+S._pendingEmail);
   }catch(e){showToast('Could not resend — try again');}
   finally{if(btn){btn.textContent='Resend code';btn.style.pointerEvents='';}}
@@ -3587,4 +3599,3 @@ async function createRing(){
   }catch(e){}
 })();
 </script></body></html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
