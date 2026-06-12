@@ -11,6 +11,40 @@
   s.onerror=function(){s.src='https://tutlee-backend.onrender.com/api.js?v=20260612';s.onerror=function(){console.error('api.js failed to load');};document.head.appendChild(s);};
   document.head.appendChild(s);
 "></script>
+<script>
+// Ensure API.Auth has verifyOTP/sendOTP/getToken regardless of which api.js version loads
+(function patchAPI(){
+  function tryPatch(){
+    if(!window.API||!window.API.Auth){setTimeout(tryPatch,50);return;}
+    var A=window.API.Auth;
+    var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
+    function apiPost(path,body,noAuth){
+      var headers={'Content-Type':'application/json'};
+      return fetch(BASE+path,{method:'POST',headers:headers,body:JSON.stringify(body)})
+        .then(function(r){return r.json().then(function(d){if(!r.ok)throw Object.assign(new Error(d.detail||d.error||'Error'),d);return d;});});
+    }
+    if(typeof A.getToken!=='function'){
+      A.getToken=function(){return A._accessToken||null;};
+    }
+    if(typeof A.verifyOTP!=='function'){
+      A.verifyOTP=function(email,code){
+        return apiPost('/api/accounts/otp/verify/',{email:email,code:code}).then(function(data){
+          if(data.access){
+            try{sessionStorage.setItem('_t_a',data.access);if(data.refresh)sessionStorage.setItem('_t_r',data.refresh);if(data.user)sessionStorage.setItem('_t_u',JSON.stringify(data.user));}catch(e){}
+          }
+          return data;
+        });
+      };
+    }
+    if(typeof A.sendOTP!=='function'){
+      A.sendOTP=function(email){
+        return apiPost('/api/accounts/otp/send/',{email:email});
+      };
+    }
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',tryPatch);}else{tryPatch();}
+})();
+</script>
 <style>
 :root{
   --t9:#053D38;--t8:#0A6B62;--t7:#0E8F84;--t6:#13B5A7;--t5:#17CFBF;--t4:#45D9CB;--t2:#B0F0EA;--t1:#D8F8F5;--t0:#F0FDFB;
