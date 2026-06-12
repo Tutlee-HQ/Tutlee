@@ -126,12 +126,20 @@ SIMPLE_JWT = {
 # ── CORS ──
 CORS_ALLOW_ALL_ORIGINS = True          # dev only — restric
 # ── EMAIL ──
-# Auto-switches to SMTP when credentials are set via environment variables.
-# On Render: set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD to enable real email.
-# Without credentials the system falls back to console backend and returns
-# dev_otp_code in the register API response so the UI can auto-fill it.
+# Auto-switches to SMTP when EMAIL_HOST_USER + EMAIL_HOST_PASSWORD env vars are set.
+# On Render: add those two vars in the Environment tab to enable real email sending.
+# Without them the backend logs OTP to console and returns dev_otp_code in the
+# register API response so the frontend can auto-fill the field during testing.
 import os as _os
 EMAIL_HOST          = _os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT          = int(_os.environ.get('EMAIL_PORT', 587))
+EMAIL_PORT          = int(_os.environ.get('EMAIL_PORT', '587'))
 EMAIL_USE_TLS       = _os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_
+EMAIL_HOST_USER     = _os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = _os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL  = _os.environ.get('DEFAULT_FROM_EMAIL', 'Tutlee <noreply@tutlee.com>')
+
+# Use real SMTP when credentials are present, console otherwise
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = _os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+else:
+    EMAIL_BACKEND = _os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
