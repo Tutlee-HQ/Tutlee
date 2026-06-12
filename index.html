@@ -2146,36 +2146,27 @@ async function obCreate(){
     return s.includes('already exist');
   }
 
-  async function _doRegister(isRetry){
-    try{
-      var data=await API.Auth.register(payload);
-      S._pendingUser=data.user;
-      _showOTP(data.dev_otp_code||null);
-    }catch(e){
-      var isNetwork=(e instanceof TypeError)||(e.message||'').toLowerCase().includes('failed to fetch')||(e.message||'').toLowerCase().includes('network');
-      if(isNetwork&&!isRetry){
-        // Server not ready — reset and wait for a confirmed ping then retry once
-        _srv.ready=false;_srv.promise=null;
-        btn.textContent='Retrying…';
-        await _ensureServer(function(elapsed){btn.textContent='Waking server… ('+elapsed+'s)';});
-        btn.textContent='Creating account…';
-        return _doRegister(true);
-      }
-      if(_isExists(e)){
-        try{
-          var r=await API.Auth.sendOTP(email);
-          _showOTP(r&&r.dev_otp_code);
-        }catch(e2){
-          _showErr('An account with this email already exists. Please sign in instead.');
-          _resetBtn();
-        }
-      }else{
-        _showErr(e.message||'Registration failed. Please try again.');
+  try{
+    var data=await API.Auth.register(payload);
+    S._pendingUser=data.user;
+    _showOTP(data.dev_otp_code||null);
+  }catch(e){
+    if(_isExists(e)){
+      // Account exists (unverified) — backend will resend OTP on re-register
+      // Try re-registering which now returns OTP for unverified accounts
+      try{
+        var data2=await API.Auth.register(payload);
+        S._pendingUser=data2.user;
+        _showOTP(data2.dev_otp_code||null);
+      }catch(e2){
+        _showErr('An account with this email already exists. Please sign in instead.');
         _resetBtn();
       }
+    }else{
+      _showErr(e.message||'Registration failed. Please try again.');
+      _resetBtn();
     }
   }
-  _doRegister(false);
 }
 
 async function verifyOTP(){

@@ -31,9 +31,24 @@ class RegisterView(generics.CreateAPIView):
     serializer_class   = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
-        s = self.get_serializer(data=request.data)
-        s.is_valid(raise_exception=True)
-        user = s.save()
+        import sys
+        email = (request.data.get('email') or '').strip().lower()
+        # Idempotent: if account exists but not yet verified, just resend OTP
+        existing = None
+        try:
+            existing = User.objects.get(email=email)
+        except User.DoesNotExist:
+            pass
+        if existing is not None:
+            if not existing.is_active:
+                user = existing  # resend OTP below
+            else:
+                from rest_framework.exceptions import ValidationError
+                raise ValidationError({'email': ['An account with this email already exists.']})
+        else:
+            s = self.get_serializer(data=request.data)
+            s.is_valid(raise_exception=True)
+            user = s.save()
         # Generate and send OTP for email verification
         dev_otp_code = None
         try:
