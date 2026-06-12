@@ -157,6 +157,11 @@ const TutleeAPI = (() => {
     async sendOTP(email) {
       return post('/api/accounts/otp/send/', { email }, { noAuth: true });
     },
+
+    async refreshMe() {
+      _user = await get('/api/accounts/me/');
+      return _user;
+    },
   };
 
   // ── USERS ────────────────────────────────────────────────────────────────────
@@ -238,4 +243,27 @@ const TutleeAPI = (() => {
     payouts:        (status='')=> get(`/api/payments/payouts/${status ? '?status='+status : ''}`),
     approvePayout:  (id)     => post(`/api/payments/payouts/${id}/approve/`),
     declinePayout:  (id)     => post(`/api/payments/payouts/${id}/decline/`),
-    revenueStats:   ()       => get('/api/paym
+    revenueStats:   () => get('/api/payments/revenue-stats/'),
+  };
+
+  // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
+  async function ping() {
+    try {
+      const r = await fetch(`${BASE}/api/accounts/me/`, { method: 'GET' });
+      return r.status !== 0;
+    } catch { return false; }
+  }
+
+  // ── CONTENT (CMS) ────────────────────────────────────────────────────────────
+  const Content = {
+    get:    () => get('/api/accounts/site-content/'),
+    update: (data) => patch('/api/accounts/site-content/', data),
+  };
+
+  // Public surface
+  return { Auth, Users, Sessions, Assessments, KYT, Rings, Reports, Payments, Content, ping, APIError };
+
+})();
+
+// Global shorthand
+window.API = TutleeAPI;
