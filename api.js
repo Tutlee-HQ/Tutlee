@@ -136,6 +136,7 @@ const TutleeAPI = (() => {
     currentUser() { return _user; },
     isLoggedIn()  { return !!_access; },
     isAdmin()     { return _user?.role === 'admin' || _user?.is_staff; },
+    getToken()    { return _access; },
 
     onAuthChange(cb) { _onAuthChange = cb; },
 

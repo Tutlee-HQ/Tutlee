@@ -2193,7 +2193,7 @@ var cmsData = {
 
 async function loadCMSContent() {
   try {
-    var res = await fetch('/api/content/homepage/', {
+    var res = await fetch('https://tutlee-backend.onrender.com/api/accounts/site-content/', {
       headers: { 'Authorization': 'Bearer ' + (API.Auth.getToken ? API.Auth.getToken() : '') }
     });
     if (res.ok) {
@@ -2296,7 +2296,7 @@ async function saveCMSContent() {
   if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
   try {
     var token = API.Auth.getToken ? API.Auth.getToken() : '';
-    var res = await fetch('/api/content/homepage/', {
+    var res = await fetch('https://tutlee-backend.onrender.com/api/accounts/site-content/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ key: 'homepage', content: JSON.stringify(cmsData) })
@@ -2314,4 +2314,3 @@ async function saveCMSContent() {
 </script>
 </body>
 </html>
-                                                                                                                 

@@ -40,6 +40,8 @@ class TutorProfile(models.Model):
     balance       = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_featured   = models.BooleanField(default=False)
     specialities  = models.JSONField(default=list)   # weak areas the tutor is strong in
+    is_available  = models.BooleanField(default=True)   # visible to learners
+    availability  = models.JSONField(default=dict)      # {weekdays:{start,end}, weekends:{start,end}}
 
     def __str__(self):
         return f'TutorProfile({self.user.full_name})'

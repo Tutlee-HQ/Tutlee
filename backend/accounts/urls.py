@@ -21,5 +21,6 @@ urlpatterns = [
     path('stats/',             admin_stats,                     name='admin-stats'),
     path('otp/send/',          SendOTPView.as_view(),         name='otp-send'),
     path('otp/verify/',        VerifyOTPView.as_view(),       name='otp-verify'),
+    path('site-content/',       SiteContentView.as_view(),     name='site-content'),
 ]
 

@@ -3653,7 +3653,7 @@ async function createRing(){
 // ─── CMS: load homepage content from backend ─────────────────────────────────
 (function loadCMSHomepage(){
   try{
-    fetch('https://tutlee-backend.onrender.com/api/content/homepage/')
+    fetch('https://tutlee-backend.onrender.com/api/accounts/site-content/')
       .then(function(r){return r.ok?r.json():null;})
       .then(function(data){
         if(!data||!data.content)return;
