@@ -32,6 +32,29 @@ class RegisterView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         import sys
+        # ── warm DB connection on THIS worker before any ORM call ──────────
+        try:
+            from django.db import connection as _dbc
+            with _dbc.cursor() as _cur:
+                _cur.execute('SELECT 1')
+        except Exception as _db_w_err:
+            print(f'[REGISTER] DB warmup err: {_db_w_err}', file=sys.stderr, flush=True)
+
+        try:
+            return self._do_register(request, *args, **kwargs)
+        except Exception as _top_err:
+            import traceback
+            print(f'[REGISTER] top-level crash: {_top_err}', file=sys.stderr, flush=True)
+            traceback.print_exc(file=sys.stderr)
+            # Always return JSON — never let the worker drop the connection
+            from rest_framework.response import Response as _Rsp
+            from rest_framework import status as _st
+            _r = _Rsp({'detail': str(_top_err)}, status=_st.HTTP_500_INTERNAL_SERVER_ERROR)
+            _r['Access-Control-Allow-Origin'] = '*'
+            return _r
+
+    def _do_register(self, request, *args, **kwargs):
+        import sys
         email = (request.data.get('email') or '').strip().lower()
         print(f'[REGISTER] attempt for {email}', file=sys.stderr, flush=True)
         # Idempotent: if account exists but not yet verified, just resend OTP

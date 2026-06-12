@@ -4,7 +4,7 @@ services:
     runtime: python
     rootDir: backend
     buildCommand: "./build.sh"
-    startCommand: "gunicorn tutlee.wsgi --log-file -"
+    startCommand: "gunicorn tutlee.wsgi --workers=1 --timeout=120 --log-file -"
     envVars:
       - key: SECRET_KEY
         generateValue: true
