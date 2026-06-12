@@ -60,8 +60,7 @@ class RegisterView(generics.CreateAPIView):
                 email_sent = True
             except Exception:
                 pass  # email failed — surface code in dev mode below
-            # Return the code in dev/staging so the UI can auto-fill it
-            # (safe: in production set DEBUG=False via Render env var)
+            # Return the code when email could not be sent so the UI can auto-fill it
             if not email_sent or django.conf.settings.DEBUG:
                 dev_otp_code = code
         except Exception:
@@ -260,4 +259,22 @@ class VerifyOTPView(APIView):
 
 
 # ─── SITE CONTENT (CMS) ─────────────────────────────────────────────────────
-class Site
+class SiteContentView(APIView):
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+    def get(self, request, key='homepage'):
+        try:
+            obj = SiteContent.objects.get(key=key)
+            return Response({'key': obj.key, 'content': obj.content, 'updated_at': obj.updated_at})
+        except SiteContent.DoesNotExist:
+            return Response({'key': key, 'content': '{}'})
+
+    def post(self, request, key='homepage'):
+        key = request.data.get('key', key)
+        content = request.data.get('content', '{}')
+        obj, _ = SiteContent.objects.update_or_create(key=key, defaults={'content': content})
+        return Response({'key': obj.key, 'updated_at': obj.updated_at})
+
