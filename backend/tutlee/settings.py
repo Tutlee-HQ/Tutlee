@@ -136,7 +136,9 @@ EMAIL_PORT          = int(_os.environ.get('EMAIL_PORT', '587'))
 EMAIL_USE_TLS       = _os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER     = _os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = _os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL  = _os.environ.get('DEFAULT_FROM_EMAIL', 'Tutlee <noreply@tutlee.com>')
+# Gmail requires FROM to match the authenticated account — fall back to that
+_default_from = f'Tutlee <{EMAIL_HOST_USER}>' if EMAIL_HOST_USER else 'Tutlee <noreply@tutlee.com>'
+DEFAULT_FROM_EMAIL  = _os.environ.get('DEFAULT_FROM_EMAIL', _default_from)
 
 # Use real SMTP when credentials are present, console otherwise
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:

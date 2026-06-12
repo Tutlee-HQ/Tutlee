@@ -58,8 +58,9 @@ class RegisterView(generics.CreateAPIView):
                     fail_silently=False,
                 )
                 email_sent = True
-            except Exception:
-                pass  # email failed — surface code in dev mode below
+            except Exception as _email_err:
+                import sys
+                print(f'[TUTLEE] OTP email failed: {_email_err}', file=sys.stderr)
             # Return the code when email could not be sent so the UI can auto-fill it
             if not email_sent or django.conf.settings.DEBUG:
                 dev_otp_code = code
@@ -224,8 +225,9 @@ class SendOTPView(APIView):
                 fail_silently=False,
             )
         except Exception as e:
-            # Still return code in dev if email fails (console backend)
-            return Response({'detail': 'OTP sent', 'dev_code': str(code) if django_settings.DEBUG else None})
+            import sys
+            print(f'[TUTLEE] SendOTP email failed: {e}', file=sys.stderr)
+            return Response({'detail': 'OTP sent', 'dev_otp_code': str(code)})
         return Response({'detail': 'OTP sent to ' + email})
 
 
