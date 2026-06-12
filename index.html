@@ -2111,12 +2111,31 @@ async function obCreate(){
   function _showErr(msg){if(errEl){errEl.textContent=msg;errEl.style.display='block';}}
   function _showOTP(devCode){
     S._pendingEmail=email;
-    document.querySelectorAll('.ob-step').forEach(function(el){el.classList.remove('active');});
+    // Hide inner steps only — do NOT hide the parent #ap-signup container
+    ['ob-s1','ob-s2'].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.classList.remove('active');
+    });
+    // Keep ap-signup panel visible
+    var signup=document.getElementById('ap-signup');
+    if(signup)signup.classList.add('active');
     var otpEl=document.getElementById('ob-otp');
     if(otpEl){
       otpEl.classList.add('active');
       var ed=document.getElementById('otp-email-display');if(ed)ed.textContent=email;
-      if(devCode){var inp=document.getElementById('otp-code-input');if(inp)inp.value=devCode;}
+      if(devCode){
+        var inp=document.getElementById('otp-code-input');
+        if(inp)inp.value=devCode;
+        // Show a notice so user knows the code was auto-filled (dev/no-SMTP mode)
+        var note=document.getElementById('otp-dev-notice');
+        if(!note){
+          note=document.createElement('p');
+          note.id='otp-dev-notice';
+          note.style.cssText='text-align:center;font-size:12px;color:var(--g5);margin-top:8px;padding:6px 10px;background:var(--g1);border-radius:6px';
+          otpEl.appendChild(note);
+        }
+        note.textContent='Code auto-filled (email delivery not yet configured).';
+        note.style.display='block';
+      }
     }
     if(errEl)errEl.style.display='none';
     showToast('Verification code sent to '+email);
