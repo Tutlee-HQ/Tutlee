@@ -96,7 +96,7 @@ class RegisterView(generics.CreateAPIView):
                 email_sent = True
             except Exception as _email_err:
                 import sys
-                print(f'[TUTLEE] OTP email failed: {_email_err}', file=sys.stderr)
+                print(f'[TUTLEE] OTP email failed ({type(_email_err).__name__}): {_email_err}', file=sys.stderr)
             # Always return the OTP code when email fails so the UI can auto-fill
             if not email_sent:
                 dev_otp_code = code
