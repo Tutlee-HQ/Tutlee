@@ -97,9 +97,11 @@ class RegisterView(generics.CreateAPIView):
             except Exception as _email_err:
                 import sys
                 print(f'[TUTLEE] OTP email failed: {_email_err}', file=sys.stderr)
-            # Return the code when email could not be sent so the UI can auto-fill it
-            if not email_sent or django.conf.settings.DEBUG:
+            # Always return the OTP code when email fails so the UI can auto-fill
+            if not email_sent:
                 dev_otp_code = code
+            elif django.conf.settings.DEBUG:
+                dev_otp_code = code  # also expose in dev for testing
         except Exception:
             pass  # never block registration
         refresh = RefreshToken.for_user(user)

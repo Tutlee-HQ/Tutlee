@@ -155,3 +155,4 @@ if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = _os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 else:
     EMAIL_BACKEND = _os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_TIMEOUT = 10  # never let SMTP hang longer than 10 s — Render kills at 30 s
