@@ -1972,15 +1972,27 @@ canvas.lc{width:100%;display:block}
 var S={role:'learner',isPro:false,curMode:'learner',availOn:true,wbColor:'#1A2130',sgWbColor:'#1A2130',timerInt:null,currentSurveySessionId:null,chartsHaveData:false};
 // Server readiness — ping fires when auth modal opens; submit waits for it
 var _srv={ready:false,promise:null};
-function _ensureServer(){
+function _ensureServer(onTick){
   if(_srv.ready)return Promise.resolve(true);
   if(!_srv.promise){
-    var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
-    var tid=ctrl?setTimeout(function(){ctrl.abort();},40000):null;
-    _srv.promise=fetch('https://tutlee-backend.onrender.com/api/accounts/me/',
-      {method:'GET',signal:ctrl?ctrl.signal:undefined})
-      .then(function(){if(tid)clearTimeout(tid);_srv.ready=true;return true;})
-      .catch(function(){if(tid)clearTimeout(tid);_srv.ready=true;return true;});
+    _srv.promise=new Promise(function(resolve){
+      var start=Date.now();
+      function tryPing(){
+        var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
+        var tid=ctrl?setTimeout(function(){ctrl.abort();},9000):null;
+        fetch('https://tutlee-backend.onrender.com/api/accounts/me/',
+          {method:'GET',signal:ctrl?ctrl.signal:undefined})
+          .then(function(){if(tid)clearTimeout(tid);_srv.ready=true;resolve(true);})
+          .catch(function(){
+            if(tid)clearTimeout(tid);
+            var elapsed=Math.round((Date.now()-start)/1000);
+            if(onTick)onTick(elapsed);
+            if(elapsed<75){setTimeout(tryPing,3000);}
+            else{_srv.ready=true;resolve(true);}
+          });
+      }
+      tryPing();
+    });
   }
   return _srv.promise;
 }
@@ -2081,7 +2093,9 @@ async function obCreate(){
 
   // Wait until the server is confirmed awake before sending registration
   // (avoids timeout → duplicate account problem entirely)
-  await _ensureServer();
+  await _ensureServer(function(elapsed){
+    btn.textContent='Starting up… ('+elapsed+'s)';
+  });
 
   btn.textContent='Creating account…';
   var payload={
