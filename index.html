@@ -1970,6 +1970,20 @@ canvas.lc{width:100%;display:block}
 <script>
 // ═══ STATE ═══
 var S={role:'learner',isPro:false,curMode:'learner',availOn:true,wbColor:'#1A2130',sgWbColor:'#1A2130',timerInt:null,currentSurveySessionId:null,chartsHaveData:false};
+// Server readiness — ping fires when auth modal opens; submit waits for it
+var _srv={ready:false,promise:null};
+function _ensureServer(){
+  if(_srv.ready)return Promise.resolve(true);
+  if(!_srv.promise){
+    var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
+    var tid=ctrl?setTimeout(function(){ctrl.abort();},40000):null;
+    _srv.promise=fetch('https://tutlee-backend.onrender.com/api/accounts/me/',
+      {method:'GET',signal:ctrl?ctrl.signal:undefined})
+      .then(function(){if(tid)clearTimeout(tid);_srv.ready=true;return true;})
+      .catch(function(){if(tid)clearTimeout(tid);_srv.ready=true;return true;});
+  }
+  return _srv.promise;
+}
 var obStep=1, selRoleVal='learner', assessAnswers={};
 var assCorrect=[1,2,1];
 var curSelPlan='m';
@@ -1981,9 +1995,9 @@ var SG_MEMBERS=[];
 // ═══ AUTH ═══
 function openAuth(mode){
   document.getElementById('auth-ov').classList.remove('hidden');
-  // Silently wake the Render backend the moment the modal opens,
-  // so it's warm by the time the user finishes filling the form
-  try{fetch('https://tutlee-backend.onrender.com/api/accounts/me/',{method:'GET'}).catch(function(){});}catch(e){}
+  // Start server wake-up the instant the modal opens — by the time they
+  // finish filling the form the server will be ready
+  _ensureServer().catch(function(){});
   if(mode==='signin'){
     showAuthStep('ap-signin');
   } else {
@@ -2063,7 +2077,13 @@ async function obCreate(){
   if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){if(errEl){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';}return;}
   if(!pass||pass.length<8){if(errEl){errEl.textContent='Password must be at least 8 characters.';errEl.style.display='block';}return;}
   var parts=name.split(/\s+/);
-  btn.textContent='Creating account…';btn.classList.add('loading');btn.disabled=true;
+  btn.textContent='Connecting…';btn.classList.add('loading');btn.disabled=true;
+
+  // Wait until the server is confirmed awake before sending registration
+  // (avoids timeout → duplicate account problem entirely)
+  await _ensureServer();
+
+  btn.textContent='Creating account…';
   var payload={
     email:email,
     first_name:parts[0]||name,
@@ -2075,7 +2095,6 @@ async function obCreate(){
 
   function _resetBtn(){btn.textContent='Create account';btn.classList.remove('loading');btn.disabled=false;}
   function _showErr(msg){if(errEl){errEl.textContent=msg;errEl.style.display='block';}}
-
   function _showOTP(devCode){
     S._pendingEmail=email;
     document.querySelectorAll('.ob-step').forEach(function(el){el.classList.remove('active');});
@@ -2089,22 +2108,9 @@ async function obCreate(){
     showToast('Verification code sent to '+email);
     _resetBtn();
   }
-
-  function _isNetwork(e){return e instanceof TypeError||(e.message||'').includes('fetch');}
   function _isExists(e){
     var s=((e.message||'')+(e.body?JSON.stringify(e.body):'')).toLowerCase();
     return s.includes('already exist');
-  }
-
-  // If email already registered (from a previous timed-out attempt), send a fresh OTP and show the screen
-  async function _recoverExists(){
-    try{
-      var r=await API.Auth.sendOTP(email);
-      _showOTP(r&&r.dev_otp_code);
-    }catch(e2){
-      _showErr('An account with this email already exists. Please sign in instead.');
-      _resetBtn();
-    }
   }
 
   try{
@@ -2113,31 +2119,16 @@ async function obCreate(){
     _showOTP(data.dev_otp_code||null);
   }catch(e){
     if(_isExists(e)){
-      // Account already exists (possibly created by a previous timed-out request)
-      await _recoverExists();
-    }else if(_isNetwork(e)){
-      // Render cold start — show status, wait for server to wake, retry once
-      _showErr('Server is starting up, please wait…');
-      btn.textContent='Connecting…';
-      await new Promise(function(r){setTimeout(r,12000);});
+      // Account already registered — send a fresh OTP and go to verify screen
       try{
-        var data2=await API.Auth.register(payload);
-        S._pendingUser=data2.user;
-        _showOTP(data2.dev_otp_code||null);
+        var r=await API.Auth.sendOTP(email);
+        _showOTP(r&&r.dev_otp_code);
       }catch(e2){
-        if(_isExists(e2)){
-          // First request succeeded but timed out — recover via OTP
-          await _recoverExists();
-        }else if(_isNetwork(e2)){
-          _showErr('Server is still starting. Please wait 30 seconds and try again.');
-          _resetBtn();
-        }else{
-          _showErr(e2.message||'Registration failed.');
-          _resetBtn();
-        }
+        _showErr('An account with this email already exists. Please sign in instead.');
+        _resetBtn();
       }
     }else{
-      _showErr(e.message||'Registration failed.');
+      _showErr(e.message||'Registration failed. Please try again.');
       _resetBtn();
     }
   }
