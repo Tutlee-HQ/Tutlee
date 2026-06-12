@@ -36,6 +36,13 @@ def serve_js_file(filename):
 
 @csrf_exempt
 def health(request):
+    # Also wake the database — Render free tier DB sleeps independently of Gunicorn
+    try:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT 1')
+    except Exception:
+        pass  # best-effort; server is still up even if DB ping fails
     return JsonResponse({'status': 'ok'})
 
 
