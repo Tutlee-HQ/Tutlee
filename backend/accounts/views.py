@@ -33,6 +33,7 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         import sys
         email = (request.data.get('email') or '').strip().lower()
+        print(f'[REGISTER] attempt for {email}', file=sys.stderr, flush=True)
         # Idempotent: if account exists but not yet verified, just resend OTP
         existing = None
         try:

@@ -1981,7 +1981,7 @@ function _ensureServer(onTick){
         var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
         var tid=ctrl?setTimeout(function(){ctrl.abort();},10000):null;
         fetch('https://tutlee-backend.onrender.com/api/health/',
-          {method:'GET',headers:{'Content-Type':'application/json'},signal:ctrl?ctrl.signal:undefined})
+          {method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:ctrl?ctrl.signal:undefined})
           .then(function(){
             if(tid)clearTimeout(tid);
             _srv.ready=true;
@@ -2165,7 +2165,10 @@ async function obCreate(){
       S._pendingUser=data2.user;
       _showOTP(data2.dev_otp_code||null);
     }catch(e2){
-      _showErr(e2.message||'Registration failed. Please try again.');
+      var _em=e2.message||'';
+      var _et=e2.name||'Error';
+      console.error('[REGISTER] final error:', _et, _em, e2);
+      _showErr(_em||'Registration failed. Please try again.');
       _resetBtn();
     }
   }

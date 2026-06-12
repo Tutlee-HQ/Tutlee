@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.views import TokenRefreshView
 from accounts.views import LoginView, SiteContentView
 import os
@@ -33,6 +34,7 @@ def serve_js_file(filename):
     return view
 
 
+@csrf_exempt
 def health(request):
     return JsonResponse({'status': 'ok'})
 
