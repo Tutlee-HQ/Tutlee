@@ -1830,7 +1830,7 @@ canvas.lc{width:100%;display:block}
     <h2 style="font-size:18px;font-weight:800;margin-bottom:4px">Subjects & Rates</h2>
     <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Set your hourly rate per subject</p>
     <div id="rates-subjects-form" style="font-size:13px;color:var(--g5);padding:16px 0">Add subjects via KYT verification to set rates.</div>
-    <button class="btn-full btn-full-p" onclick="alert('Rates saved!');closeModal('rates-modal')">Save rates</button>
+    <button class="btn-full btn-full-p" id="save-rates-btn" onclick="saveRates()">Save rates</button>
   </div>
 </div>
 
@@ -2554,7 +2554,31 @@ function buildBookCal(){
 function selSlot(btn){document.querySelectorAll('#book-slots .btn-sm').forEach(function(b){b.classList.remove('p')});btn.classList.add('p');}
 function selSt(v){['60','90','120'].forEach(function(x){var b=document.getElementById('st-'+x);if(b){b.className='btn-lg '+(x===v?'p':'s');}});}
 function selBookT(t){['ko','rc'].forEach(function(x){var el=document.getElementById('book-'+x);if(!el)return;el.style.background=x===t?'var(--t0)':'var(--g0)';el.style.border=x===t?'1.5px solid var(--t4)':'1px solid var(--g2)';});}
-function confirmBook(){showModal('payment-modal');}
+async function confirmBook(){
+  var btn=document.querySelector('#screen-book .btn-lg.p[onclick="confirmBook()"]');
+  if(btn){btn.disabled=true;btn.textContent='Processing…';}
+  try{
+    var subj=(document.querySelector('#screen-book textarea.fi')||{}).value||'General';
+    var slot=S._selectedSlot||new Date(Date.now()+86400000).toISOString();
+    var dur=S._selectedDuration||60;
+    var tutorId=S._selectedTutorId||null;
+    var rate=parseFloat((document.getElementById('book-rate')||{}).textContent||'12')||12;
+    var fee=parseFloat((rate*dur/60*0.12).toFixed(2));
+    var total=parseFloat((rate*dur/60+fee).toFixed(2));
+    var sess=await bookSession(tutorId,subj,'',slot,dur);
+    if(sess){
+      var pf=document.getElementById('pay-session-fee');
+      var pfee=document.getElementById('pay-platform-fee');
+      var pt=document.getElementById('pay-total');
+      if(pf)pf.textContent='$'+(rate*dur/60).toFixed(2);
+      if(pfee)pfee.textContent='$'+fee.toFixed(2);
+      if(pt)pt.textContent='$'+total.toFixed(2);
+      showModal('payment-modal');
+      showToast('Session booked successfully ✓');
+    }
+  }catch(e){showToast('Booking failed: '+(e.message||'Try again'));}
+  finally{if(btn){btn.disabled=false;btn.textContent='Confirm & Pay';}}
+}
 
 // ═══ SESSION ROOM ═══
 function startTimer(){
@@ -2899,6 +2923,25 @@ function activatePro(){
   document.body.appendChild(toast);
   setTimeout(function(){toast.remove();},3500);
 }
+async function saveRates(){
+  var btn=document.getElementById('save-rates-btn');
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  try{
+    var inputs=document.querySelectorAll('#rates-subjects-form input[type="number"]');
+    var subjects=[];
+    inputs.forEach(function(inp){
+      var subj=inp.dataset.subject;
+      var rate=parseFloat(inp.value)||0;
+      if(subj)subjects.push({subject:subj,rate:rate});
+    });
+    var rate=subjects.length?subjects[0].rate:0;
+    await API.Users.updateTutorProfile({hourly_rate:rate});
+    closeModal('rates-modal');
+    showToast('Rates saved ✓');
+  }catch(e){showToast('Failed to save rates');}
+  finally{if(btn){btn.disabled=false;btn.textContent='Save rates';}}
+}
+
 async function saveSettings() {
   var btn  = document.querySelector('#screen-settings .btn-lg.p');
   var name = document.getElementById('set-name')?.value?.trim();
@@ -3057,7 +3100,7 @@ async function bookSession(tutorId, subject, topic, scheduledAt, durationMins) {
     });
     return sess;
   } catch(e) {
-    alert('Booking failed: ' + e.message);
+    showToast('Booking failed: ' + (e.message||'Try again'));
     return null;
   }
 }
