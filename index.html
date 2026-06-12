@@ -1980,14 +1980,14 @@ function _ensureServer(onTick){
       function tryPing(){
         var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
         var tid=ctrl?setTimeout(function(){ctrl.abort();},9000):null;
-        fetch('https://tutlee-backend.onrender.com/api/accounts/me/',
+        fetch('https://tutlee-backend.onrender.com/api/health/',
           {method:'GET',signal:ctrl?ctrl.signal:undefined})
           .then(function(){if(tid)clearTimeout(tid);_srv.ready=true;resolve(true);})
           .catch(function(){
             if(tid)clearTimeout(tid);
             var elapsed=Math.round((Date.now()-start)/1000);
             if(onTick)onTick(elapsed);
-            if(elapsed<75){setTimeout(tryPing,3000);}
+            if(elapsed<80){setTimeout(tryPing,3000);}
             else{_srv.ready=true;resolve(true);}
           });
       }
@@ -2146,25 +2146,36 @@ async function obCreate(){
     return s.includes('already exist');
   }
 
-  try{
-    var data=await API.Auth.register(payload);
-    S._pendingUser=data.user;
-    _showOTP(data.dev_otp_code||null);
-  }catch(e){
-    if(_isExists(e)){
-      // Account already registered — send a fresh OTP and go to verify screen
-      try{
-        var r=await API.Auth.sendOTP(email);
-        _showOTP(r&&r.dev_otp_code);
-      }catch(e2){
-        _showErr('An account with this email already exists. Please sign in instead.');
+  async function _doRegister(isRetry){
+    try{
+      var data=await API.Auth.register(payload);
+      S._pendingUser=data.user;
+      _showOTP(data.dev_otp_code||null);
+    }catch(e){
+      var isNetwork=(e instanceof TypeError)||(e.message||'').toLowerCase().includes('failed to fetch')||(e.message||'').toLowerCase().includes('network');
+      if(isNetwork&&!isRetry){
+        // Server not ready — reset and wait for a confirmed ping then retry once
+        _srv.ready=false;_srv.promise=null;
+        btn.textContent='Retrying…';
+        await _ensureServer(function(elapsed){btn.textContent='Waking server… ('+elapsed+'s)';});
+        btn.textContent='Creating account…';
+        return _doRegister(true);
+      }
+      if(_isExists(e)){
+        try{
+          var r=await API.Auth.sendOTP(email);
+          _showOTP(r&&r.dev_otp_code);
+        }catch(e2){
+          _showErr('An account with this email already exists. Please sign in instead.');
+          _resetBtn();
+        }
+      }else{
+        _showErr(e.message||'Registration failed. Please try again.');
         _resetBtn();
       }
-    }else{
-      _showErr(e.message||'Registration failed. Please try again.');
-      _resetBtn();
     }
   }
+  _doRegister(false);
 }
 
 async function verifyOTP(){
@@ -3640,7 +3651,7 @@ async function createRing(){
 
 // ─── Wake up Render backend silently on page load ────────────────────────────
 (function(){
-  try{fetch('https://tutlee-backend.onrender.com/api/accounts/me/',{method:'GET'}).catch(function(){});}catch(e){}
+  try{fetch('https://tutlee-backend.onrender.com/api/health/',{method:'GET'}).catch(function(){});}catch(e){}
 })();
 
 // ─── CMS: load homepage content from backend ─────────────────────────────────

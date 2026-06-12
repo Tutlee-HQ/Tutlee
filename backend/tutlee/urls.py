@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework_simplejwt.views import TokenRefreshView
 from accounts.views import LoginView, SiteContentView
 import os
@@ -33,7 +33,12 @@ def serve_js_file(filename):
     return view
 
 
+def health(request):
+    return JsonResponse({'status': 'ok'})
+
+
 urlpatterns = [
+    path('api/health/', health, name='health'),
     path('django-admin/', admin.site.urls),
 
     path('api.js', serve_js_file('api.js'), name='api-js'),
