@@ -2061,42 +2061,54 @@ async function obCreate(){
   if(!pass||pass.length<8){if(errEl){errEl.textContent='Password must be at least 8 characters.';errEl.style.display='block';}return;}
   var parts=name.split(/\s+/);
   btn.textContent='Creating account…';btn.classList.add('loading');btn.disabled=true;
-  try{
-    var payload={
-      email: email,
-      first_name: parts[0]||name,
-      last_name: parts.slice(1).join(' ')||'',
-      role: selRoleVal||'learner',
-      password: pass,
-      password2: pass,
-    };
-    var data=await API.Auth.register(payload);
-    S._pendingUser=data.user;
-    S._pendingEmail=email;
-    if(data.email_verification_required){
-      document.querySelectorAll('.ob-step').forEach(function(el){el.classList.remove('active');});
-      var otpStep=document.getElementById('ob-otp');
-      if(otpStep){
-        otpStep.classList.add('active');
-        var ed=document.getElementById('otp-email-display');if(ed)ed.textContent=S._pendingEmail;
-        if(data.dev_otp_code){
-          var inp=document.getElementById('otp-code-input');
-          if(inp)inp.value=data.dev_otp_code;
+  var payload={
+    email: email,
+    first_name: parts[0]||name,
+    last_name: parts.slice(1).join(' ')||'',
+    role: selRoleVal||'learner',
+    password: pass,
+    password2: pass,
+  };
+  var attempt=0;
+  while(attempt<2){
+    try{
+      var data=await API.Auth.register(payload);
+      S._pendingUser=data.user;
+      S._pendingEmail=email;
+      if(data.email_verification_required){
+        document.querySelectorAll('.ob-step').forEach(function(el){el.classList.remove('active');});
+        var otpStep=document.getElementById('ob-otp');
+        if(otpStep){
+          otpStep.classList.add('active');
+          var ed=document.getElementById('otp-email-display');if(ed)ed.textContent=S._pendingEmail;
+          if(data.dev_otp_code){
+            var inp=document.getElementById('otp-code-input');
+            if(inp)inp.value=data.dev_otp_code;
+          }
           showToast('Check your email for the verification code');
         }
+      }else{
+        closeAuth();
+        launchApp(data.user.full_name||name,data.user.role);
+        loadUserDashboard(data.user);
       }
-    }else{
-      closeAuth();
-      launchApp(data.user.full_name||name,data.user.role);
-      loadUserDashboard(data.user);
+      btn.textContent='Create account';btn.classList.remove('loading');btn.disabled=false;
+      return;
+    }catch(e){
+      var isNetworkErr=(e.message==='Failed to fetch'||e.message==='NetworkError when attempting to fetch resource.'||e instanceof TypeError);
+      if(isNetworkErr&&attempt===0){
+        attempt++;
+        if(errEl){errEl.textContent='Server is starting up — retrying in 8 seconds…';errEl.style.display='block';}
+        await new Promise(function(r){setTimeout(r,8000);});
+        btn.textContent='Retrying…';
+        continue;
+      }
+      var msg=isNetworkErr?'Server is unavailable. Please try again in a moment.':e.message||'Registration failed.';
+      if(errEl){errEl.textContent=msg;errEl.style.display='block';}
+      break;
     }
-  }catch(e){
-    var msg=e.message||'Registration failed.';
-    if(errEl){errEl.textContent=msg;errEl.style.display='block';}
-    else{alert(msg);}
-  }finally{
-    btn.textContent='Create account';btn.classList.remove('loading');btn.disabled=false;
   }
+  btn.textContent='Create account';btn.classList.remove('loading');btn.disabled=false;
 }
 
 async function verifyOTP(){
@@ -3570,10 +3582,15 @@ async function createRing(){
   }catch(e){}
 })();
 
+// ─── Wake up Render backend silently on page load ────────────────────────────
+(function(){
+  try{fetch('https://tutlee-backend.onrender.com/api/accounts/me/',{method:'GET'}).catch(function(){});}catch(e){}
+})();
+
 // ─── CMS: load homepage content from backend ─────────────────────────────────
 (function loadCMSHomepage(){
   try{
-    fetch('/api/content/homepage/')
+    fetch('https://tutlee-backend.onrender.com/api/content/homepage/')
       .then(function(r){return r.ok?r.json():null;})
       .then(function(data){
         if(!data||!data.content)return;
