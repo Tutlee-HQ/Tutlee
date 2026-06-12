@@ -40,11 +40,8 @@ class RegisterView(generics.CreateAPIView):
         except User.DoesNotExist:
             pass
         if existing is not None:
-            if not existing.is_active:
-                user = existing  # resend OTP below
-            else:
-                from rest_framework.exceptions import ValidationError
-                raise ValidationError({'email': ['An account with this email already exists.']})
+            # Always resend OTP — account may exist from a timed-out previous attempt
+            user = existing
         else:
             s = self.get_serializer(data=request.data)
             s.is_valid(raise_exception=True)

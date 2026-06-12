@@ -2100,8 +2100,6 @@ async function obCreate(){
     btn.textContent='Starting up… ('+elapsed+'s)';
   });
 
-  // Brief settle after health check — Gunicorn may need a moment to fully init
-  await new Promise(function(r){setTimeout(r,1500);});
   btn.textContent='Creating account…';
   var payload={
     email:email,
@@ -2151,52 +2149,23 @@ async function obCreate(){
     return s.includes('already exist');
   }
 
-  // 22-second abort: if server got the request but took too long to reply,
-  // the account was likely created — show OTP screen rather than erroring
-  var _rc=typeof AbortController!=='undefined'?new AbortController():null;
-  var _rt=_rc?setTimeout(function(){_rc.abort();},22000):null;
+  // Simple register — backend is idempotent for any existing account
   try{
-    var data=await API.Auth.register(payload,{signal:_rc?_rc.signal:undefined});
-    if(_rt)clearTimeout(_rt);
+    var data=await API.Auth.register(payload);
     S._pendingUser=data.user;
     _showOTP(data.dev_otp_code||null);
   }catch(e){
-    if(_rt)clearTimeout(_rt);
-    var isAbort=e&&(e.name==='AbortError'||(e.message||'').toLowerCase().includes('abort'));
-    var isNetwork=e&&(e instanceof TypeError)&&!isAbort;
-    if(isAbort){
-      // Request was sent — account was likely created. Show OTP screen.
-      _showOTP(null);
-    }else if(isNetwork){
-      // Health check passed but register still failed — server not fully ready
-      // Reset and re-ping with a confirmed CORS preflight, then retry once
-      _srv.ready=false;_srv.promise=null;
-      btn.textContent='Reconnecting…';
-      await _ensureServer(function(el){btn.textContent='Reconnecting… ('+el+'s)';});
-      await new Promise(function(r){setTimeout(r,2000);});
-      btn.textContent='Creating account…';
-      // Retry — backend is idempotent so no double-account risk
-      try{
-        var dr=await API.Auth.register(payload);
-        S._pendingUser=dr.user;_showOTP(dr.dev_otp_code||null);
-      }catch(er){
-        if(_isExists(er)){
-          try{var dr2=await API.Auth.register(payload);S._pendingUser=dr2.user;_showOTP(dr2.dev_otp_code||null);}
-          catch(er2){_showErr('This email is registered. Please sign in.');_resetBtn();}
-        }else{_showErr(er.message||'Registration failed. Please try again.');_resetBtn();}
-      }
-    }else if(_isExists(e)){
-      // Unverified account — re-register resends OTP (backend is idempotent)
-      try{
-        var data2=await API.Auth.register(payload);
-        S._pendingUser=data2.user;
-        _showOTP(data2.dev_otp_code||null);
-      }catch(e2){
-        _showErr('This email is already registered. Please sign in.');
-        _resetBtn();
-      }
-    }else{
-      _showErr(e.message||'Registration failed. Please try again.');
+    // Any failure — wait 3s and retry once. Backend resends OTP for existing
+    // accounts so this is always safe regardless of what failed first time.
+    btn.textContent='Retrying…';
+    await new Promise(function(r){setTimeout(r,3000);});
+    btn.textContent='Creating account…';
+    try{
+      var data2=await API.Auth.register(payload);
+      S._pendingUser=data2.user;
+      _showOTP(data2.dev_otp_code||null);
+    }catch(e2){
+      _showErr(e2.message||'Registration failed. Please try again.');
       _resetBtn();
     }
   }
