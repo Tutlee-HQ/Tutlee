@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tutlee</title>
 <script>window.TUTLEE_API_BASE ='https://tutlee-backend.onrender.com';</script>
-<script src="api.js" onerror="
+<script src="api.js?v=20260612" onerror="
   var s=document.createElement('script');
-  s.src='/static/js/api.js';
-  s.onerror=function(){s.src='https://tutlee-backend.onrender.com/api.js';s.onerror=function(){console.error('api.js failed to load');};document.head.appendChild(s);};
+  s.src='/static/js/api.js?v=20260612';
+  s.onerror=function(){s.src='https://tutlee-backend.onrender.com/api.js?v=20260612';s.onerror=function(){console.error('api.js failed to load');};document.head.appendChild(s);};
   document.head.appendChild(s);
 "></script>
 <style>
@@ -3719,6 +3719,4 @@ async function createRing(){
           }
         }catch(e){}
       }).catch(function(){});
-  }catch(e){}
-})();
-</script></body></html>
+  }catch(e)
