@@ -44,7 +44,7 @@ def flush_db(request):
         from django.contrib.auth import get_user_model
         from sessions_app.models import Session
         from kyt.models import KYTApplication
-        from payments.models import Transaction, Payout
+        from payments.models import Transaction, PayoutRequest
         from assessments.models import Assessment
         from study_rings.models import StudyRing
         from reports.models import Report
@@ -55,7 +55,7 @@ def flush_db(request):
             ('sessions', Session.objects.all()),
             ('kyt', KYTApplication.objects.all()),
             ('transactions', Transaction.objects.all()),
-            ('payouts', Payout.objects.all()),
+            ('payouts', PayoutRequest.objects.all()),
             ('assessments', Assessment.objects.all()),
             ('rings', StudyRing.objects.all()),
             ('reports', Report.objects.all()),
