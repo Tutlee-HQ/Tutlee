@@ -2,7 +2,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('0002', '0002_emailotp_sitecontent'),
+        ('accounts', '0002_emailotp_sitecontent'),
     ]
     operations = [
         migrations.AddField(
