@@ -1979,16 +1979,19 @@ function _ensureServer(onTick){
       var start=Date.now();
       function tryPing(){
         var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
-        var tid=ctrl?setTimeout(function(){ctrl.abort();},9000):null;
+        var tid=ctrl?setTimeout(function(){ctrl.abort();},10000):null;
         fetch('https://tutlee-backend.onrender.com/api/health/',
           {method:'GET',signal:ctrl?ctrl.signal:undefined})
-          .then(function(){if(tid)clearTimeout(tid);_srv.ready=true;resolve(true);})
+          .then(function(){
+            if(tid)clearTimeout(tid);
+            _srv.ready=true;
+            resolve(true); // only resolve on a REAL response
+          })
           .catch(function(){
             if(tid)clearTimeout(tid);
             var elapsed=Math.round((Date.now()-start)/1000);
             if(onTick)onTick(elapsed);
-            if(elapsed<80){setTimeout(tryPing,3000);}
-            else{_srv.ready=true;resolve(true);}
+            setTimeout(tryPing,3000); // retry forever — never give up
           });
       }
       tryPing();
@@ -2146,20 +2149,35 @@ async function obCreate(){
     return s.includes('already exist');
   }
 
+  // 22-second abort: if server got the request but took too long to reply,
+  // the account was likely created — show OTP screen rather than erroring
+  var _rc=typeof AbortController!=='undefined'?new AbortController():null;
+  var _rt=_rc?setTimeout(function(){_rc.abort();},22000):null;
   try{
-    var data=await API.Auth.register(payload);
+    var data=await API.Auth.register(payload,{signal:_rc?_rc.signal:undefined});
+    if(_rt)clearTimeout(_rt);
     S._pendingUser=data.user;
     _showOTP(data.dev_otp_code||null);
   }catch(e){
-    if(_isExists(e)){
-      // Account exists (unverified) — backend will resend OTP on re-register
-      // Try re-registering which now returns OTP for unverified accounts
+    if(_rt)clearTimeout(_rt);
+    var isAbort=e&&(e.name==='AbortError'||(e.message||'').toLowerCase().includes('abort'));
+    var isNetwork=e&&(e instanceof TypeError)&&!isAbort;
+    if(isAbort){
+      // Request was sent — account was likely created. Show OTP screen.
+      _showOTP(null);
+    }else if(isNetwork){
+      // True network failure (couldn't reach server) — reset and let user retry
+      _srv.ready=false;_srv.promise=null;
+      _showErr('Could not reach the server. Please try again in a moment.');
+      _resetBtn();
+    }else if(_isExists(e)){
+      // Unverified account — re-register resends OTP (backend is idempotent)
       try{
         var data2=await API.Auth.register(payload);
         S._pendingUser=data2.user;
         _showOTP(data2.dev_otp_code||null);
       }catch(e2){
-        _showErr('An account with this email already exists. Please sign in instead.');
+        _showErr('This email is already registered. Please sign in.');
         _resetBtn();
       }
     }else{

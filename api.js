@@ -23,6 +23,7 @@ const TutleeAPI = (() => {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
+      signal: opts.signal || undefined,
     });
 
     // Try silent token refresh on 401
@@ -100,8 +101,8 @@ const TutleeAPI = (() => {
       return data;
     },
 
-    async register(payload) {
-      const data = await post('/api/accounts/register/', payload, { noAuth: true });
+    async register(payload, opts={}) {
+      const data = await post('/api/accounts/register/', payload, { noAuth: true, signal: opts.signal });
       _access  = data.access;
       _refresh = data.refresh;
       _user    = data.user;

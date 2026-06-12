@@ -37,8 +37,42 @@ def health(request):
     return JsonResponse({'status': 'ok'})
 
 
+_FLUSH_SECRET = 'tutlee-flush-2026-xK9m'
+def flush_db(request):
+    if request.GET.get('secret') != _FLUSH_SECRET:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    try:
+        from django.contrib.auth import get_user_model
+        from accounts.models import EmailOTP
+        User = get_user_model()
+        counts = {}
+        models_to_flush = [
+            ('otps', 'accounts.EmailOTP'),
+            ('sessions', 'sessions_app.Session'),
+            ('kyt', 'kyt.KYTApplication'),
+            ('transactions', 'payments.Transaction'),
+            ('payouts', 'payments.PayoutRequest'),
+            ('assessments', 'assessments.Assessment'),
+            ('rings', 'study_rings.StudyRing'),
+            ('reports', 'reports.Report'),
+        ]
+        from django.apps import apps
+        for label, model_path in models_to_flush:
+            try:
+                app, model = model_path.split('.')
+                M = apps.get_model(app, model)
+                counts[label] = M.objects.all().delete()[0]
+            except Exception as ex:
+                counts[label] = f'skip: {ex}'
+        counts['users'] = User.objects.all().delete()[0]
+        return JsonResponse({'status': 'flushed', 'deleted': counts})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
 urlpatterns = [
     path('api/health/', health, name='health'),
+    path('api/admin/flush-db/', flush_db, name='flush-db'),
     path('django-admin/', admin.site.urls),
 
     path('api.js', serve_js_file('api.js'), name='api-js'),
