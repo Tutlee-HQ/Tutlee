@@ -33,6 +33,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'tutlee.middleware.ForceCORSMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -124,7 +125,16 @@ SIMPLE_JWT = {
 }
 
 # ── CORS ──
-CORS_ALLOW_ALL_ORIGINS = True          # dev only — restric
+CORS_ALLOW_ALL_ORIGINS   = True
+CORS_ORIGIN_ALLOW_ALL    = True   # legacy alias for older django-cors-headers
+CORS_ALLOW_CREDENTIALS   = True
+CORS_PREFLIGHT_MAX_AGE   = 86400
+CORS_ALLOW_HEADERS       = [
+    'accept', 'accept-encoding', 'authorization',
+    'content-type', 'dnt', 'origin', 'user-agent',
+    'x-csrftoken', 'x-requested-with',
+]
+CORS_ALLOW_METHODS = ['DELETE','GET','OPTIONS','PATCH','POST','PUT']
 # ── EMAIL ──
 # Auto-switches to SMTP when EMAIL_HOST_USER + EMAIL_HOST_PASSWORD env vars are set.
 # On Render: add those two vars in the Environment tab to enable real email sending.
