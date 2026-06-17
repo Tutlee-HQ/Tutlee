@@ -77,26 +77,7 @@ class RegisterView(generics.CreateAPIView):
             import random, string, django.conf
             code = ''.join(random.choices(string.digits, k=6))
             EmailOTP.objects.create(user=user, code=code)
-            from django.core.mail import send_mail
-            email_sent = False
-            try:
-                send_mail(
-                    subject='Welcome to Tutlee — verify your email',
-                    message=(
-                        f'Hi {user.first_name},\n\n'
-                        f'Your verification code is: {code}\n\n'
-                        f'Enter this in the app to complete your signup.\n\n'
-                        f'The code expires in 10 minutes.\n\n'
-                        f'— Tutlee'
-                    ),
-                    from_email=django.conf.settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[user.email],
-                    fail_silently=False,
-                )
-                email_sent = True
-            except Exception as _email_err:
-                import sys
-                print(f'[TUTLEE] OTP email failed ({type(_email_err).__name__}): {_email_err}', file=sys.stderr)
+            email_sent = _send_otp_email(user.email, user.first_name or 'there', code)
             # Always return the OTP code when email fails so the UI can auto-fill
             if not email_sent:
                 dev_otp_code = code
@@ -234,13 +215,94 @@ def admin_stats(request):
 # ─── OTP VERIFICATION ────────────────────────────────────────────────────────
 import random
 import string
-from django.core.mail import send_mail
+import os
+import json
+import urllib.request
 from django.conf import settings as django_settings
 from .models import EmailOTP, SiteContent
 
 
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
+
+
+def _send_otp_email(to_email, first_name, code):
+    """
+    Send OTP email. Tries Resend API first (set RESEND_API_KEY in Render env).
+    Falls back to Django send_mail (Gmail/SMTP) if configured.
+    Returns True on success, False on failure.
+    """
+    import sys
+
+    subject = 'Your Tutlee verification code'
+    html_body = f"""
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px;border:1px solid #EDE9FE">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="display:inline-block;background:#7C3AED;border-radius:10px;padding:10px 18px">
+          <span style="color:#fff;font-size:20px;font-weight:800;letter-spacing:-.4px">Tut<span style="color:#4ADE80">lee</span></span>
+        </div>
+      </div>
+      <h2 style="font-size:22px;font-weight:800;color:#0F0720;margin:0 0 8px">Verify your email</h2>
+      <p style="font-size:14px;color:#6456A0;margin:0 0 24px">Hi {first_name}, use the code below to complete your signup:</p>
+      <div style="background:#F5F3FF;border:2px solid #7C3AED;border-radius:12px;padding:20px;text-align:center;margin-bottom:24px">
+        <span style="font-size:36px;font-weight:800;color:#7C3AED;letter-spacing:8px">{code}</span>
+      </div>
+      <p style="font-size:13px;color:#8B7EC0;margin:0">This code expires in 10 minutes. If you didn't create a Tutlee account, ignore this email.</p>
+    </div>
+    """
+    plain_body = f'Hi {first_name},\n\nYour Tutlee verification code is: {code}\n\nThis code expires in 10 minutes.\n\n— Tutlee'
+
+    # ── 1. Try Resend API ────────────────────────────────────────────────────
+    resend_key = os.environ.get('RESEND_API_KEY', '').strip()
+    if resend_key:
+        try:
+            from_addr = os.environ.get('RESEND_FROM', 'Tutlee <noreply@tutlee.io>')
+            payload = json.dumps({
+                'from': from_addr,
+                'to': [to_email],
+                'subject': subject,
+                'html': html_body,
+                'text': plain_body,
+            }).encode('utf-8')
+            req = urllib.request.Request(
+                'https://api.resend.com/emails',
+                data=payload,
+                headers={
+                    'Authorization': f'Bearer {resend_key}',
+                    'Content-Type': 'application/json',
+                },
+                method='POST'
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                resp_body = resp.read()
+                if resp.status in (200, 201):
+                    print(f'[TUTLEE] Resend OK → {to_email}', file=sys.stderr)
+                    return True
+                print(f'[TUTLEE] Resend non-2xx {resp.status}: {resp_body}', file=sys.stderr)
+        except Exception as resend_err:
+            print(f'[TUTLEE] Resend error ({type(resend_err).__name__}): {resend_err}', file=sys.stderr)
+
+    # ── 2. Fall back to Django SMTP (Gmail App Password) ────────────────────
+    smtp_user = os.environ.get('EMAIL_HOST_USER', '').strip()
+    smtp_pass = os.environ.get('EMAIL_HOST_PASSWORD', '').strip()
+    if smtp_user and smtp_pass:
+        try:
+            from django.core.mail import send_mail
+            send_mail(
+                subject=subject,
+                message=plain_body,
+                from_email=django_settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[to_email],
+                fail_silently=False,
+                html_message=html_body,
+            )
+            print(f'[TUTLEE] SMTP OK → {to_email}', file=sys.stderr)
+            return True
+        except Exception as smtp_err:
+            print(f'[TUTLEE] SMTP error ({type(smtp_err).__name__}): {smtp_err}', file=sys.stderr)
+
+    print('[TUTLEE] No email provider configured — falling back to dev_otp_code', file=sys.stderr)
+    return False
 
 
 class SendOTPView(APIView):
@@ -254,17 +316,9 @@ class SendOTPView(APIView):
             return Response({'error': 'No account found with that email.'}, status=404)
         code = generate_otp()
         EmailOTP.objects.create(user=user, code=code)
-        try:
-            send_mail(
-                subject='Your Tutlee verification code',
-                message=f'Your verification code is: {code}\n\nThis code expires in 10 minutes.',
-                from_email=django_settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                fail_silently=False,
-            )
-        except Exception as e:
-            import sys
-            print(f'[TUTLEE] SendOTP email failed: {e}', file=sys.stderr)
+        user_name = user.first_name or 'there'
+        ok = _send_otp_email(email, user_name, code)
+        if not ok:
             return Response({'detail': 'OTP sent', 'dev_otp_code': str(code)})
         return Response({'detail': 'OTP sent to ' + email})
 
