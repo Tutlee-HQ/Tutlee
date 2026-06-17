@@ -70,19 +70,13 @@ class RegisterView(generics.CreateAPIView):
             s = self.get_serializer(data=request.data)
             s.is_valid(raise_exception=True)
             user = s.save()
-        # Generate and send OTP for email verification
-        dev_otp_code = None
+        # Generate and send OTP for email verification via Resend
         try:
             from .models import EmailOTP
-            import random, string, django.conf
+            import random, string
             code = ''.join(random.choices(string.digits, k=6))
             EmailOTP.objects.create(user=user, code=code)
-            email_sent = _send_otp_email(user.email, user.first_name or 'there', code)
-            # Always return the OTP code when email fails so the UI can auto-fill
-            if not email_sent:
-                dev_otp_code = code
-            elif django.conf.settings.DEBUG:
-                dev_otp_code = code  # also expose in dev for testing
+            _send_otp_email(user.email, user.first_name or 'there', code)
         except Exception:
             pass  # never block registration
         refresh = RefreshToken.for_user(user)
@@ -92,8 +86,6 @@ class RegisterView(generics.CreateAPIView):
             'user':    UserSerializer(user).data,
             'email_verification_required': True,
         }
-        if dev_otp_code is not None:
-            resp['dev_otp_code'] = dev_otp_code
         return Response(resp, status=status.HTTP_201_CREATED)
 
 
@@ -301,7 +293,7 @@ def _send_otp_email(to_email, first_name, code):
         except Exception as smtp_err:
             print(f'[TUTLEE] SMTP error ({type(smtp_err).__name__}): {smtp_err}', file=sys.stderr)
 
-    print('[TUTLEE] No email provider configured — falling back to dev_otp_code', file=sys.stderr)
+    print('[TUTLEE] No email provider configured — check RESEND_API_KEY in Render', file=sys.stderr)
     return False
 
 
@@ -319,7 +311,7 @@ class SendOTPView(APIView):
         user_name = user.first_name or 'there'
         ok = _send_otp_email(email, user_name, code)
         if not ok:
-            return Response({'detail': 'OTP sent', 'dev_otp_code': str(code)})
+            return Response({'detail': 'OTP sent'})
         return Response({'detail': 'OTP sent to ' + email})
 
 

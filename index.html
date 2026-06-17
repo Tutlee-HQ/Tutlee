@@ -2035,36 +2035,22 @@ async function obCreate(){
 
   function _resetBtn(){btn.textContent='Create account';btn.classList.remove('loading');btn.disabled=false;}
   function _showErr(msg){if(errEl){errEl.textContent=msg;errEl.style.display='block';}}
-  function _showOTP(devCode){
+  function _showOTP(){
     S._pendingEmail=email;
-    // Hide inner steps only — do NOT hide the parent #ap-signup container
     ['ob-s1','ob-s2'].forEach(function(id){
       var el=document.getElementById(id);if(el)el.classList.remove('active');
     });
-    // Keep ap-signup panel visible
     var signup=document.getElementById('ap-signup');
     if(signup)signup.classList.add('active');
     var otpEl=document.getElementById('ob-otp');
     if(otpEl){
       otpEl.classList.add('active');
       var ed=document.getElementById('otp-email-display');if(ed)ed.textContent=email;
-      if(devCode){
-        var inp=document.getElementById('otp-code-input');
-        if(inp)inp.value=devCode;
-        // Show a notice so user knows the code was auto-filled (dev/no-SMTP mode)
-        var note=document.getElementById('otp-dev-notice');
-        if(!note){
-          note=document.createElement('p');
-          note.id='otp-dev-notice';
-          note.style.cssText='text-align:center;font-size:12px;color:var(--g5);margin-top:8px;padding:6px 10px;background:var(--g1);border-radius:6px';
-          otpEl.appendChild(note);
-        }
-        note.textContent='Code auto-filled (email delivery not yet configured).';
-        note.style.display='block';
-      }
+      var inp=document.getElementById('otp-code-input');
+      if(inp)inp.value='';
     }
     if(errEl)errEl.style.display='none';
-    showToast('Verification code sent to '+email);
+    showToast('Check your email for the verification code');
     _resetBtn();
   }
   function _isExists(e){
@@ -2076,7 +2062,7 @@ async function obCreate(){
   try{
     var data=await API.Auth.register(payload);
     S._pendingUser=data.user;
-    _showOTP(data.dev_otp_code||null);
+    _showOTP();
   }catch(e){
     // Any failure — wait 3s and retry once. Backend resends OTP for existing
     // accounts so this is always safe regardless of what failed first time.
@@ -2086,7 +2072,7 @@ async function obCreate(){
     try{
       var data2=await API.Auth.register(payload);
       S._pendingUser=data2.user;
-      _showOTP(data2.dev_otp_code||null);
+      _showOTP();
     }catch(e2){
       var _em=e2.message||'';
       var _et=e2.name||'Error';
@@ -2137,7 +2123,6 @@ async function resendOTP(){
       body:JSON.stringify({email:S._pendingEmail})
     });
     var res=await r.json();
-    if(res&&res.dev_otp_code){var inp=document.getElementById('otp-code-input');if(inp)inp.value=res.dev_otp_code;}
     showToast('New code sent to '+S._pendingEmail);
   }catch(e){showToast('Could not resend — try again');}
   finally{if(btn){btn.textContent='Resend code';btn.style.pointerEvents='';}}
