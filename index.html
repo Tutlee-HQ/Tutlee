@@ -502,6 +502,11 @@ tr:hover td{background:var(--g1)}
           <button class="btn-hp" id="cms-hp-cta" onclick="openAuth('signup-learner')">Start learning free</button>
           <button class="btn-hs" onclick="openAuth('signup-tutor')">Become a tutor</button>
         </div>
+        <div class="hero-stats" id="cms-stats-bar">
+          <div><div class="hs-val" id="cms-hp-s1n">5,000+</div><div class="hs-lbl" id="cms-hp-s1l">Students</div></div>
+          <div><div class="hs-val" id="cms-hp-s2n">500+</div><div class="hs-lbl" id="cms-hp-s2l">Tutors</div></div>
+          <div><div class="hs-val" id="cms-hp-s3n">20+</div><div class="hs-lbl" id="cms-hp-s3l">Subjects</div></div>
+        </div>
       </div>
       <div class="hero-vis">
         <div class="hcard">
@@ -604,7 +609,7 @@ tr:hover td{background:var(--g1)}
     </div>
   </section>
 
-  <section class="cta-sec">
+  <section class="cta-sec" id="cta-section">
     <div class="cta-in">
       <h2>Learning works better between peers</h2>
       <p>Research shows peer-tutored students achieve 30% more credits and a full grade-level improvement.</p>
@@ -3765,23 +3770,40 @@ async function createRing(){
 // ─── CMS: load homepage content from backend ─────────────────────────────────
 (function loadCMSHomepage(){
   try{
-    fetch('https://tutlee-backend.onrender.com/api/accounts/site-content/')
+    fetch('https://tutlee-backend.onrender.com/api/accounts/site-content/?key=homepage')
       .then(function(r){return r.ok?r.json():null;})
       .then(function(data){
         if(!data||!data.content)return;
         try{
           var cms=JSON.parse(data.content);
+          // Hero text
           if(cms.hero){
             var ht=document.getElementById('cms-hp-title');if(ht&&cms.hero.title)ht.textContent=cms.hero.title;
             var hs=document.getElementById('cms-hp-sub');if(hs&&cms.hero.sub)hs.textContent=cms.hero.sub;
             var hc=document.getElementById('cms-hp-cta');if(hc&&cms.hero.cta)hc.textContent=cms.hero.cta;
           }
+          // Stats bar
+          if(cms.stats&&cms.stats.length){
+            var s=cms.stats;
+            var fn=function(id,val){var el=document.getElementById(id);if(el&&val)el.textContent=val;};
+            fn('cms-hp-s1n',s[0]&&s[0].num);fn('cms-hp-s1l',s[0]&&s[0].lbl);
+            fn('cms-hp-s2n',s[1]&&s[1].num);fn('cms-hp-s2l',s[1]&&s[1].lbl);
+            fn('cms-hp-s3n',s[2]&&s[2].num);fn('cms-hp-s3l',s[2]&&s[2].lbl);
+          }
+          // Section visibility
+          if(cms.sections&&cms.sections.length){
+            cms.sections.forEach(function(sec){
+              var el=document.getElementById(sec.id);
+              if(el)el.style.display=sec.visible===false?'none':'';
+            });
+          }
+          // Announcement banner
           if(cms.banner&&cms.banner.text){
             var existing=document.getElementById('cms-banner-bar');
             if(!existing){
               var bar=document.createElement('div');
               bar.id='cms-banner-bar';
-              bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;color:#fff;background:'+(cms.banner.color||'#0D9488');
+              bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;color:#fff;background:'+(cms.banner.color||'#7C3AED');
               bar.textContent=cms.banner.text;
               document.body.prepend(bar);
             }
