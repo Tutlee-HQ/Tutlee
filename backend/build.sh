@@ -5,18 +5,23 @@ set -o errexit
 pip install -r requirements.txt
 python manage.py collectstatic --no-input
 
-# Drop all tables so migrate always runs on a clean schema
-python manage.py shell -c "
-from django.db import connection
-with connection.cursor() as cur:
-    cur.execute(\"SELECT tablename FROM pg_tables WHERE schemaname='public'\")
-    tables = [r[0] for r in cur.fetchall()]
-    if tables:
-        cur.execute('DROP TABLE IF EXISTS ' + ', '.join('\"' + t + '\"' for t in tables) + ' CASCADE')
-        print('[BUILD] Dropped tables:', tables)
-    else:
-        print('[BUILD] No tables to drop — clean DB')
-"
+# Reset DB schema so migrate always starts clean
+python - <<'PYEOF2'
+import os, psycopg2
+db_url = os.environ.get('DATABASE_URL', '')
+if not db_url:
+    print('[BUILD] No DATABASE_URL — skipping schema reset')
+else:
+    conn = psycopg2.connect(db_url)
+    conn.autocommit = True
+    cur = conn.cursor()
+    cur.execute('DROP SCHEMA public CASCADE')
+    cur.execute('CREATE SCHEMA public')
+    cur.execute('GRANT ALL ON SCHEMA public TO public')
+    cur.execute('GRANT ALL ON SCHEMA public TO postgres')
+    conn.close()
+    print('[BUILD] Schema reset complete — all tables dropped')
+PYEOF2
 
 python manage.py migrate
 python manage.py seed || echo "Seed already done or skipped"
