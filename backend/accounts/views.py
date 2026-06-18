@@ -351,3 +351,92 @@ class SiteContentView(APIView):
         obj, _ = SiteContent.objects.update_or_create(key=key, defaults={'content': content})
         return Response({'key': obj.key, 'updated_at': obj.updated_at})
 
+
+
+# ─── PASSWORD RESET ──────────────────────────────────────────────────────────
+class PasswordResetRequestView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        import sys, secrets
+        email = request.data.get('email', '').strip().lower()
+        # Always return 200 to avoid leaking whether email exists
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'detail': 'If that email exists, a reset link has been sent.'})
+
+        from .models import PasswordResetToken
+        token = secrets.token_urlsafe(32)
+        PasswordResetToken.objects.create(user=user, token=token)
+
+        # Build reset URL — points to the frontend
+        frontend = os.environ.get('FRONTEND_URL', 'https://tutlee-hq.github.io')
+        reset_url = f'{frontend}/?reset={token}'
+
+        subject = 'Reset your Tutlee password'
+        html_body = f"""<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px;border:1px solid #EDE9FE">
+  <div style="text-align:center;margin-bottom:24px">
+    <div style="display:inline-block;background:#7C3AED;border-radius:10px;padding:10px 18px">
+      <span style="color:#fff;font-size:20px;font-weight:800;letter-spacing:-.4px">Tut<span style="color:#4ADE80">lee</span></span>
+    </div>
+  </div>
+  <h2 style="font-size:22px;font-weight:800;color:#0F0720;margin:0 0 8px">Reset your password</h2>
+  <p style="font-size:14px;color:#6456A0;margin:0 0 24px">Hi {user.first_name or 'there'}, click the button below to set a new password. This link expires in 1 hour.</p>
+  <div style="text-align:center;margin-bottom:24px">
+    <a href="{reset_url}" style="display:inline-block;background:#7C3AED;color:#fff;text-decoration:none;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700">Reset my password</a>
+  </div>
+  <p style="font-size:13px;color:#8B7EC0;margin:0">If you didn't request this, you can safely ignore this email. Your password won't change.</p>
+</div>"""
+        plain_body = f'Hi {user.first_name or "there"},
+
+Click this link to reset your Tutlee password:
+{reset_url}
+
+This link expires in 1 hour. If you didn't request this, ignore this email.
+
+— Tutlee'
+
+        _send_otp_email.__func__ if hasattr(_send_otp_email, '__func__') else None
+        # Re-use same email sending logic
+        resend_key = os.environ.get('RESEND_API_KEY', '').strip()
+        if resend_key:
+            try:
+                import resend as resend_sdk
+                resend_sdk.api_key = resend_key
+                from_addr = os.environ.get('RESEND_FROM', 'onboarding@resend.dev')
+                resend_sdk.Emails.send({'from': from_addr, 'to': [email], 'subject': subject, 'html': html_body, 'text': plain_body})
+                print(f'[TUTLEE] Password reset email sent → {email}', file=sys.stderr)
+            except Exception as e:
+                print(f'[TUTLEE] Password reset email error: {e}', file=sys.stderr)
+
+        return Response({'detail': 'If that email exists, a reset link has been sent.'})
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        from django.utils import timezone
+        import datetime
+        from .models import PasswordResetToken
+        token_str = request.data.get('token', '').strip()
+        password  = request.data.get('password', '').strip()
+
+        if not token_str or not password:
+            return Response({'detail': 'Token and password are required.'}, status=400)
+        if len(password) < 8:
+            return Response({'detail': 'Password must be at least 8 characters.'}, status=400)
+
+        cutoff = timezone.now() - datetime.timedelta(hours=1)
+        try:
+            reset = PasswordResetToken.objects.get(token=token_str, is_used=False, created_at__gte=cutoff)
+        except PasswordResetToken.DoesNotExist:
+            return Response({'detail': 'This reset link is invalid or has expired. Please request a new one.'}, status=400)
+
+        reset.user.set_password(password)
+        reset.user.save()
+        reset.is_used = True
+        reset.save()
+
+        return Response({'detail': 'Password updated successfully.'})
