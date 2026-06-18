@@ -49,7 +49,8 @@ def health(request):
 
 @csrf_exempt
 def dev_flush(request):
-    """One-time DB flush — protected by FLUSH_SECRET env var."""
+    """Drop ALL public tables so the next deploy runs migrations from scratch.
+    Protected by FLUSH_SECRET env var. Visit with ?key=<FLUSH_SECRET>&drop=1 to drop tables."""
     import os
     secret = os.environ.get('FLUSH_SECRET', '')
     if not secret or request.GET.get('key') != secret:
@@ -59,8 +60,15 @@ def dev_flush(request):
         cur.execute("SELECT tablename FROM pg_tables WHERE schemaname='public'")
         tables = [r[0] for r in cur.fetchall()]
         if tables:
-            cur.execute('TRUNCATE TABLE ' + ', '.join(f'"{t}"' for t in tables) + ' RESTART IDENTITY CASCADE')
-    return JsonResponse({'status': 'flushed', 'tables': tables})
+            if request.GET.get('drop') == '1':
+                # Drop tables entirely so next migrate creates them fresh
+                cur.execute('DROP TABLE IF EXISTS ' + ', '.join(f'"{t}"' for t in tables) + ' CASCADE')
+                return JsonResponse({'status': 'dropped', 'tables': tables})
+            else:
+                # Default: truncate (keep schema, clear data)
+                cur.execute('TRUNCATE TABLE ' + ', '.join(f'"{t}"' for t in tables) + ' RESTART IDENTITY CASCADE')
+                return JsonResponse({'status': 'truncated', 'tables': tables})
+    return JsonResponse({'status': 'nothing_to_do', 'tables': []})
 
 urlpatterns = [
     path('api/health/', health, name='health'),
@@ -76,12 +84,4 @@ urlpatterns = [
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('api/accounts/',    include('accounts.urls')),
-    path('api/sessions/',    include('sessions_app.urls')),
-    path('api/assessments/', include('assessments.urls')),
-    path('api/kyt/',         include('kyt.urls')),
-    path('api/rings/',       include('study_rings.urls')),
-    path('api/reports/',     include('reports.urls')),
-    path('api/payments/',    include('payments.urls')),
-    path('api/content/<str:key>/', SiteContentView.as_view(), name='site-content'),
-    path('api/content/',          SiteContentView.as_view(), name='site-content-default'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    pa
