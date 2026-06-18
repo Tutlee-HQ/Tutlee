@@ -735,7 +735,7 @@ tr:hover td{background:var(--g1)}
       <div class="sbi" id="nav-tutor-dash" onclick="goTo('tutor-dash')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
       <div class="sbi" id="nav-t-sessions" onclick="goTo('t-sessions')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>My Sessions</div>
       <div class="sbi" id="nav-t-messages" onclick="goTo('messages')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages<span class="sb-bdg bdg-w">3</span></div>
-      <div class="sbi" id="nav-t-rings" onclick="goTo('study-groups')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Study Rings</div>
+      
       <div class="sb-sec">Analytics</div>
       <div class="sbi" id="nav-earnings" onclick="goTo('earnings')"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Earnings</div>
       <div class="sbi" id="nav-t-analytics" onclick="goTo('t-analytics')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Teaching Analytics</div>
@@ -1216,7 +1216,7 @@ tr:hover td{background:var(--g1)}
   </div>
   <!-- Ring tabs -->
   <div style="display:flex;gap:0;border-bottom:1px solid var(--g1);margin-bottom:24px">
-    <button id="rtab-live" class="ring-tab active" onclick="switchRingTab('live')">Live now <span class="sb-bdg bdg-t" style="margin-left:6px">2</span></button>
+    <button id="rtab-live" class="ring-tab active" onclick="switchRingTab('live')">Live now <span class="sb-bdg bdg-t" id="rtab-live-count" style="margin-left:6px;display:none">0</span></button>
     <button id="rtab-upcoming" class="ring-tab" onclick="switchRingTab('upcoming')">Upcoming</button>
     <button id="rtab-all" class="ring-tab" onclick="switchRingTab('all')">All Rings</button>
     <button id="rtab-mine" class="ring-tab" onclick="switchRingTab('mine')">My Rings</button>
@@ -1251,15 +1251,28 @@ tr:hover td{background:var(--g1)}
   <div class="g2">
     <div>
       <!-- Video grid -->
-      <div id="sg-video-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:12px;min-height:0"></div>
-      <video id="sg-local-video" autoplay playsinline muted style="width:100%;height:120px;object-fit:cover;border-radius:var(--rl);background:#0A0F1A;display:none;margin-bottom:12px"></video>
+      <div id="sg-video-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:16px;min-height:0"></div>
+      <video id="sg-local-video" autoplay playsinline muted style="width:100%;height:200px;object-fit:cover;border-radius:var(--rl);background:#0A0F1A;display:none;margin-bottom:16px"></video>
+
+      <!-- Media controls -->
+      <div id="sg-media-controls" style="display:none;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn-sm" id="sg-mic-btn" onclick="toggleRingMic()" style="display:inline-flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Mic On
+        </button>
+        <button class="btn-sm" id="sg-cam-btn" onclick="toggleRingCam()" style="display:inline-flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Cam On
+        </button>
+        <button class="btn-sm" style="display:inline-flex;align-items:center;gap:6px;color:var(--err)" onclick="leaveStudyRing()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Leave Ring
+        </button>
+      </div>
 
       <!-- Live discussion -->
       <div class="card" style="margin-bottom:16px">
         <div class="ct" style="margin-bottom:12px">Live discussion</div>
         <div class="sg-chat-wrap">
           <div class="sg-chat-msgs" id="sg-chat-msgs-list">
-            <div style="padding:24px;text-align:center;color:var(--g5);font-size:13px">No messages yet. Be the first to contribute.</div>
+            <div style="padding:24px;text-align:center;color:var(--g5);font-size:13px" data-placeholder>No messages yet. Be the first to contribute.</div>
           </div>
           <div class="sg-inp">
             <button class="cinp-act" onclick="alert('Recording voice note…')" style="display:inline-flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>Voice</button>
@@ -1287,53 +1300,16 @@ tr:hover td{background:var(--g1)}
     <div>
       <!-- Members -->
       <div class="card" style="margin-bottom:16px">
-        <div class="ct">Members <span style="color:var(--g4);font-weight:400">(11)</span></div>
+        <div class="ct">Members <span style="color:var(--g4);font-weight:400" id="sg-member-count"></span></div>
         <div id="sg-members"></div>
         <div style="padding:10px 0 0;text-align:center"><span style="font-size:12px;color:var(--t6);cursor:pointer;font-weight:500">View all members</span></div>
       </div>
 
-      <!-- Schedule -->
+      <!-- Members join/leave log -->
       <div class="card" style="margin-bottom:16px">
-        <div class="ct">Ring schedule</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="padding:12px;background:var(--t0);border:1px solid var(--t2);border-radius:var(--r)">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-              <span style="font-size:13px;font-weight:600;color:var(--g9)">Cell Transport Deep Dive</span>
-              <span class="bdg bt" style="font-size:10px">● Live</span>
-            </div>
-            <div style="font-size:12px;color:var(--t7)">Today · Now</div>
-          </div>
-          <div style="padding:12px;background:var(--g0);border-radius:var(--r)">
-            <div style="font-size:13px;font-weight:500;color:var(--g9);margin-bottom:2px">DNA Replication Overview</div>
-            <div style="font-size:12px;color:var(--g5)">May 27 · 7:00 PM EAT</div>
-          </div>
-          <div style="padding:12px;background:var(--g0);border-radius:var(--r)">
-            <div style="font-size:13px;font-weight:500;color:var(--g9);margin-bottom:2px">Protein Synthesis - Transcription</div>
-            <div style="font-size:12px;color:var(--g5)">May 29 · 8:00 PM EAT</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Past recordings -->
-      <div class="card">
-        <div class="ct">Past recordings</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--g0);border-radius:var(--r)">
-            <div style="width:36px;height:36px;background:#0A0F1A;border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" stroke="#fff" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:500;color:var(--g9)">Osmosis &amp; Diffusion</div>
-              <div style="font-size:11px;color:var(--g5)">May 20 · 48 min · 14 attendees</div>
-            </div>
-            <button class="btn-sm" onclick="showModal('recording-modal')">Watch</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--g0);border-radius:var(--r)">
-            <div style="width:36px;height:36px;background:#0A0F1A;border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" stroke="#fff" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:500;color:var(--g9)">Cell Organelles Review</div>
-              <div style="font-size:11px;color:var(--g5)">May 13 · 62 min · 9 attendees</div>
-            </div>
-            <button class="btn-sm" onclick="showModal('recording-modal')">Watch</button>
-          </div>
+        <div class="ct">Ring activity</div>
+        <div id="sg-activity-log" style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--g5);max-height:160px;overflow-y:auto">
+          <div style="text-align:center;padding:24px 0;color:var(--g4)">No activity yet — join to get started</div>
         </div>
       </div>
     </div>
@@ -2405,6 +2381,10 @@ function buildSGGrid(){
     if(curRingTab==='mine')return sg.mine;
     return true;
   });
+  // Update live count badge
+  var liveCount=SG_DATA.filter(function(r){return r.status==='Live now';}).length;
+  var badge=document.getElementById('rtab-live-count');
+  if(badge){badge.textContent=liveCount;badge.style.display=liveCount?'':' none';}
   if(filtered.length===0){
     g.innerHTML='<div style="grid-column:1/-1;padding:48px 24px;text-align:center;background:var(--g0);border-radius:var(--rxl);border:1px dashed var(--g2)">'
       +'<div style="width:48px;height:48px;border-radius:var(--rl);background:var(--t1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px">'
@@ -2448,15 +2428,29 @@ function buildSGMembers(){
   }).join('');
 }
 function sendSGChat(){
-  var inp=document.getElementById('sg-inp'),msgs=document.getElementById('sg-chat');
+  var inp=document.getElementById('sg-inp');
   if(!inp||!inp.value.trim())return;
-  var m=inp.value;inp.value='';
-  msgs.innerHTML+='<div style="display:flex;gap:8px;align-items:flex-start"><div style="width:28px;height:28px;border-radius:50%;background:#B85F00;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">AO</div><div><div style="font-size:11px;color:var(--g4);margin-bottom:2px">You</div><div class="cbbl">'+m+'</div></div></div>';
+  var m=inp.value.trim();inp.value='';
+  var user=API.Auth.currentUser();
+  var name=(user&&(user.full_name||(user.first_name||''))).trim()||'You';
+  var initials=name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'ME';
+  // Append locally
+  _appendSGChat(initials,'#7C3AED',name,m,true);
+  // Broadcast via WebSocket
+  if(sgWS&&sgWS.readyState===1){
+    sgWS.send(JSON.stringify({type:'chat',room:'ring-'+sgRoomId,sender:name,initials:initials,text:m}));
+  }
+}
+function _appendSGChat(initials,color,sender,text,isMe){
+  var msgs=document.getElementById('sg-chat-msgs-list');if(!msgs)return;
+  // Clear placeholder if present
+  var ph=msgs.querySelector('[data-placeholder]');if(ph)ph.remove();
+  var row=document.createElement('div');
+  row.style.cssText='display:flex;gap:8px;align-items:flex-start'+(isMe?';flex-direction:row-reverse':'');
+  row.innerHTML='<div style="width:28px;height:28px;border-radius:50%;background:'+color+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">'+initials+'</div>'
+    +'<div><div style="font-size:11px;color:var(--g4);margin-bottom:2px;'+(isMe?'text-align:right':'')+'">'+sender+'</div><div class="cbbl">'+text+'</div></div>';
+  msgs.appendChild(row);
   msgs.scrollTop=msgs.scrollHeight;
-  setTimeout(function(){
-    msgs.innerHTML+='<div style="display:flex;gap:8px;align-items:flex-start"><div style="width:28px;height:28px;border-radius:50%;background:var(--t7);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">KO</div><div><div style="font-size:11px;color:var(--g4);margin-bottom:2px">Kwame Osei (Host)</div><div class="cbbl">Good question! Let me explain on the whiteboard.</div></div></div>';
-    msgs.scrollTop=msgs.scrollHeight;
-  },700);
 }
 
 // ═══ BOOK CALENDAR ═══
@@ -3424,7 +3418,8 @@ async function startStudyRing(ringId){
   sgWS.onmessage=function(e){
     var msg=JSON.parse(e.data);
     if(msg.type==='peer_joined'&&msg.peerId!=='local'){
-      createRingPeer(msg.peerId,true); // we are polite — send offer
+      createRingPeer(msg.peerId,true);
+      _addSGActivity('A participant joined');
     }else if(msg.type==='offer'){
       handleRingOffer(msg);
     }else if(msg.type==='answer'&&sgPeers[msg.peerId]){
@@ -3433,13 +3428,20 @@ async function startStudyRing(ringId){
       sgPeers[msg.peerId].addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(function(){});
     }else if(msg.type==='peer_left'){
       leaveRingPeer(msg.peerId);
+      _addSGActivity('A participant left');
+    }else if(msg.type==='chat'){
+      var colors=['#0E8F84','#5243F5','#B85F00','#7B3F9E','#E04F4F'];
+      var ci=(msg.sender||'?').charCodeAt(0)%colors.length;
+      _appendSGChat(msg.initials||'?',colors[ci],msg.sender||'Participant',msg.text||'',false);
     }
   };
   sgWS.onerror=function(){showToast('Ring connection failed.');};
 
-  // Update join button
+  // Show media controls, update join button
+  var ctrl=document.getElementById('sg-media-controls');if(ctrl)ctrl.style.display='flex';
   var btn=document.querySelector('#screen-ring-detail .btn-lg.p');
   if(btn){btn.textContent='Leave Ring';btn.onclick=function(){leaveStudyRing();};}
+  _addSGActivity('You joined the ring');
   showToast('Joined study ring — camera and mic are live');
 }
 
@@ -3513,6 +3515,28 @@ function leaveRingPeer(peerId){
   if(sgPeers[peerId]){sgPeers[peerId].close();delete sgPeers[peerId];}
   var el=document.getElementById('rv-'+peerId);if(el)el.remove();
 }
+function toggleRingMic(){
+  sgMicOn=!sgMicOn;
+  if(sgStream)sgStream.getAudioTracks().forEach(function(t){t.enabled=sgMicOn;});
+  var btn=document.getElementById('sg-mic-btn');
+  if(btn){btn.style.color=sgMicOn?'':' var(--err)';btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Mic '+(sgMicOn?'On':'Off');}
+}
+function toggleRingCam(){
+  sgCamOn=!sgCamOn;
+  if(sgStream)sgStream.getVideoTracks().forEach(function(t){t.enabled=sgCamOn;});
+  var btn=document.getElementById('sg-cam-btn');
+  if(btn){btn.style.color=sgCamOn?'':' var(--err)';btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Cam '+(sgCamOn?'On':'Off');}
+}
+function _addSGActivity(text){
+  var log=document.getElementById('sg-activity-log');if(!log)return;
+  var ph=log.querySelector('[data-act-ph]');if(ph)ph.remove();
+  var row=document.createElement('div');
+  row.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--g1)';
+  var t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  row.innerHTML='<span style="color:var(--g4);font-size:11px;flex-shrink:0">'+t+'</span><span>'+text+'</span>';
+  log.appendChild(row);
+  log.scrollTop=log.scrollHeight;
+}
 
 function leaveStudyRing(){
   // Stop local tracks
@@ -3525,10 +3549,12 @@ function leaveStudyRing(){
   // Tell API
   if(currentRingId&&API&&API.Auth.isLoggedIn())API.Rings.leave(currentRingId).catch(function(){});
   showToast('You have left the study ring');
-  // Reset join button
-  var btn=document.querySelector('#screen-ring-detail .btn-lg.p');
-  if(btn){btn.textContent='Join live session';btn.onclick=function(){startStudyRing(currentRingId||'demo');};}
-  goTo('study-groups');
+  // Hide media controls, reset join button — stay on ring page so they can rejoin
+  var ctrl=document.getElementById('sg-media-controls');if(ctrl)ctrl.style.display='none';
+  var joinBtn=document.querySelector('#screen-ring-detail .btn-lg.p');
+  if(joinBtn){joinBtn.textContent='Join live session';joinBtn.onclick=function(){startStudyRing(currentRingId);};}
+  _addSGActivity('You left the ring');
+  // Log activity
 }
 
 // ═══ OPEN RING DETAIL ═══
@@ -3552,12 +3578,15 @@ function openRingDetail(sg){
     badgeEl.textContent = isLive ? '● Live now · ' + (sg.members||0) + ' active' : sg.status||'';
     badgeEl.style.display = badgeEl.textContent ? 'inline-flex' : 'none';
   }
-  // Reset join button
+  // Reset join button, chat, activity
   var btn = document.querySelector('#screen-ring-detail .btn-lg.p');
-  if(btn){
-    btn.textContent = 'Join live session';
-    btn.onclick = function(){ startStudyRing(currentRingId); };
-  }
+  if(btn){btn.textContent='Join live session';btn.onclick=function(){startStudyRing(currentRingId);};}
+  var chatEl=document.getElementById('sg-chat-msgs-list');
+  if(chatEl)chatEl.innerHTML='<div style="padding:24px;text-align:center;color:var(--g5);font-size:13px" data-placeholder>No messages yet. Be the first to contribute.</div>';
+  var actLog=document.getElementById('sg-activity-log');
+  if(actLog)actLog.innerHTML='<div style="text-align:center;padding:16px 0;color:var(--g4)" data-act-ph>No activity yet</div>';
+  var ctrl=document.getElementById('sg-media-controls');if(ctrl)ctrl.style.display='none';
+  var mc=document.getElementById('sg-member-count');if(mc)mc.textContent='('+( sg.members||0)+')';
   goTo('ring-detail');
 }
 
