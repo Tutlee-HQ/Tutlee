@@ -388,14 +388,10 @@ class PasswordResetRequestView(APIView):
   </div>
   <p style="font-size:13px;color:#8B7EC0;margin:0">If you didn't request this, you can safely ignore this email. Your password won't change.</p>
 </div>"""
-        plain_body = f'Hi {user.first_name or "there"},
-
-Click this link to reset your Tutlee password:
-{reset_url}
-
-This link expires in 1 hour. If you didn't request this, ignore this email.
-
-— Tutlee'
+        plain_body = (f"Hi {user.first_name or 'there'},\n\n"
+                      f"Click this link to reset your Tutlee password:\n{reset_url}\n\n"
+                      "This link expires in 1 hour. If you didn't request this, ignore this email.\n\n"
+                      "— Tutlee")
 
         _send_otp_email.__func__ if hasattr(_send_otp_email, '__func__') else None
         # Re-use same email sending logic
