@@ -360,10 +360,12 @@ class PasswordResetRequestView(APIView):
     def post(self, request):
         import sys, secrets
         email = request.data.get('email', '').strip().lower()
+        print(f'[TUTLEE] Password reset requested for: {email}', file=sys.stderr)
         # Always return 200 to avoid leaking whether email exists
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
+            print(f'[TUTLEE] Password reset: user not found for {email}', file=sys.stderr)
             return Response({'detail': 'If that email exists, a reset link has been sent.'})
 
         from .models import PasswordResetToken
@@ -373,6 +375,7 @@ class PasswordResetRequestView(APIView):
         # Build reset URL — points to the frontend
         frontend = os.environ.get('FRONTEND_URL', 'https://tutlee-hq.github.io')
         reset_url = f'{frontend}/?reset={token}'
+        print(f'[TUTLEE] Password reset URL: {reset_url}', file=sys.stderr)
 
         subject = 'Reset your Tutlee password'
         html_body = f"""<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px;border:1px solid #EDE9FE">
@@ -393,18 +396,20 @@ class PasswordResetRequestView(APIView):
                       "This link expires in 1 hour. If you didn't request this, ignore this email.\n\n"
                       "— Tutlee")
 
-        _send_otp_email.__func__ if hasattr(_send_otp_email, '__func__') else None
-        # Re-use same email sending logic
         resend_key = os.environ.get('RESEND_API_KEY', '').strip()
+        print(f'[TUTLEE] RESEND_API_KEY present: {bool(resend_key)}', file=sys.stderr)
         if resend_key:
             try:
                 import resend as resend_sdk
                 resend_sdk.api_key = resend_key
                 from_addr = os.environ.get('RESEND_FROM', 'onboarding@resend.dev')
-                resend_sdk.Emails.send({'from': from_addr, 'to': [email], 'subject': subject, 'html': html_body, 'text': plain_body})
-                print(f'[TUTLEE] Password reset email sent → {email}', file=sys.stderr)
+                print(f'[TUTLEE] Sending reset email from {from_addr} to {email}', file=sys.stderr)
+                resp = resend_sdk.Emails.send({'from': from_addr, 'to': [email], 'subject': subject, 'html': html_body, 'text': plain_body})
+                print(f'[TUTLEE] Password reset email sent → {email}: {resp}', file=sys.stderr)
             except Exception as e:
-                print(f'[TUTLEE] Password reset email error: {e}', file=sys.stderr)
+                print(f'[TUTLEE] Password reset email error ({type(e).__name__}): {e}', file=sys.stderr)
+        else:
+            print('[TUTLEE] RESEND_API_KEY not set — reset email NOT sent', file=sys.stderr)
 
         return Response({'detail': 'If that email exists, a reset link has been sent.'})
 
