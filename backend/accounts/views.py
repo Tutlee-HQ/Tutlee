@@ -220,15 +220,13 @@ def generate_otp():
 
 def _send_otp_email(to_email, first_name, code):
     """
-    Send OTP email. Tries Resend API first (set RESEND_API_KEY in Render env).
-    Falls back to Django send_mail (Gmail/SMTP) if configured.
+    Send OTP email via Resend (official SDK) or SMTP fallback.
     Returns True on success, False on failure.
     """
     import sys
 
     subject = 'Your Tutlee verification code'
-    html_body = f"""
-    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px;border:1px solid #EDE9FE">
+    html_body = f"""<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px;border:1px solid #EDE9FE">
       <div style="text-align:center;margin-bottom:24px">
         <div style="display:inline-block;background:#7C3AED;border-radius:10px;padding:10px 18px">
           <span style="color:#fff;font-size:20px;font-weight:800;letter-spacing:-.4px">Tut<span style="color:#4ADE80">lee</span></span>
@@ -240,45 +238,30 @@ def _send_otp_email(to_email, first_name, code):
         <span style="font-size:36px;font-weight:800;color:#7C3AED;letter-spacing:8px">{code}</span>
       </div>
       <p style="font-size:13px;color:#8B7EC0;margin:0">This code expires in 10 minutes. If you didn't create a Tutlee account, ignore this email.</p>
-    </div>
-    """
+    </div>"""
     plain_body = f'Hi {first_name},\n\nYour Tutlee verification code is: {code}\n\nThis code expires in 10 minutes.\n\n— Tutlee'
 
-    # ── 1. Try Resend API ────────────────────────────────────────────────────
+    # ── 1. Try Resend SDK ────────────────────────────────────────────────────
     resend_key = os.environ.get('RESEND_API_KEY', '').strip()
     if resend_key:
         try:
-            # onboarding@resend.dev works without domain verification
+            import resend as resend_sdk
+            resend_sdk.api_key = resend_key
             from_addr = os.environ.get('RESEND_FROM', 'onboarding@resend.dev')
-            payload = json.dumps({
+            params = {
                 'from': from_addr,
                 'to': [to_email],
                 'subject': subject,
                 'html': html_body,
                 'text': plain_body,
-            }).encode('utf-8')
-            req = urllib.request.Request(
-                'https://api.resend.com/emails',
-                data=payload,
-                headers={
-                    'Authorization': f'Bearer {resend_key}',
-                    'Content-Type': 'application/json',
-                },
-                method='POST'
-            )
-            try:
-                with urllib.request.urlopen(req, timeout=15) as resp:
-                    resp_body = resp.read().decode('utf-8')
-                    print(f'[TUTLEE] Resend {resp.status} → {to_email}: {resp_body}', file=sys.stderr)
-                    if resp.status in (200, 201):
-                        return True
-            except urllib.error.HTTPError as http_err:
-                err_body = http_err.read().decode('utf-8')
-                print(f'[TUTLEE] Resend HTTP {http_err.code} → {to_email}: {err_body}', file=sys.stderr)
+            }
+            resp = resend_sdk.Emails.send(params)
+            print(f'[TUTLEE] Resend SDK OK → {to_email}: {resp}', file=sys.stderr)
+            return True
         except Exception as resend_err:
-            print(f'[TUTLEE] Resend error ({type(resend_err).__name__}): {resend_err}', file=sys.stderr)
+            print(f'[TUTLEE] Resend SDK error ({type(resend_err).__name__}): {resend_err}', file=sys.stderr)
 
-    # ── 2. Fall back to Django SMTP (Gmail App Password) ────────────────────
+    # ── 2. Fall back to Django SMTP ──────────────────────────────────────────
     smtp_user = os.environ.get('EMAIL_HOST_USER', '').strip()
     smtp_pass = os.environ.get('EMAIL_HOST_PASSWORD', '').strip()
     if smtp_user and smtp_pass:
