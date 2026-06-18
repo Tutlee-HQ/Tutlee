@@ -46,8 +46,25 @@ def health(request):
     return JsonResponse({'status': 'ok'})
 
 
+
+@csrf_exempt
+def dev_flush(request):
+    """One-time DB flush — protected by FLUSH_SECRET env var."""
+    import os
+    secret = os.environ.get('FLUSH_SECRET', '')
+    if not secret or request.GET.get('key') != secret:
+        return JsonResponse({'error': 'forbidden'}, status=403)
+    from django.db import connection
+    with connection.cursor() as cur:
+        cur.execute("SELECT tablename FROM pg_tables WHERE schemaname='public'")
+        tables = [r[0] for r in cur.fetchall()]
+        if tables:
+            cur.execute('TRUNCATE TABLE ' + ', '.join(f'"{t}"' for t in tables) + ' RESTART IDENTITY CASCADE')
+    return JsonResponse({'status': 'flushed', 'tables': tables})
+
 urlpatterns = [
     path('api/health/', health, name='health'),
+    path('api/dev/flush/', dev_flush, name='dev-flush'),
     path('django-admin/', admin.site.urls),
 
     path('api.js', serve_js_file('api.js'), name='api-js'),

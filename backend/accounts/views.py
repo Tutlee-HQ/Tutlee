@@ -248,7 +248,8 @@ def _send_otp_email(to_email, first_name, code):
     resend_key = os.environ.get('RESEND_API_KEY', '').strip()
     if resend_key:
         try:
-            from_addr = os.environ.get('RESEND_FROM', 'Tutlee <noreply@tutlee.io>')
+            # onboarding@resend.dev works without domain verification
+            from_addr = os.environ.get('RESEND_FROM', 'onboarding@resend.dev')
             payload = json.dumps({
                 'from': from_addr,
                 'to': [to_email],
@@ -265,12 +266,15 @@ def _send_otp_email(to_email, first_name, code):
                 },
                 method='POST'
             )
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                resp_body = resp.read()
-                if resp.status in (200, 201):
-                    print(f'[TUTLEE] Resend OK → {to_email}', file=sys.stderr)
-                    return True
-                print(f'[TUTLEE] Resend non-2xx {resp.status}: {resp_body}', file=sys.stderr)
+            try:
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    resp_body = resp.read().decode('utf-8')
+                    print(f'[TUTLEE] Resend {resp.status} → {to_email}: {resp_body}', file=sys.stderr)
+                    if resp.status in (200, 201):
+                        return True
+            except urllib.error.HTTPError as http_err:
+                err_body = http_err.read().decode('utf-8')
+                print(f'[TUTLEE] Resend HTTP {http_err.code} → {to_email}: {err_body}', file=sys.stderr)
         except Exception as resend_err:
             print(f'[TUTLEE] Resend error ({type(resend_err).__name__}): {resend_err}', file=sys.stderr)
 
