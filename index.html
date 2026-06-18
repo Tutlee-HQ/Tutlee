@@ -483,11 +483,11 @@ tr:hover td{background:var(--g1)}
 <div class="view active" id="vlanding">
   <nav class="lnav">
     <div class="lnav-in">
-      <div class="logo"><div class="logo-ic"><svg viewBox="0 0 200 200" fill="none"><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(0 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(90 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(180 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(270 100 100)"/></svg></div><span class="logo-tx">Tut<span>lee</span></span></div>
-      <div class="llinks"><a onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">How it works</a><a onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Features</a><a onclick="document.getElementById('study-rings').scrollIntoView({behavior:'smooth'})">Study Rings</a></div>
+      <div class="logo"><div class="logo-ic" id="cms-nav-logo-ic"><svg viewBox="0 0 200 200" fill="none"><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(0 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(90 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(180 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(270 100 100)"/></svg></div><span class="logo-tx" id="cms-nav-brand">Tut<span>lee</span></span></div>
+      <div class="llinks"><a id="cms-nav-l1" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">How it works</a><a id="cms-nav-l2" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Features</a><a id="cms-nav-l3" onclick="document.getElementById('study-rings').scrollIntoView({behavior:'smooth'})">Study Rings</a></div>
       <div class="lnav-r">
-        <button class="btn-ghost" onclick="openAuth('signin')">Sign in</button>
-        <button class="btn-cta" onclick="openAuth('get-started')">Get started free</button>
+        <button class="btn-ghost" id="cms-nav-signin-btn" onclick="openAuth('signin')">Sign in</button>
+        <button class="btn-cta" id="cms-nav-cta-btn" onclick="openAuth('get-started')">Get started free</button>
       </div>
     </div>
   </nav>
@@ -623,12 +623,12 @@ tr:hover td{background:var(--g1)}
   <footer class="lfooter">
     <div class="footer-in">
       <div class="footer-g">
-        <div><div class="logo" style="pointer-events:none"><div class="logo-ic"><svg viewBox="0 0 200 200" fill="none"><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(0 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(90 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(180 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(270 100 100)"/></svg></div><span class="logo-tx" style="color:#fff">Tut<span>lee</span></span></div><p class="fb-p">Peer-to-peer learning for students, by students.</p></div>
-        <div class="fc"><h4>Platform</h4><a onclick="openAuth('get-started')">For Learners</a><a onclick="openAuth('signup-tutor')">For Tutors</a><a onclick="document.getElementById('study-rings').scrollIntoView({behavior:'smooth'})">Study Rings</a></div>
-        <div class="fc"><h4>Company</h4><a href="/about.html">About</a><a href="/research.html">Research</a><a href="/blog.html">Blog</a><a href="/careers.html">Careers</a></div>
-        <div class="fc"><h4>Support</h4><a href="/help.html">Help Centre</a><a href="/safety.html">Safety</a><a href="/privacy.html">Privacy Policy</a><a href="/terms.html">Terms</a></div>
+        <div><div class="logo" style="pointer-events:none"><div class="logo-ic"><svg viewBox="0 0 200 200" fill="none"><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(0 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(90 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(180 100 100)"/><ellipse cx="100" cy="55" rx="26" ry="40" stroke="#0F1318" stroke-width="8" fill="none" transform="rotate(270 100 100)"/></svg></div><span class="logo-tx" style="color:#fff">Tut<span>lee</span></span></div><p class="fb-p" id="cms-foot-tagline">Peer-to-peer learning for students, by students.</p></div>
+        <div class="fc"><h4 id="cms-fc1-head">Platform</h4><a id="cms-foot-p1" onclick="openAuth('get-started')">For Learners</a><a id="cms-foot-p2" onclick="openAuth('signup-tutor')">For Tutors</a><a id="cms-foot-p3" onclick="document.getElementById('study-rings').scrollIntoView({behavior:'smooth'})">Study Rings</a></div>
+        <div class="fc"><h4 id="cms-fc2-head">Company</h4><a id="cms-foot-c1" href="/about.html">About</a><a id="cms-foot-c2" href="/research.html">Research</a><a id="cms-foot-c3" href="/blog.html">Blog</a><a id="cms-foot-c4" href="/careers.html">Careers</a></div>
+        <div class="fc"><h4 id="cms-fc3-head">Support</h4><a id="cms-foot-s1" href="/help.html">Help Centre</a><a id="cms-foot-s2" href="/safety.html">Safety</a><a id="cms-foot-s3" href="/privacy.html">Privacy Policy</a><a id="cms-foot-s4" href="/terms.html">Terms</a></div>
       </div>
-      <div class="fb-bot"><p>© 2026 Tutlee Technologies Ltd.</p><p>Made for students, everywhere.</p></div>
+      <div class="fb-bot"><p id="cms-foot-copy">© 2026 Tutlee Technologies Ltd.</p><p id="cms-foot-sub">Made for students, everywhere.</p></div>
     </div>
   </footer>
 </div>
@@ -3807,6 +3807,45 @@ async function createRing(){
               bar.textContent=cms.banner.text;
               document.body.prepend(bar);
             }
+          }
+          // Navbar
+          if(cms.navbar){
+            var nb=cms.navbar;
+            var fn2=function(id,val){var e=document.getElementById(id);if(e&&val)e.textContent=val;};
+            // Brand name — preserve the inner <span> color accent on last 3 chars
+            if(nb.brandName){
+              var brandEl=document.getElementById('cms-nav-brand');
+              if(brandEl){
+                var bn=nb.brandName;
+                if(bn.length>3){brandEl.innerHTML=bn.slice(0,-3)+'<span>'+bn.slice(-3)+'</span>';}
+                else{brandEl.textContent=bn;}
+              }
+            }
+            // Logo image
+            if(nb.logoUrl){
+              var licEl=document.getElementById('cms-nav-logo-ic');
+              if(licEl) licEl.innerHTML='<img src="'+nb.logoUrl+'" style="width:100%;height:100%;object-fit:contain;border-radius:9px">';
+            }
+            // Nav links
+            var nl=nb.links||[];
+            if(nl[0]){fn2('cms-nav-l1',nl[0].text);var e1=document.getElementById('cms-nav-l1');if(e1&&nl[0].href)e1.setAttribute('onclick',"document.getElementById('"+nl[0].href+"').scrollIntoView({behavior:'smooth'})");}
+            if(nl[1]){fn2('cms-nav-l2',nl[1].text);var e2=document.getElementById('cms-nav-l2');if(e2&&nl[1].href)e2.setAttribute('onclick',"document.getElementById('"+nl[1].href+"').scrollIntoView({behavior:'smooth'})");}
+            if(nl[2]){fn2('cms-nav-l3',nl[2].text);var e3=document.getElementById('cms-nav-l3');if(e3&&nl[2].href)e3.setAttribute('onclick',"document.getElementById('"+nl[2].href+"').scrollIntoView({behavior:'smooth'})");}
+            // Buttons
+            fn2('cms-nav-signin-btn', nb.signinText);
+            fn2('cms-nav-cta-btn',    nb.ctaText);
+          }
+          // Footer
+          if(cms.footer){
+            var ft=cms.footer;
+            var fn3=function(id,val){var e=document.getElementById(id);if(e&&val)e.textContent=val;};
+            fn3('cms-foot-tagline', ft.tagline);
+            fn3('cms-foot-copy',    ft.copyright);
+            fn3('cms-foot-sub',     ft.subtext);
+            var fc=ft.cols||[];
+            if(fc[0]){fn3('cms-fc1-head',fc[0].head);var fl1=fc[0].links||[];fn3('cms-foot-p1',fl1[0]);fn3('cms-foot-p2',fl1[1]);fn3('cms-foot-p3',fl1[2]);}
+            if(fc[1]){fn3('cms-fc2-head',fc[1].head);var fl2=fc[1].links||[];fn3('cms-foot-c1',fl2[0]);fn3('cms-foot-c2',fl2[1]);fn3('cms-foot-c3',fl2[2]);}
+            if(fc[2]){fn3('cms-fc3-head',fc[2].head);var fl3=fc[2].links||[];fn3('cms-foot-s1',fl3[0]);fn3('cms-foot-s2',fl3[1]);fn3('cms-foot-s3',fl3[2]);}
           }
         }catch(e){}
       }).catch(function(){});

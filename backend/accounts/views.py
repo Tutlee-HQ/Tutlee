@@ -70,13 +70,38 @@ class RegisterView(generics.CreateAPIView):
             s = self.get_serializer(data=request.data)
             s.is_valid(raise_exception=True)
             user = s.save()
-        # Generate and send OTP for email verification via Resend
+        # Generate and send OTP for email verification
+        dev_otp_code = None
         try:
             from .models import EmailOTP
-            import random, string
+            import random, string, django.conf
             code = ''.join(random.choices(string.digits, k=6))
             EmailOTP.objects.create(user=user, code=code)
-            _send_otp_email(user.email, user.first_name or 'there', code)
+            from django.core.mail import send_mail
+            email_sent = False
+            try:
+                send_mail(
+                    subject='Welcome to Tutlee — verify your email',
+                    message=(
+                        f'Hi {user.first_name},\n\n'
+                        f'Your verification code is: {code}\n\n'
+                        f'Enter this in the app to complete your signup.\n\n'
+                        f'The code expires in 10 minutes.\n\n'
+                        f'— Tutlee'
+                    ),
+                    from_email=django.conf.settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=False,
+                )
+                email_sent = True
+            except Exception as _email_err:
+                import sys
+                print(f'[TUTLEE] OTP email failed: {_email_err}', file=sys.stderr)
+            # Always return the OTP code when email fails so the UI can auto-fill
+            if not email_sent:
+                dev_otp_code = code
+            elif django.conf.settings.DEBUG:
+                dev_otp_code = code  # also expose in dev for testing
         except Exception:
             pass  # never block registration
         refresh = RefreshToken.for_user(user)
@@ -86,6 +111,8 @@ class RegisterView(generics.CreateAPIView):
             'user':    UserSerializer(user).data,
             'email_verification_required': True,
         }
+        if dev_otp_code is not None:
+            resp['dev_otp_code'] = dev_otp_code
         return Response(resp, status=status.HTTP_201_CREATED)
 
 
@@ -207,81 +234,13 @@ def admin_stats(request):
 # ─── OTP VERIFICATION ────────────────────────────────────────────────────────
 import random
 import string
-import os
-import json
-import urllib.request
+from django.core.mail import send_mail
 from django.conf import settings as django_settings
 from .models import EmailOTP, SiteContent
 
 
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
-
-
-def _send_otp_email(to_email, first_name, code):
-    """
-    Send OTP email via Resend (official SDK) or SMTP fallback.
-    Returns True on success, False on failure.
-    """
-    import sys
-
-    subject = 'Your Tutlee verification code'
-    html_body = f"""<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px;border:1px solid #EDE9FE">
-      <div style="text-align:center;margin-bottom:24px">
-        <div style="display:inline-block;background:#7C3AED;border-radius:10px;padding:10px 18px">
-          <span style="color:#fff;font-size:20px;font-weight:800;letter-spacing:-.4px">Tut<span style="color:#4ADE80">lee</span></span>
-        </div>
-      </div>
-      <h2 style="font-size:22px;font-weight:800;color:#0F0720;margin:0 0 8px">Verify your email</h2>
-      <p style="font-size:14px;color:#6456A0;margin:0 0 24px">Hi {first_name}, use the code below to complete your signup:</p>
-      <div style="background:#F5F3FF;border:2px solid #7C3AED;border-radius:12px;padding:20px;text-align:center;margin-bottom:24px">
-        <span style="font-size:36px;font-weight:800;color:#7C3AED;letter-spacing:8px">{code}</span>
-      </div>
-      <p style="font-size:13px;color:#8B7EC0;margin:0">This code expires in 10 minutes. If you didn't create a Tutlee account, ignore this email.</p>
-    </div>"""
-    plain_body = f'Hi {first_name},\n\nYour Tutlee verification code is: {code}\n\nThis code expires in 10 minutes.\n\n— Tutlee'
-
-    # ── 1. Try Resend SDK ────────────────────────────────────────────────────
-    resend_key = os.environ.get('RESEND_API_KEY', '').strip()
-    if resend_key:
-        try:
-            import resend as resend_sdk
-            resend_sdk.api_key = resend_key
-            from_addr = os.environ.get('RESEND_FROM', 'onboarding@resend.dev')
-            params = {
-                'from': from_addr,
-                'to': [to_email],
-                'subject': subject,
-                'html': html_body,
-                'text': plain_body,
-            }
-            resp = resend_sdk.Emails.send(params)
-            print(f'[TUTLEE] Resend SDK OK → {to_email}: {resp}', file=sys.stderr)
-            return True
-        except Exception as resend_err:
-            print(f'[TUTLEE] Resend SDK error ({type(resend_err).__name__}): {resend_err}', file=sys.stderr)
-
-    # ── 2. Fall back to Django SMTP ──────────────────────────────────────────
-    smtp_user = os.environ.get('EMAIL_HOST_USER', '').strip()
-    smtp_pass = os.environ.get('EMAIL_HOST_PASSWORD', '').strip()
-    if smtp_user and smtp_pass:
-        try:
-            from django.core.mail import send_mail
-            send_mail(
-                subject=subject,
-                message=plain_body,
-                from_email=django_settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[to_email],
-                fail_silently=False,
-                html_message=html_body,
-            )
-            print(f'[TUTLEE] SMTP OK → {to_email}', file=sys.stderr)
-            return True
-        except Exception as smtp_err:
-            print(f'[TUTLEE] SMTP error ({type(smtp_err).__name__}): {smtp_err}', file=sys.stderr)
-
-    print('[TUTLEE] No email provider configured — check RESEND_API_KEY in Render', file=sys.stderr)
-    return False
 
 
 class SendOTPView(APIView):
@@ -295,10 +254,18 @@ class SendOTPView(APIView):
             return Response({'error': 'No account found with that email.'}, status=404)
         code = generate_otp()
         EmailOTP.objects.create(user=user, code=code)
-        user_name = user.first_name or 'there'
-        ok = _send_otp_email(email, user_name, code)
-        if not ok:
-            return Response({'detail': 'OTP sent'})
+        try:
+            send_mail(
+                subject='Your Tutlee verification code',
+                message=f'Your verification code is: {code}\n\nThis code expires in 10 minutes.',
+                from_email=django_settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            import sys
+            print(f'[TUTLEE] SendOTP email failed: {e}', file=sys.stderr)
+            return Response({'detail': 'OTP sent', 'dev_otp_code': str(code)})
         return Response({'detail': 'OTP sent to ' + email})
 
 
@@ -351,93 +318,3 @@ class SiteContentView(APIView):
         obj, _ = SiteContent.objects.update_or_create(key=key, defaults={'content': content})
         return Response({'key': obj.key, 'updated_at': obj.updated_at})
 
-
-
-# ─── PASSWORD RESET ──────────────────────────────────────────────────────────
-class PasswordResetRequestView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        import sys, secrets
-        email = request.data.get('email', '').strip().lower()
-        print(f'[TUTLEE] Password reset requested for: {email}', file=sys.stderr)
-        # Always return 200 to avoid leaking whether email exists
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            print(f'[TUTLEE] Password reset: user not found for {email}', file=sys.stderr)
-            return Response({'detail': 'If that email exists, a reset link has been sent.'})
-
-        from .models import PasswordResetToken
-        token = secrets.token_urlsafe(32)
-        PasswordResetToken.objects.create(user=user, token=token)
-
-        # Build reset URL — points to the frontend
-        frontend = os.environ.get('FRONTEND_URL', 'https://tutlee-hq.github.io')
-        reset_url = f'{frontend}/?reset={token}'
-        print(f'[TUTLEE] Password reset URL: {reset_url}', file=sys.stderr)
-
-        subject = 'Reset your Tutlee password'
-        html_body = f"""<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px;border:1px solid #EDE9FE">
-  <div style="text-align:center;margin-bottom:24px">
-    <div style="display:inline-block;background:#7C3AED;border-radius:10px;padding:10px 18px">
-      <span style="color:#fff;font-size:20px;font-weight:800;letter-spacing:-.4px">Tut<span style="color:#4ADE80">lee</span></span>
-    </div>
-  </div>
-  <h2 style="font-size:22px;font-weight:800;color:#0F0720;margin:0 0 8px">Reset your password</h2>
-  <p style="font-size:14px;color:#6456A0;margin:0 0 24px">Hi {user.first_name or 'there'}, click the button below to set a new password. This link expires in 1 hour.</p>
-  <div style="text-align:center;margin-bottom:24px">
-    <a href="{reset_url}" style="display:inline-block;background:#7C3AED;color:#fff;text-decoration:none;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700">Reset my password</a>
-  </div>
-  <p style="font-size:13px;color:#8B7EC0;margin:0">If you didn't request this, you can safely ignore this email. Your password won't change.</p>
-</div>"""
-        plain_body = (f"Hi {user.first_name or 'there'},\n\n"
-                      f"Click this link to reset your Tutlee password:\n{reset_url}\n\n"
-                      "This link expires in 1 hour. If you didn't request this, ignore this email.\n\n"
-                      "— Tutlee")
-
-        resend_key = os.environ.get('RESEND_API_KEY', '').strip()
-        print(f'[TUTLEE] RESEND_API_KEY present: {bool(resend_key)}', file=sys.stderr)
-        if resend_key:
-            try:
-                import resend as resend_sdk
-                resend_sdk.api_key = resend_key
-                from_addr = os.environ.get('RESEND_FROM', 'onboarding@resend.dev')
-                print(f'[TUTLEE] Sending reset email from {from_addr} to {email}', file=sys.stderr)
-                resp = resend_sdk.Emails.send({'from': from_addr, 'to': [email], 'subject': subject, 'html': html_body, 'text': plain_body})
-                print(f'[TUTLEE] Password reset email sent → {email}: {resp}', file=sys.stderr)
-            except Exception as e:
-                print(f'[TUTLEE] Password reset email error ({type(e).__name__}): {e}', file=sys.stderr)
-        else:
-            print('[TUTLEE] RESEND_API_KEY not set — reset email NOT sent', file=sys.stderr)
-
-        return Response({'detail': 'If that email exists, a reset link has been sent.'})
-
-
-class PasswordResetConfirmView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        from django.utils import timezone
-        import datetime
-        from .models import PasswordResetToken
-        token_str = request.data.get('token', '').strip()
-        password  = request.data.get('password', '').strip()
-
-        if not token_str or not password:
-            return Response({'detail': 'Token and password are required.'}, status=400)
-        if len(password) < 8:
-            return Response({'detail': 'Password must be at least 8 characters.'}, status=400)
-
-        cutoff = timezone.now() - datetime.timedelta(hours=1)
-        try:
-            reset = PasswordResetToken.objects.get(token=token_str, is_used=False, created_at__gte=cutoff)
-        except PasswordResetToken.DoesNotExist:
-            return Response({'detail': 'This reset link is invalid or has expired. Please request a new one.'}, status=400)
-
-        reset.user.set_password(password)
-        reset.user.save()
-        reset.is_used = True
-        reset.save()
-
-        return Response({'detail': 'Password updated successfully.'})

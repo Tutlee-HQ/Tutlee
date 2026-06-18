@@ -46,33 +46,8 @@ def health(request):
     return JsonResponse({'status': 'ok'})
 
 
-@csrf_exempt
-def dev_flush(request):
-    """Drop ALL public tables so the next deploy runs migrations from scratch.
-    Protected by FLUSH_SECRET env var. Use ?key=<FLUSH_SECRET>&drop=1 to drop tables."""
-    import os
-    secret = os.environ.get('FLUSH_SECRET', '')
-    if not secret or request.GET.get('key') != secret:
-        return JsonResponse({'error': 'forbidden'}, status=403)
-    from django.db import connection
-    with connection.cursor() as cur:
-        cur.execute("SELECT tablename FROM pg_tables WHERE schemaname='public'")
-        tables = [r[0] for r in cur.fetchall()]
-        if tables:
-            if request.GET.get('drop') == '1':
-                # Drop tables entirely so next migrate creates them fresh
-                cur.execute('DROP TABLE IF EXISTS ' + ', '.join(f'"{t}"' for t in tables) + ' CASCADE')
-                return JsonResponse({'status': 'dropped', 'tables': tables})
-            else:
-                # Default: truncate (keep schema, clear data)
-                cur.execute('TRUNCATE TABLE ' + ', '.join(f'"{t}"' for t in tables) + ' RESTART IDENTITY CASCADE')
-                return JsonResponse({'status': 'truncated', 'tables': tables})
-    return JsonResponse({'status': 'nothing_to_do', 'tables': []})
-
-
 urlpatterns = [
     path('api/health/', health, name='health'),
-    path('api/dev/flush/', dev_flush, name='dev-flush'),
     path('django-admin/', admin.site.urls),
 
     path('api.js', serve_js_file('api.js'), name='api-js'),

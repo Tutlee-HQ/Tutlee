@@ -79,16 +79,3 @@ class SiteContent(models.Model):
 
     def __str__(self):
         return f'SiteContent({self.key})'
-
-
-class PasswordResetToken(models.Model):
-    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reset_tokens')
-    token      = models.CharField(max_length=64, unique=True)
-    is_used    = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f'PasswordResetToken({self.user.email})'
