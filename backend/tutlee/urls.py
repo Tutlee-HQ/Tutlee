@@ -46,11 +46,10 @@ def health(request):
     return JsonResponse({'status': 'ok'})
 
 
-
 @csrf_exempt
 def dev_flush(request):
     """Drop ALL public tables so the next deploy runs migrations from scratch.
-    Protected by FLUSH_SECRET env var. Visit with ?key=<FLUSH_SECRET>&drop=1 to drop tables."""
+    Protected by FLUSH_SECRET env var. Use ?key=<FLUSH_SECRET>&drop=1 to drop tables."""
     import os
     secret = os.environ.get('FLUSH_SECRET', '')
     if not secret or request.GET.get('key') != secret:
@@ -70,6 +69,7 @@ def dev_flush(request):
                 return JsonResponse({'status': 'truncated', 'tables': tables})
     return JsonResponse({'status': 'nothing_to_do', 'tables': []})
 
+
 urlpatterns = [
     path('api/health/', health, name='health'),
     path('api/dev/flush/', dev_flush, name='dev-flush'),
@@ -84,4 +84,12 @@ urlpatterns = [
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('api/accounts/',    include('accounts.urls')),
-    pa
+    path('api/sessions/',    include('sessions_app.urls')),
+    path('api/assessments/', include('assessments.urls')),
+    path('api/kyt/',         include('kyt.urls')),
+    path('api/rings/',       include('study_rings.urls')),
+    path('api/reports/',     include('reports.urls')),
+    path('api/payments/',    include('payments.urls')),
+    path('api/content/<str:key>/', SiteContentView.as_view(), name='site-content'),
+    path('api/content/',          SiteContentView.as_view(), name='site-content-default'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
