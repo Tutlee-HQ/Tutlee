@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Render build script — runs on every deploy
 set -o errexit
+# Deploy: 2026-06-18 09:45 UTC
 
 pip install -r requirements.txt
 python manage.py collectstatic --no-input
