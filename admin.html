@@ -187,6 +187,19 @@ tr:hover td{background:var(--p9)}
 .act-btn:hover{background:var(--p8);border-color:var(--p6);color:var(--p4)}
 .act-btn.danger{background:var(--err1);border-color:var(--err2);color:var(--err)}
 .act-btn.danger:hover{background:var(--err);color:#fff}
+/* ── THREE-DOT MENUS ── */
+.tdm-wrap{position:relative;display:inline-block}
+.tdm-btn{width:28px;height:28px;border:1px solid var(--g2);background:var(--g1);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--g6);line-height:1;transition:all .15s;padding:0}
+.tdm-btn:hover{background:var(--p8);border-color:var(--p6);color:var(--p4)}
+.tdm-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--w);border:1px solid var(--g2);border-radius:var(--r);box-shadow:var(--shm);min-width:140px;z-index:200;overflow:hidden}
+.tdm-menu.open{display:block}
+.tdm-item{padding:9px 14px;font-size:13px;font-weight:500;color:var(--g8);cursor:pointer;transition:background .1s;white-space:nowrap}
+.tdm-item:hover{background:var(--p9);color:var(--p4)}
+.tdm-item.danger{color:var(--err)}
+.tdm-item.danger:hover{background:var(--err1)}
+.tdm-item.warn{color:var(--warn)}
+.tdm-item.warn:hover{background:var(--warn1)}
+
 
 /* ── LIVE SESSIONS ── */
 .live-item{display:flex;align-items:center;gap:var(--sp4);padding:12px 0;border-bottom:1px solid var(--g1)}
@@ -300,6 +313,22 @@ tr:hover td{background:var(--p9)}
   #app{flex-direction:column}
 }
 @media(max-width:480px){.kpi-grid{grid-template-columns:1fr}.filters{flex-direction:column;align-items:stretch}}
+
+/* ── CMS PREVIEW ── */
+.cms-layout{display:grid;grid-template-columns:1fr 380px;gap:var(--sp6);align-items:start}
+.cms-preview-panel{position:sticky;top:var(--sp4);background:var(--g0);border:1px solid var(--g2);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shm)}
+.cms-preview-header{padding:10px var(--sp4);background:var(--w);border-bottom:1px solid var(--g2);display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--g6)}
+.cms-preview-header span{width:10px;height:10px;border-radius:50%;display:inline-block}
+.cms-preview-body{padding:0;overflow:hidden}
+.cms-preview-hp{padding:24px var(--sp5)}
+.cms-preview-hero-title{font-size:20px;font-weight:800;color:var(--g9);line-height:1.25;margin-bottom:8px;letter-spacing:-.3px}
+.cms-preview-hero-sub{font-size:12px;color:var(--g6);line-height:1.6;margin-bottom:14px}
+.cms-preview-cta{display:inline-block;background:var(--p4);color:#fff;padding:8px 18px;border-radius:var(--r);font-size:12px;font-weight:700}
+.cms-preview-stats{display:flex;gap:var(--sp4);margin-top:var(--sp4);padding-top:var(--sp4);border-top:1px solid var(--g2)}
+.cms-preview-stat strong{display:block;font-size:16px;font-weight:800;color:var(--p4)}
+.cms-preview-stat span{font-size:10px;color:var(--g5)}
+.cms-preview-banner{padding:8px var(--sp4);font-size:12px;font-weight:600;color:#fff;text-align:center;display:none}
+@media(max-width:1100px){.cms-layout{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -361,7 +390,7 @@ tr:hover td{background:var(--p9)}
       <div class="nav-item" onclick="navTo('kyt',this)">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         KYT Verification
-        <span class="nav-badge" id="kyt-badge">4</span>
+        <span class="nav-badge" id="kyt-badge" style="display:none">0</span>
       </div>
 
       <div class="nav-section-label">Platform</div>
@@ -384,7 +413,7 @@ tr:hover td{background:var(--p9)}
       <div class="nav-item" onclick="navTo('reports',this)">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
         Reports
-        <span class="nav-badge" id="reports-badge">2</span>
+        <span class="nav-badge" id="reports-badge" style="display:none">0</span>
       </div>
 
       <div class="nav-item" onclick="navTo('cms',this)">
@@ -557,7 +586,7 @@ tr:hover td{background:var(--p9)}
                   <th>Sessions</th>
                   <th>Last Active</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th style="width:44px"></th>
                 </tr>
               </thead>
               <tbody id="learners-tbody"></tbody>
@@ -590,7 +619,7 @@ tr:hover td{background:var(--p9)}
                   <th>Rating</th>
                   <th>Pass Rate</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th style="width:44px"></th>
                 </tr>
               </thead>
               <tbody id="tutors-tbody"></tbody>
@@ -650,7 +679,7 @@ tr:hover td{background:var(--p9)}
                 <th>Duration</th>
                 <th>Amount</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th style="width:44px"></th>
               </tr>
             </thead>
             <tbody id="sessions-tbody"></tbody>
@@ -737,7 +766,7 @@ tr:hover td{background:var(--p9)}
                 <th>Platform Fee</th>
                 <th>Net Payout</th>
                 <th>Requested</th>
-                <th>Actions</th>
+                <th style="width:44px"></th>
               </tr>
             </thead>
             <tbody id="payouts-tbody"></tbody>
@@ -811,33 +840,37 @@ tr:hover td{background:var(--p9)}
 
     <!-- ═══ CMS ═══ -->
     <div class="screen" id="screen-cms">
-      <div style="max-width:900px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-          <div style="font-size:13px;color:var(--g5)">Changes are saved to the backend and reflected on the live homepage immediately.</div>
-          <div style="display:flex;gap:10px;align-items:center">
-            <span id="cms-save-status" style="font-size:12px;color:var(--ok);font-weight:600;opacity:0;transition:opacity .3s">✓ Saved</span>
-            <button class="act-btn primary" id="cms-save-btn" onclick="saveCMSContent()">Save &amp; Publish</button>
-          </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--g9);margin-bottom:2px">Homepage CMS</div>
+          <div style="font-size:12px;color:var(--g5)">Edit content and see a live preview before publishing.</div>
         </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span id="cms-save-status" style="font-size:12px;color:var(--ok);font-weight:600;opacity:0;transition:opacity .3s">✓ Saved</span>
+          <button class="act-btn primary" id="cms-save-btn" onclick="saveCMSContent()">Save &amp; Publish</button>
+        </div>
+      </div>
+      <div class="cms-layout">
+      <div>
         <div class="card" style="margin-bottom:16px">
           <div class="card-head"><svg width="16" height="16" fill="none" stroke="var(--t5)" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg><h3>Hero Section</h3></div>
           <div class="card-body">
-            <div class="setting-row"><div class="setting-label"><strong>Headline</strong><span>Main hero title text</span></div><div class="setting-control" style="flex:2"><input type="text" class="setting-input" id="cms-hero-title" placeholder="e.g. Learn anything from Africa's best tutors"></div></div>
-            <div class="setting-row"><div class="setting-label"><strong>Sub-headline</strong><span>Supporting text below headline</span></div><div class="setting-control" style="flex:2"><input type="text" class="setting-input" id="cms-hero-sub" placeholder="e.g. Book live 1-on-1 sessions, join study rings…"></div></div>
-            <div class="setting-row"><div class="setting-label"><strong>Primary CTA</strong><span>Main call-to-action button text</span></div><div class="setting-control" style="flex:2"><input type="text" class="setting-input" id="cms-cta-primary" placeholder="e.g. Start learning today"></div></div>
-            <div class="setting-row"><div class="setting-label"><strong>Hero BG Image URL</strong><span>Direct link or leave blank for default gradient</span></div><div class="setting-control" style="flex:2"><input type="text" class="setting-input" id="cms-hero-bg" placeholder="https://..."></div></div>
+            <div class="setting-row"><div class="setting-label"><strong>Headline</strong><span>Main hero title text</span></div><div class="setting-control" style="flex:2"><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-hero-title" placeholder="e.g. Learn anything from Africa's best tutors"></div></div>
+            <div class="setting-row"><div class="setting-label"><strong>Sub-headline</strong><span>Supporting text below headline</span></div><div class="setting-control" style="flex:2"><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-hero-sub" placeholder="e.g. Book live 1-on-1 sessions, join study rings…"></div></div>
+            <div class="setting-row"><div class="setting-label"><strong>Primary CTA</strong><span>Main call-to-action button text</span></div><div class="setting-control" style="flex:2"><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-cta-primary" placeholder="e.g. Start learning today"></div></div>
+            <div class="setting-row"><div class="setting-label"><strong>Hero BG Image URL</strong><span>Direct link or leave blank for default gradient</span></div><div class="setting-control" style="flex:2"><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-hero-bg" placeholder="https://..."></div></div>
           </div>
         </div>
         <div class="card" style="margin-bottom:16px">
           <div class="card-head"><svg width="16" height="16" fill="none" stroke="var(--a5)" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><h3>Stats Bar</h3></div>
           <div class="card-body">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:10px">
-              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 1 #</label><input type="text" class="setting-input" id="cms-stat1-num" placeholder="5,000+"></div>
-              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 1 Label</label><input type="text" class="setting-input" id="cms-stat1-lbl" placeholder="Students"></div>
-              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 2 #</label><input type="text" class="setting-input" id="cms-stat2-num" placeholder="500+"></div>
-              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 2 Label</label><input type="text" class="setting-input" id="cms-stat2-lbl" placeholder="Tutors"></div>
-              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 3 #</label><input type="text" class="setting-input" id="cms-stat3-num" placeholder="20+"></div>
-              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 3 Label</label><input type="text" class="setting-input" id="cms-stat3-lbl" placeholder="Subjects"></div>
+              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 1 #</label><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-stat1-num" placeholder="5,000+"></div>
+              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 1 Label</label><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-stat1-lbl" placeholder="Students"></div>
+              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 2 #</label><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-stat2-num" placeholder="500+"></div>
+              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 2 Label</label><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-stat2-lbl" placeholder="Tutors"></div>
+              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 3 #</label><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-stat3-num" placeholder="20+"></div>
+              <div><label style="font-size:11px;color:var(--g5);display:block;margin-bottom:4px">Stat 3 Label</label><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-stat3-lbl" placeholder="Subjects"></div>
             </div>
           </div>
         </div>
@@ -850,8 +883,8 @@ tr:hover td{background:var(--p9)}
           <div class="card-body">
             <div id="cms-media-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px"></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <input type="url" class="setting-input" id="cms-media-url" placeholder="Paste image or YouTube URL…" style="flex:1;min-width:200px">
-              <input type="text" class="setting-input" id="cms-media-caption" placeholder="Caption (optional)" style="min-width:140px">
+              <input oninput="updateCMSPreview()" type="url" class="setting-input" id="cms-media-url" placeholder="Paste image or YouTube URL…" style="flex:1;min-width:200px">
+              <input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-media-caption" placeholder="Caption (optional)" style="min-width:140px">
               <button class="act-btn ghost" onclick="addCMSMedia()">Add</button>
             </div>
           </div>
@@ -859,11 +892,40 @@ tr:hover td{background:var(--p9)}
         <div class="card">
           <div class="card-head"><svg width="16" height="16" fill="none" stroke="var(--ok)" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><h3>Announcement Banner</h3></div>
           <div class="card-body">
-            <div class="setting-row"><div class="setting-label"><strong>Banner Text</strong><span>Shown at top of homepage. Leave blank to hide.</span></div><div class="setting-control" style="flex:2"><input type="text" class="setting-input" id="cms-banner-text" placeholder="e.g. 🎉 Launch special — first session free!"></div></div>
-            <div class="setting-row"><div class="setting-label"><strong>Banner Colour</strong><span>Hex colour code</span></div><div class="setting-control"><input type="color" id="cms-banner-color" value="#0D9488" style="width:44px;height:34px;border:none;border-radius:6px;cursor:pointer"></div></div>
+            <div class="setting-row"><div class="setting-label"><strong>Banner Text</strong><span>Shown at top of homepage. Leave blank to hide.</span></div><div class="setting-control" style="flex:2"><input oninput="updateCMSPreview()" type="text" class="setting-input" id="cms-banner-text" placeholder="e.g. 🎉 Launch special — first session free!"></div></div>
+            <div class="setting-row"><div class="setting-label"><strong>Banner Colour</strong><span>Hex colour code</span></div><div class="setting-control"><input onchange="updateCMSPreview()" type="color" id="cms-banner-color" value="#0D9488" style="width:44px;height:34px;border:none;border-radius:6px;cursor:pointer"></div></div>
+          </div>
+        </div>
+      </div><!-- end left col -->
+
+      <!-- LIVE PREVIEW PANEL -->
+      <div class="cms-preview-panel">
+        <div class="cms-preview-header">
+          <span style="background:#ef4444"></span>
+          <span style="background:#f59e0b"></span>
+          <span style="background:#22c55e"></span>
+          <span style="margin-left:4px">tutlee.com — live preview</span>
+        </div>
+        <div id="cms-preview-banner" class="cms-preview-banner"></div>
+        <div class="cms-preview-body">
+          <div class="cms-preview-hp">
+            <div class="cms-preview-hero-title" id="cms-prev-title">Your headline will appear here</div>
+            <div class="cms-preview-hero-sub" id="cms-prev-sub">Your sub-headline will appear here.</div>
+            <div class="cms-preview-cta" id="cms-prev-cta">Start learning free</div>
+            <div class="cms-preview-stats">
+              <div class="cms-preview-stat"><strong id="cms-prev-s1n">—</strong><span id="cms-prev-s1l">Students</span></div>
+              <div class="cms-preview-stat"><strong id="cms-prev-s2n">—</strong><span id="cms-prev-s2l">Tutors</span></div>
+              <div class="cms-preview-stat"><strong id="cms-prev-s3n">—</strong><span id="cms-prev-s3l">Subjects</span></div>
+            </div>
+          </div>
+          <div style="padding:0 var(--sp5) var(--sp4);border-top:1px solid var(--g2);margin-top:var(--sp4)">
+            <div style="font-size:10px;font-weight:700;color:var(--g5);text-transform:uppercase;letter-spacing:.06em;margin:var(--sp4) 0 var(--sp3)">Visible sections</div>
+            <div id="cms-prev-sections" style="display:flex;flex-wrap:wrap;gap:6px"></div>
           </div>
         </div>
       </div>
+
+      </div><!-- end .cms-layout -->
     </div>
 
     <!-- ═══ SETTINGS ═══ -->
@@ -1131,6 +1193,8 @@ async function doLogin() {
     if (!data.user.is_staff && data.user.role !== 'admin') {
       throw new Error('Access denied. Admin credentials required.');
     }
+    localStorage.setItem('tutlee_admin_token', data.access);
+    localStorage.setItem('tutlee_admin_user', JSON.stringify(data.user));
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     document.querySelector('.sidebar-user-name').textContent = data.user.first_name + ' ' + data.user.last_name;
@@ -1156,6 +1220,9 @@ function closeSidebar() {
 }
 
 function doLogout() {
+  localStorage.removeItem('tutlee_admin_token');
+  localStorage.removeItem('tutlee_admin_user');
+  localStorage.removeItem('tutlee_admin_nav');
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('admin-email').value = '';
@@ -1182,6 +1249,7 @@ function navTo(id, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   if (el) el.classList.add('active');
+  try { localStorage.setItem('tutlee_admin_nav', id); } catch(e) {}
   const m = screenMeta[id];
   if (m) {
     document.getElementById('topbar-title').textContent = m.title;
@@ -1246,11 +1314,7 @@ function renderLearners(data) {
       <td>${l.sessions}</td>
       <td>${l.last}</td>
       <td><span class="pill ${l.status==='Active'?'green':l.status==='Suspended'?'red':'gray'}">${l.status}</span></td>
-      <td><div class="act-btns">
-        <button class="act-btn ghost" onclick="viewUser(${l.id},'learner')">View</button>
-        <button class="act-btn warn" onclick="confirmAction('Suspend',${l.id},'learner')">Suspend</button>
-        <button class="act-btn danger" onclick="confirmAction('Delete',${l.id},'learner')">Delete</button>
-      </div></td>
+      <td>${tdm([{l:'View',a:"viewUser("+l.id+",'learner')",c:''},{l:'Suspend',a:"confirmAction('Suspend',"+l.id+",'learner')",c:'warn'},{l:'Delete',a:"confirmAction('Delete',"+l.id+",'learner')",c:'danger'}])}</td>
     </tr>`).join('');
 }
 
@@ -1274,11 +1338,7 @@ function renderTutors(data) {
       <td>${t.rating}</td>
       <td>${t.passRate === '-' ? '-' : t.passRate + '%'}</td>
       <td><span class="pill ${t.status==='Active'?'green':t.status==='Suspended'?'red':'amber'}">${t.status}</span></td>
-      <td><div class="act-btns">
-        <button class="act-btn ghost" onclick="viewUser(${t.id},'tutor')">View</button>
-        <button class="act-btn warn" onclick="confirmAction('Suspend',${t.id},'tutor')">Suspend</button>
-        <button class="act-btn danger" onclick="confirmAction('Delete',${t.id},'tutor')">Delete</button>
-      </div></td>
+      <td>${tdm([{l:'View',a:"viewUser("+t.id+",'tutor')",c:''},{l:'Suspend',a:"confirmAction('Suspend',"+t.id+",'tutor')",c:'warn'},{l:'Delete',a:"confirmAction('Delete',"+t.id+",'tutor')",c:'danger'}])}</td>
     </tr>`).join('');
 }
 
@@ -1393,7 +1453,7 @@ function renderKYT() {
 
 function approveKYT(id) {
   toast('Tutor application approved. They have been notified.', 'var(--ok)');
-  document.getElementById('kyt-badge').textContent = Math.max(0, parseInt(document.getElementById('kyt-badge').textContent) - 1);
+  var _kbd=document.getElementById('kyt-badge');var _kvd=Math.max(0,parseInt(_kbd.textContent)-1);_kbd.textContent=_kvd;_kbd.style.display=_kvd>0?'inline':'none';
 }
 
 let rejectingKYTId = null;
@@ -1420,7 +1480,7 @@ function renderSessions() {
       <td>${s.duration}</td>
       <td class="amount">${s.amount}</td>
       <td><span class="pill ${s.status==='Live'?'green':s.status==='Completed'?'blue':s.status==='Cancelled'?'gray':'red'}">${s.status==='Live'?'● '+s.status:s.status}</span></td>
-      <td><button class="act-btn ghost">Details</button></td>
+      <td>${tdm([{l:'View Details',a:'',c:''}])}</td>
     </tr>`).join('');
 }
 
@@ -1434,10 +1494,7 @@ function renderPayouts() {
       <td style="color:var(--err)">${p.fee}</td>
       <td class="amount">${p.net}</td>
       <td style="color:var(--g4);font-size:12px">${p.requested}</td>
-      <td><div class="act-btns">
-        <button class="act-btn primary" onclick="toast('Payout of ${p.net} approved for ${p.tutor}.','var(--ok)')">Approve</button>
-        <button class="act-btn danger" onclick="toast('Payout declined for ${p.tutor}.','var(--err)')">Decline</button>
-      </div></td>
+      <td>${tdm([{l:'Approve',a:"toast('Payout approved.','var(--ok)')",c:''},{l:'Decline',a:"toast('Payout declined.','var(--err)')",c:'danger'}])}</td>
     </tr>`).join('');
 }
 
@@ -1536,7 +1593,7 @@ function confirmReportAction() {
   const action = document.getElementById('report-action').value;
   closeModal('modal-report');
   toast('Action applied: ' + action, 'var(--err)');
-  document.getElementById('reports-badge').textContent = Math.max(0, parseInt(document.getElementById('reports-badge').textContent) - 1);
+  var _rbd=document.getElementById('reports-badge');var _rvd=Math.max(0,parseInt(_rbd.textContent)-1);_rbd.textContent=_rvd;_rbd.style.display=_rvd>0?'inline':'none';
 }
 
 /* ── SETTINGS ── */
@@ -1683,7 +1740,7 @@ async function initApp() {
       if (as) as.textContent = s.active_sessions || 0;
       if (mr) mr.textContent = '$' + (s.monthly_revenue || 0).toLocaleString();
       if (kq) kq.textContent = s.kyt_pending || 0;
-      document.getElementById('kyt-badge').textContent = s.kyt_pending || 0;
+      var _kb=document.getElementById('kyt-badge');var _kv=parseInt(s.kyt_pending)||0;_kb.textContent=_kv;_kb.style.display=_kv>0?'inline':'none';
       var lcp = document.getElementById('live-count-pill');
       if (lcp) lcp.textContent = (s.active_sessions || 0) + ' active';
       var kct = document.getElementById('kyt-count-text');
@@ -1749,7 +1806,7 @@ async function initApp() {
           <td>${s.duration_mins} min</td>
           <td class="amount">$${s.amount}</td>
           <td><span class="pill ${s.status==='live'?'green':s.status==='completed'?'blue':s.status==='cancelled'?'gray':'red'}">${s.status==='live'?'● Live':s.status}</span></td>
-          <td><button class="act-btn ghost">Details</button></td>
+          <td>${tdm([{l:'View Details',a:'',c:''}])}</td>
         </tr>`).join('');
     }
 
@@ -1780,7 +1837,7 @@ async function initApp() {
         status: r.status === 'open' ? 'Open' : r.status === 'reviewing' ? 'Under review' : 'Resolved',
       }));
       renderReports('all');
-      document.getElementById('reports-badge').textContent = list.filter(r => r.status === 'open').length;
+      var _rb=document.getElementById('reports-badge');var _rv=list.filter(r=>r.status==='open').length;_rb.textContent=_rv;_rb.style.display=_rv>0?'inline':'none';
     }
 
     // Payouts
@@ -1927,6 +1984,61 @@ async function approveAllPayouts() {
   }
 }
 
+
+
+/* ── CMS LIVE PREVIEW ── */
+function updateCMSPreview() {
+  var g = function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
+  // Hero
+  var title = g('cms-hero-title');
+  var sub   = g('cms-hero-sub');
+  var cta   = g('cms-cta-primary');
+  var el;
+  el=document.getElementById('cms-prev-title'); if(el) el.textContent=title||'Your headline will appear here';
+  el=document.getElementById('cms-prev-sub');   if(el) el.textContent=sub||'Your sub-headline will appear here.';
+  el=document.getElementById('cms-prev-cta');   if(el) el.textContent=cta||'Start learning free';
+  // Stats
+  el=document.getElementById('cms-prev-s1n'); if(el) el.textContent=g('cms-stat1-num')||'—';
+  el=document.getElementById('cms-prev-s1l'); if(el) el.textContent=g('cms-stat1-lbl')||'Students';
+  el=document.getElementById('cms-prev-s2n'); if(el) el.textContent=g('cms-stat2-num')||'—';
+  el=document.getElementById('cms-prev-s2l'); if(el) el.textContent=g('cms-stat2-lbl')||'Tutors';
+  el=document.getElementById('cms-prev-s3n'); if(el) el.textContent=g('cms-stat3-num')||'—';
+  el=document.getElementById('cms-prev-s3l'); if(el) el.textContent=g('cms-stat3-lbl')||'Subjects';
+  // Banner
+  var bannerText = g('cms-banner-text');
+  var bannerEl = document.getElementById('cms-preview-banner');
+  if (bannerEl) {
+    if (bannerText) {
+      var bc = document.getElementById('cms-banner-color');
+      bannerEl.style.background = bc ? bc.value : '#0D9488';
+      bannerEl.textContent = bannerText;
+      bannerEl.style.display = 'block';
+    } else {
+      bannerEl.style.display = 'none';
+    }
+  }
+  // Sections visibility
+  var secEl = document.getElementById('cms-prev-sections');
+  if (secEl && cmsData.sections) {
+    secEl.innerHTML = cmsData.sections.map(function(s){
+      return '<span style="padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;'
+        + (s.visible ? 'background:var(--ok1);color:var(--ok)' : 'background:var(--g1);color:var(--g4);text-decoration:line-through')
+        + '">' + s.label + '</span>';
+    }).join('');
+  }
+}
+/* ── THREE-DOT MENU HELPERS ── */
+function tdm(items) {
+  var id = 'tdm_' + Math.random().toString(36).slice(2,8);
+  return '<div class="tdm-wrap"><button class="tdm-btn" onclick="toggleTDM(\''+id+'\',event)">⋮</button>'
+    + '<div class="tdm-menu" id="'+id+'">'
+    + items.map(function(i){ return '<div class="tdm-item'+(i.c?' '+i.c:'')+'" onclick="closeTDM(\''+id+'\');'+i.a+'">'+i.l+'</div>'; }).join('')
+    + '</div></div>';
+}
+function toggleTDM(id,e){e.stopPropagation();var m=document.getElementById(id);var open=m.classList.contains('open');document.querySelectorAll('.tdm-menu.open').forEach(function(el){el.classList.remove('open');});if(!open)m.classList.add('open');}
+function closeTDM(id){var m=document.getElementById(id);if(m)m.classList.remove('open');}
+document.addEventListener('click',function(){document.querySelectorAll('.tdm-menu.open').forEach(function(el){el.classList.remove('open');});});
+
 /* ── CMS ── */
 var cmsData = {
   hero: { title: '', sub: '', cta: '', bg: '' },
@@ -1990,6 +2102,8 @@ function renderCMSForm() {
   }
   // Media
   renderCMSMedia();
+  // Sync live preview
+  updateCMSPreview();
 }
 
 function renderCMSMedia() {
@@ -2030,6 +2144,7 @@ function removeCMSMedia(i) {
 
 function toggleCMSSection(i, visible) {
   if (cmsData.sections && cmsData.sections[i]) cmsData.sections[i].visible = visible;
+  updateCMSPreview();
 }
 
 async function saveCMSContent() {
@@ -2063,6 +2178,37 @@ async function saveCMSContent() {
     if (btn) { btn.disabled = false; btn.textContent = 'Save & Publish'; }
   }
 }
+
+/* ── AUTO-RESTORE ADMIN SESSION ON RELOAD ── */
+(function() {
+  var token = localStorage.getItem('tutlee_admin_token');
+  var userData = localStorage.getItem('tutlee_admin_user');
+  if (!token) return;
+  try {
+    var user = userData ? JSON.parse(userData) : {};
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    if (user.first_name) {
+      document.querySelector('.sidebar-user-name').textContent = (user.first_name||'') + ' ' + (user.last_name||'');
+      document.querySelector('.sidebar-user-av').textContent = (user.first_name[0] || 'A');
+    }
+    initApp().then(function() {
+      var nav = localStorage.getItem('tutlee_admin_nav');
+      if (nav && nav !== 'dashboard') {
+        var el = document.querySelector('.nav-item[onclick*="\'' + nav + '\'"]');
+        setTimeout(function() { navTo(nav, el); }, 300);
+      }
+    }).catch(function(err) {
+      console.warn('[TUTLEE ADMIN] Session restore failed:', err);
+      localStorage.removeItem('tutlee_admin_token');
+      localStorage.removeItem('tutlee_admin_user');
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+    });
+  } catch(e) {
+    localStorage.removeItem('tutlee_admin_token');
+  }
+})();
 
 </script>
 </body>

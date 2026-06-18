@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tutlee</title>
 <script>window.TUTLEE_API_BASE ='https://tutlee-backend.onrender.com';</script>
+<script>
+// ── STORAGE BRIDGE: redirect auth sessionStorage keys to localStorage ──
+(function(){
+  var _keys=['_t_a','_t_r','_t_u'];
+  var _ss=window.sessionStorage;
+  var _set=_ss.setItem.bind(_ss),_get=_ss.getItem.bind(_ss),_rm=_ss.removeItem.bind(_ss);
+  _ss.setItem=function(k,v){if(_keys.indexOf(k)>=0)localStorage.setItem(k,v);else _set(k,v);};
+  _ss.getItem=function(k){if(_keys.indexOf(k)>=0)return localStorage.getItem(k)||_get(k);return _get(k);};
+  _ss.removeItem=function(k){if(_keys.indexOf(k)>=0)localStorage.removeItem(k);else _rm(k);};
+})();
+</script>
 <script src="api.js?v=20260612" onerror="
   var s=document.createElement('script');
   s.src='/static/js/api.js?v=20260612';
@@ -30,7 +41,7 @@
       A.verifyOTP=function(email,code){
         return apiPost('/api/accounts/otp/verify/',{email:email,code:code}).then(function(data){
           if(data.access){
-            try{sessionStorage.setItem('_t_a',data.access);if(data.refresh)sessionStorage.setItem('_t_r',data.refresh);if(data.user)sessionStorage.setItem('_t_u',JSON.stringify(data.user));}catch(e){}
+            try{localStorage.setItem('_t_a',data.access);if(data.refresh)localStorage.setItem('_t_r',data.refresh);if(data.user)localStorage.setItem('_t_u',JSON.stringify(data.user));}catch(e){}
           }
           return data;
         });
@@ -2179,9 +2190,9 @@ async function verifyOTP(){
     if(!r.ok)throw new Error(data.detail||data.error||'Verification failed. Check the code and try again.');
     // Store tokens
     try{
-      sessionStorage.setItem('_t_a',data.access);
-      if(data.refresh)sessionStorage.setItem('_t_r',data.refresh);
-      if(data.user)sessionStorage.setItem('_t_u',JSON.stringify(data.user));
+      localStorage.setItem('_t_a',data.access);
+      if(data.refresh)localStorage.setItem('_t_r',data.refresh);
+      if(data.user)localStorage.setItem('_t_u',JSON.stringify(data.user));
     }catch(e){}
     closeAuth();
     launchApp(data.user.full_name||(data.user.first_name+' '+data.user.last_name).trim(),data.user.role);
@@ -2237,7 +2248,7 @@ function launchApp(name,role){
   app.style.display='flex';
   // Start tour for new users (first session only)
   var tourDone = false;
-  try { tourDone = sessionStorage.getItem('tutlee_tour_done'); } catch(e){}
+  try { tourDone = localStorage.getItem('tutlee_tour_done'); } catch(e){}
 
   if (role === 'tutor' || role === 'both') {
     requestAnimationFrame(function(){
@@ -2269,7 +2280,7 @@ var NAV_MAP={
   'book':'sessions','session-room':'sessions','ai-summary':'sessions'
 };
 function goTo(id){
-  try { sessionStorage.setItem('_t_screen', id); } catch(e){}
+  try { localStorage.setItem('_t_screen', id); } catch(e){}
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
   var el=document.getElementById('screen-'+id);if(el)el.classList.add('active');
   document.querySelectorAll('.sbi').forEach(function(e){e.classList.remove('active')});
@@ -3221,7 +3232,7 @@ function submitKYT() {
 
   // Use XHR for real upload progress
   var xhr = new XMLHttpRequest();
-  var token = window.API && window.API.Auth && (sessionStorage.getItem('_t_a'));
+  var token = window.API && window.API.Auth && (localStorage.getItem('_t_a'));
 
   progWrap.style.display = 'block';
 
@@ -3354,7 +3365,7 @@ function endTour(){
   if(tourHighlight)tourHighlight.remove();
   if(tourTip)tourTip.remove();
   tourOverlay=tourHighlight=tourTip=null;
-  try{sessionStorage.setItem('tutlee_tour_done','1');}catch(e){}
+  try{localStorage.setItem('tutlee_tour_done','1');}catch(e){}
 }
 
 // (initWB, clearWB, initSGWB, startTimer defined above — duplicates removed)
@@ -3737,7 +3748,7 @@ async function createRing(){
     if(user){
       var _name=(user.full_name||(user.first_name||'')+' '+(user.last_name||'')).trim()||'User';
       launchApp(_name,user.role);
-      var lastScreen=sessionStorage.getItem('_t_screen');
+      var lastScreen=localStorage.getItem('_t_screen');
       if(lastScreen){
         var safeScreens=['dashboard','ai-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
         if(safeScreens.indexOf(lastScreen)!==-1)setTimeout(function(){goTo(lastScreen);},200);
