@@ -315,8 +315,9 @@ tr:hover td{background:var(--p9)}
 @media(max-width:480px){.kpi-grid{grid-template-columns:1fr}.filters{flex-direction:column;align-items:stretch}}
 
 /* ── CMS PREVIEW ── */
-.cms-layout{display:grid;grid-template-columns:1fr 400px;gap:var(--sp6);align-items:start}
-.cms-preview-panel{position:sticky;top:var(--sp4);border:1px solid var(--g2);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shm);background:var(--g0)}
+.cms-layout{display:flex;gap:var(--sp6);align-items:flex-start}
+.cms-editor-col{flex:1 1 0;min-width:0}
+.cms-preview-panel{flex:0 0 380px;position:sticky;top:var(--sp4);border:1px solid var(--g2);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shm);background:var(--g0)}
 .cms-preview-chrome{padding:8px 14px;background:var(--w);border-bottom:1px solid var(--g2);display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--g5)}
 .cms-preview-chrome span{width:9px;height:9px;border-radius:50%;display:inline-block}
 .cpv-banner{display:none;padding:7px 16px;font-size:11px;font-weight:600;color:#fff;text-align:center}
@@ -340,7 +341,7 @@ tr:hover td{background:var(--p9)}
 .cpv-sections-pills{display:flex;flex-wrap:wrap;gap:4px}
 .cpv-sec-on{padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;background:#dcfce7;color:#166534}
 .cpv-sec-off{padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;background:#f5f3ff;color:#b0a0dc;text-decoration:line-through}
-@media(max-width:1100px){.cms-layout{grid-template-columns:1fr} .cms-preview-panel{display:none}}
+@media(max-width:800px){.cms-layout{flex-direction:column} .cms-preview-panel{position:static;width:100%}}
 </style>
 </head>
 <body>
@@ -863,7 +864,7 @@ tr:hover td{background:var(--p9)}
         </div>
       </div>
       <div class="cms-layout">
-      <div>
+      <div class="cms-editor-col">
         <div class="card" style="margin-bottom:16px">
           <div class="card-head"><svg width="16" height="16" fill="none" stroke="var(--t5)" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg><h3>Hero Section</h3></div>
           <div class="card-body">
