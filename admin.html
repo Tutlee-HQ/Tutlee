@@ -315,12 +315,31 @@ tr:hover td{background:var(--p9)}
 @media(max-width:480px){.kpi-grid{grid-template-columns:1fr}.filters{flex-direction:column;align-items:stretch}}
 
 /* ── CMS PREVIEW ── */
-.cms-layout{display:grid;grid-template-columns:1fr 460px;gap:var(--sp6);align-items:start}
-.cms-preview-panel{position:sticky;top:var(--sp4);background:var(--g0);border:1px solid var(--g2);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shm)}
-.cms-preview-header{padding:10px var(--sp4);background:var(--w);border-bottom:1px solid var(--g2);display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--g6)}
-.cms-preview-header span{width:10px;height:10px;border-radius:50%;display:inline-block}
-.cms-preview-frame{width:100%;height:640px;border:none;display:block;background:var(--w)}
-.cms-prev-sections-bar{padding:12px var(--sp4);border-top:1px solid var(--g2);display:flex;flex-wrap:wrap;gap:6px}
+.cms-layout{display:grid;grid-template-columns:1fr 400px;gap:var(--sp6);align-items:start}
+.cms-preview-panel{position:sticky;top:var(--sp4);border:1px solid var(--g2);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shm);background:var(--g0)}
+.cms-preview-chrome{padding:8px 14px;background:var(--w);border-bottom:1px solid var(--g2);display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--g5)}
+.cms-preview-chrome span{width:9px;height:9px;border-radius:50%;display:inline-block}
+.cpv-banner{display:none;padding:7px 16px;font-size:11px;font-weight:600;color:#fff;text-align:center}
+.cpv-nav{height:40px;background:#fff;border-bottom:1px solid #ede9fe;display:flex;align-items:center;padding:0 16px;gap:7px}
+.cpv-logo{width:20px;height:20px;background:#7C3AED;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cpv-brand{font-size:12px;font-weight:800;color:#0F0720;letter-spacing:-.2px}
+.cpv-brand b{color:#7C3AED;font-weight:800}
+.cpv-signin{margin-left:auto;padding:4px 10px;background:#7C3AED;color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:700}
+.cpv-hero{padding:28px 16px 24px;background:#fff;transition:background .3s}
+.cpv-pill{display:inline-flex;align-items:center;background:#EDE9FE;color:#7C3AED;border:1px solid #DDD6FE;font-size:9px;font-weight:700;padding:3px 8px;border-radius:9999px;letter-spacing:.04em;margin-bottom:10px}
+.cpv-h1{font-size:18px;font-weight:800;line-height:1.2;letter-spacing:-.3px;color:#0F0720;margin-bottom:8px}
+.cpv-sub{font-size:11px;color:#6456A0;line-height:1.65;margin-bottom:14px}
+.cpv-btns{display:flex;gap:6px;flex-wrap:wrap}
+.cpv-btn-p{padding:8px 16px;background:#7C3AED;color:#fff;border:none;border-radius:9px;font-size:11px;font-weight:700;box-shadow:0 3px 8px rgba(124,58,237,.25)}
+.cpv-btn-s{padding:8px 16px;background:#fff;color:#1E1040;border:1.5px solid #D4C4F5;border-radius:9px;font-size:11px;font-weight:600}
+.cpv-stats{display:flex;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid #EDE9FE}
+.cpv-stat-val{font-size:15px;font-weight:800;color:#0F0720}
+.cpv-stat-lbl{font-size:9px;color:#6456A0;margin-top:1px}
+.cpv-sections{padding:12px 16px;background:#fafafa;border-top:1px solid #ede9fe}
+.cpv-sections-label{font-size:9px;font-weight:700;color:#8B7EC0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.cpv-sections-pills{display:flex;flex-wrap:wrap;gap:4px}
+.cpv-sec-on{padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;background:#dcfce7;color:#166534}
+.cpv-sec-off{padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;background:#f5f3ff;color:#b0a0dc;text-decoration:line-through}
 @media(max-width:1100px){.cms-layout{grid-template-columns:1fr} .cms-preview-panel{display:none}}
 </style>
 </head>
@@ -892,17 +911,37 @@ tr:hover td{background:var(--p9)}
       </div><!-- end left col -->
 
       <!-- LIVE PREVIEW PANEL -->
+      <!-- LIVE PREVIEW PANEL -->
       <div class="cms-preview-panel">
-        <div class="cms-preview-header">
+        <div class="cms-preview-chrome">
           <span style="background:#ef4444"></span>
           <span style="background:#f59e0b"></span>
           <span style="background:#22c55e"></span>
-          <span style="margin-left:4px">tutlee.com — live preview</span>
+          <span style="margin-left:6px">tutlee.com &mdash; live preview</span>
         </div>
-        <iframe id="cms-preview-frame" class="cms-preview-frame" sandbox="allow-same-origin"></iframe>
-        <div class="cms-prev-sections-bar" id="cms-prev-sections-bar" style="display:none">
-          <span style="font-size:10px;font-weight:700;color:var(--g5);text-transform:uppercase;letter-spacing:.06em;width:100%;margin-bottom:4px">Visible sections</span>
-          <div id="cms-prev-sections" style="display:flex;flex-wrap:wrap;gap:6px;width:100%"></div>
+        <div class="cpv-banner" id="cpv-banner"></div>
+        <div class="cpv-nav">
+          <div class="cpv-logo"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <span class="cpv-brand">Tut<b>lee</b></span>
+          <button class="cpv-signin">Sign in</button>
+        </div>
+        <div class="cpv-hero" id="cpv-hero">
+          <div class="cpv-pill">Peer-to-peer &middot; 24/7</div>
+          <div class="cpv-h1" id="cpv-title">Your headline will appear here</div>
+          <div class="cpv-sub" id="cpv-sub">Your sub-headline will appear here.</div>
+          <div class="cpv-btns">
+            <button class="cpv-btn-p" id="cpv-cta">Start learning free</button>
+            <button class="cpv-btn-s">Become a tutor</button>
+          </div>
+          <div class="cpv-stats">
+            <div><div class="cpv-stat-val" id="cpv-s1n">—</div><div class="cpv-stat-lbl" id="cpv-s1l">Students</div></div>
+            <div><div class="cpv-stat-val" id="cpv-s2n">—</div><div class="cpv-stat-lbl" id="cpv-s2l">Tutors</div></div>
+            <div><div class="cpv-stat-val" id="cpv-s3n">—</div><div class="cpv-stat-lbl" id="cpv-s3l">Subjects</div></div>
+          </div>
+        </div>
+        <div class="cpv-sections">
+          <div class="cpv-sections-label">Visible sections</div>
+          <div class="cpv-sections-pills" id="cpv-sections"></div>
         </div>
       </div>
 
@@ -1968,91 +2007,36 @@ async function approveAllPayouts() {
 
 
 /* ── CMS LIVE PREVIEW ── */
-function buildCMSPreviewDoc(vals) {
-  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  var bannerHtml = vals.bannerText
-    ? '<div style="padding:10px 24px;background:'+esc(vals.bannerColor)+';color:#fff;font-size:13px;font-weight:600;text-align:center">'+esc(vals.bannerText)+'</div>'
-    : '';
-  var heroStyle = vals.heroBg
-    ? 'background:url('+esc(vals.heroBg)+') center/cover no-repeat;'
-    : 'background:#fff;';
-  var secPills = (vals.sections && vals.sections.length)
-    ? '<div style="padding:14px 24px;background:#fafafa;border-top:1px solid #ede9fe">'
-      + '<div style="font-size:10px;font-weight:700;color:#8b7ec0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Visible sections</div>'
-      + '<div style="display:flex;flex-wrap:wrap;gap:6px">'
-      + vals.sections.map(function(s){
-          return '<span style="padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;'
-            + (s.visible ? 'background:#dcfce7;color:#166534' : 'background:#f5f3ff;color:#b0a0dc;text-decoration:line-through')
-            + '">'+esc(s.label)+'</span>';
-        }).join('')
-      + '</div></div>'
-    : '';
-  var doc = '<!DOCTYPE html><html><head>'
-    + '<meta charset="utf-8">'
-    + '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">'
-    + '<style>'
-    + '*{box-sizing:border-box;margin:0;padding:0}'
-    + 'body{font-family:"Plus Jakarta Sans",-apple-system,sans-serif;background:#fff;color:#0F0720;-webkit-font-smoothing:antialiased}'
-    + '.nav{height:56px;background:rgba(255,255,255,.96);border-bottom:1px solid #ede9fe;display:flex;align-items:center;padding:0 24px;gap:8px}'
-    + '.nav-logo{width:26px;height:26px;background:#7C3AED;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}'
-    + '.nav-name{font-size:16px;font-weight:800;color:#0F0720;letter-spacing:-.3px}'
-    + '.nav-name span{color:#7C3AED}'
-    + '.nav-cta{margin-left:auto;padding:7px 16px;background:#7C3AED;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer}'
-    + '.hero{' + heroStyle + 'padding:48px 24px 40px}'
-    + '.lbl{display:inline-flex;align-items:center;background:#ede9fe;color:#7C3AED;border:1px solid #ddd6fe;font-size:11px;font-weight:700;padding:4px 10px;border-radius:9999px;letter-spacing:.04em;margin-bottom:14px}'
-    + 'h1{font-size:26px;font-weight:800;line-height:1.15;letter-spacing:-.5px;color:#0F0720;margin-bottom:12px}'
-    + 'h1 em{color:#7C3AED;font-style:normal}'
-    + 'p{font-size:13px;color:#6456A0;line-height:1.7;margin-bottom:22px}'
-    + '.btns{display:flex;gap:10px;flex-wrap:wrap}'
-    + '.btn-p{padding:11px 22px;background:#7C3AED;color:#fff;border:none;border-radius:14px;font-size:13px;font-weight:700;font-family:inherit;box-shadow:0 4px 12px rgba(124,58,237,.25)}'
-    + '.btn-s{padding:11px 22px;background:#fff;color:#1E1040;border:1.5px solid #d4c4f5;border-radius:14px;font-size:13px;font-weight:600;font-family:inherit}'
-    + '.stats{display:flex;gap:24px;margin-top:24px;padding-top:24px;border-top:1px solid #ede9fe}'
-    + '.sv{font-size:20px;font-weight:800;color:#0F0720;letter-spacing:-.3px}'
-    + '.sl{font-size:11px;color:#6456A0;margin-top:2px}'
-    + '<\/style><\/head><body>'
-    + '<div class="nav">'
-    + '<div class="nav-logo"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><\/svg><\/div>'
-    + '<div class="nav-name">Tut<span>lee<\/span><\/div>'
-    + '<button class="nav-cta">Sign in<\/button><\/div>'
-    + bannerHtml
-    + '<div class="hero">'
-    + '<div class="lbl">Peer-to-peer · 24\/7<\/div>'
-    + '<h1>'+esc(vals.title||'Your headline will appear here')+'<\/h1>'
-    + '<p>'+esc(vals.sub||'Your sub-headline will appear here.')+'<\/p>'
-    + '<div class="btns">'
-    + '<button class="btn-p">'+esc(vals.cta||'Start learning free')+'<\/button>'
-    + '<button class="btn-s">Become a tutor<\/button>'
-    + '<\/div>'
-    + '<div class="stats">'
-    + '<div><div class="sv">'+esc(vals.s1n||'—')+'<\/div><div class="sl">'+esc(vals.s1l||'Students')+'<\/div><\/div>'
-    + '<div><div class="sv">'+esc(vals.s2n||'—')+'<\/div><div class="sl">'+esc(vals.s2l||'Tutors')+'<\/div><\/div>'
-    + '<div><div class="sv">'+esc(vals.s3n||'—')+'<\/div><div class="sl">'+esc(vals.s3l||'Subjects')+'<\/div><\/div>'
-    + '<\/div><\/div>'
-    + secPills
-    + '<\/body><\/html>';
-  return doc;
-}
 function updateCMSPreview() {
-  var g = function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
+  var g = function(id){ var el=document.getElementById(id); return el?el.value.trim():''; };
+  var set = function(id,val){ var el=document.getElementById(id); if(el) el.textContent=val; };
+  // Hero text
+  set('cpv-title', g('cms-hero-title') || 'Your headline will appear here');
+  set('cpv-sub',   g('cms-hero-sub')   || 'Your sub-headline will appear here.');
+  set('cpv-cta',   g('cms-cta-primary')|| 'Start learning free');
+  // Stats
+  set('cpv-s1n', g('cms-stat1-num')||'—'); set('cpv-s1l', g('cms-stat1-lbl')||'Students');
+  set('cpv-s2n', g('cms-stat2-num')||'—'); set('cpv-s2l', g('cms-stat2-lbl')||'Tutors');
+  set('cpv-s3n', g('cms-stat3-num')||'—'); set('cpv-s3l', g('cms-stat3-lbl')||'Subjects');
+  // Hero background image
+  var hero = document.getElementById('cpv-hero');
+  if (hero) { var bg=g('cms-hero-bg'); hero.style.background=bg?'url('+bg+') center/cover no-repeat':'#fff'; }
+  // Banner
+  var bannerText = g('cms-banner-text');
+  var banner = document.getElementById('cpv-banner');
   var bc = document.getElementById('cms-banner-color');
-  var vals = {
-    title:g('cms-hero-title'), sub:g('cms-hero-sub'), cta:g('cms-cta-primary'), heroBg:g('cms-hero-bg'),
-    s1n:g('cms-stat1-num'), s1l:g('cms-stat1-lbl'),
-    s2n:g('cms-stat2-num'), s2l:g('cms-stat2-lbl'),
-    s3n:g('cms-stat3-num'), s3l:g('cms-stat3-lbl'),
-    bannerText:g('cms-banner-text'), bannerColor:bc?bc.value:'#0D9488',
-    sections:cmsData.sections||[]
-  };
-  var frame = document.getElementById('cms-preview-frame');
-  if (frame) frame.srcdoc = buildCMSPreviewDoc(vals);
-  var bar = document.getElementById('cms-prev-sections-bar');
-  if (bar) bar.style.display = vals.sections.length ? 'flex' : 'none';
-  var secEl = document.getElementById('cms-prev-sections');
-  if (secEl && vals.sections.length) {
-    secEl.innerHTML = vals.sections.map(function(s){
-      return '<span style="padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;'
-        + (s.visible?'background:#dcfce7;color:#166534':'background:var(--g1);color:var(--g4);text-decoration:line-through')
-        + '">'+s.label+'</span>';
+  if (banner) {
+    if (bannerText) {
+      banner.textContent = bannerText;
+      banner.style.background = bc ? bc.value : '#7C3AED';
+      banner.style.display = 'block';
+    } else { banner.style.display = 'none'; }
+  }
+  // Section pills
+  var secEl = document.getElementById('cpv-sections');
+  if (secEl && cmsData.sections) {
+    secEl.innerHTML = cmsData.sections.map(function(s){
+      return '<span class="'+(s.visible?'cpv-sec-on':'cpv-sec-off')+'">'+s.label+'</span>';
     }).join('');
   }
 }
