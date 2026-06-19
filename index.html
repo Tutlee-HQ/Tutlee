@@ -16,18 +16,6 @@
   _ss.removeItem=function(k){if(_keys.indexOf(k)>=0)localStorage.removeItem(k);else _rm(k);};
 })();
 </script>
-<script>
-// ── EARLY AUTH CHECK: hide landing immediately if user is already signed in ──
-(function(){
-  try{
-    if(localStorage.getItem('_t_a')&&localStorage.getItem('_t_u')){
-      var s=document.createElement('style');
-      s.textContent='#vlanding{display:none!important}#vapp{display:flex!important}';
-      document.head.appendChild(s);
-    }
-  }catch(e){}
-})();
-</script>
 <script src="api.js?v=20260612" onerror="
   var s=document.createElement('script');
   s.src='/static/js/api.js?v=20260612';
@@ -2322,8 +2310,13 @@ function setMode(m){
   else{nl.classList.remove('hidden');nt.classList.add('hidden');tl.classList.add('active');tt.classList.remove('active');goTo('dashboard');}
 }
 function signOut(){
-  var app=document.getElementById('vapp');app.classList.remove('active');app.style.display='none';
-  var l=document.getElementById('vlanding');l.style.display='block';l.classList.add('active');
+  // Clear all stored tokens so the session is fully destroyed
+  try{['_t_a','_t_r','_t_u','_t_screen'].forEach(function(k){localStorage.removeItem(k);});}catch(e){}
+  try{API.Auth.logout();}catch(e){}
+  var app=document.getElementById('vapp');
+  if(app){app.classList.remove('active');app.style.display='none';}
+  var l=document.getElementById('vlanding');
+  if(l){l.style.display='block';l.classList.add('active');}
 }
 
 // ═══ NOTIFICATIONS ═══
@@ -3770,6 +3763,12 @@ async function createRing(){
         var safeScreens=['dashboard','ai-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
         if(safeScreens.indexOf(lastScreen)!==-1)setTimeout(function(){goTo(lastScreen);},200);
       }
+      // Validate token with server — if stale (e.g. DB was reset), sign out immediately
+      API.Users.me().then(function(me){
+        try{localStorage.setItem('_t_u',JSON.stringify(me));}catch(e){}
+      }).catch(function(){
+        signOut();
+      });
     }
   }catch(e){}
 })();
