@@ -16,6 +16,18 @@
   _ss.removeItem=function(k){if(_keys.indexOf(k)>=0)localStorage.removeItem(k);else _rm(k);};
 })();
 </script>
+<script>
+// ── EARLY AUTH CHECK: hide landing immediately if user is already signed in ──
+(function(){
+  try{
+    if(localStorage.getItem('_t_a')&&localStorage.getItem('_t_u')){
+      var s=document.createElement('style');
+      s.textContent='#vlanding{display:none!important}#vapp{display:flex!important}';
+      document.head.appendChild(s);
+    }
+  }catch(e){}
+})();
+</script>
 <script src="api.js?v=20260612" onerror="
   var s=document.createElement('script');
   s.src='/static/js/api.js?v=20260612';
