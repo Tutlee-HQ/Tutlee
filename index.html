@@ -661,7 +661,7 @@ tr:hover td{background:var(--g1)}
         <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Enter your email address and we'll send you a link to set a new password.</p>
         <div class="fg"><label class="fl">Email address</label><input class="fi" type="email" id="forgot-email" placeholder="you@university.edu"></div>
         <div id="forgot-err" style="display:none;color:#9B0F2B;font-size:13px;margin-bottom:10px;padding:8px;background:#FEE;border-radius:6px"></div>
-        <button class="btn-full btn-full-p" id="forgot-btn" onclick="sendPasswordReset()">Send reset link</button>
+        <button class="btn-full btn-full-p" id="forgot-btn" onclick="sendPasswordReset()">Send reset code</button>
       </div>
 
       <!-- RESET LINK SENT -->
@@ -677,10 +677,12 @@ tr:hover td{background:var(--g1)}
         <button class="btn-full btn-full-s" onclick="closeAuth()">Close</button>
       </div>
 
-      <!-- SET NEW PASSWORD (token from URL) -->
+      <!-- SET NEW PASSWORD (OTP code + new password) -->
       <div class="ob-step" id="ap-new-password">
+        <button onclick="showAuthStep('ap-forgot')" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g5);margin-bottom:20px;font-family:var(--f);padding:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
         <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Set new password</h2>
-        <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Choose a strong password for your account.</p>
+        <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Enter the 6-digit code we emailed you and choose a new password.</p>
+        <div class="fg"><label class="fl">Reset code</label><input class="fi" type="text" id="newpass-code" placeholder="6-digit code from your email" maxlength="6" inputmode="numeric"></div>
         <div class="fg"><label class="fl">New password</label><input class="fi" type="password" id="newpass-inp" placeholder="Minimum 8 characters"></div>
         <div class="fg"><label class="fl">Confirm password</label><input class="fi" type="password" id="newpass-confirm" placeholder="Repeat your password"></div>
         <div id="newpass-err" style="display:none;color:#9B0F2B;font-size:13px;margin-bottom:10px;padding:8px;background:#FEE;border-radius:6px"></div>
@@ -1046,17 +1048,20 @@ tr:hover td{background:var(--g1)}
     <div>
       <div class="card" style="margin-bottom:16px">
         <div class="ct">Session details</div>
-        <div class="fg"><label class="fl">Length</label><div style="display:flex;gap:8px"><button id="st-60" class="btn-lg p" onclick="selSt('60')" style="flex:1;justify-content:center;font-size:12px">60 min · $12</button><button id="st-90" class="btn-lg s" onclick="selSt('90')" style="flex:1;justify-content:center;font-size:12px">90 min · $18</button><button id="st-120" class="btn-lg s" onclick="selSt('120')" style="flex:1;justify-content:center;font-size:12px">120 min · $24</button></div></div>
+        <div class="fg"><label class="fl">Length</label><div style="display:flex;gap:8px"><button id="st-60" class="btn-lg p" onclick="selSt('60')" style="flex:1;justify-content:center;font-size:12px">60 min</button><button id="st-90" class="btn-lg s" onclick="selSt('90')" style="flex:1;justify-content:center;font-size:12px">90 min</button><button id="st-120" class="btn-lg s" onclick="selSt('120')" style="flex:1;justify-content:center;font-size:12px">120 min</button></div></div>
         <div class="fg"><label class="fl">What do you want to cover?</label><textarea class="fi" rows="3" placeholder="Describe the specific topic or weak area you want to work on in this session…"></textarea></div>
       </div>
       <div class="card">
         <div class="ct">Order summary</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px"><span style="color:var(--g5)">Session (60 min)</span><span>$12.00</span></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px"><span style="color:var(--g5)">Platform fee (12%)</span><span>$1.44</span></div>
-        <div style="background:var(--warn1);border-radius:var(--r);padding:10px 12px;margin-bottom:12px;font-size:12px;color:#8A6B00"><strong>Note: Rescheduling policy:</strong> Less than 1 hour before the session incurs a $3.00 penalty.</div>
+        <div style="background:var(--ok1);border-radius:var(--r);padding:12px 14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:#077A3E;margin-bottom:2px">Launch Deal — Free sessions</div>
+          <div style="font-size:12px;color:#077A3E">We're in early access. Your first sessions are completely free while we refine the experience.</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px"><span style="color:var(--g5)">Session fee</span><span style="font-weight:600;color:#077A3E">Free</span></div>
+        <div style="background:var(--warn1);border-radius:var(--r);padding:10px 12px;margin-bottom:12px;font-size:12px;color:#8A6B00"><strong>Note:</strong> Rescheduling less than 1 hour before the session will incur a late rescheduling penalty once billing goes live.</div>
         <div class="div" style="margin:10px 0"></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:20px"><span style="font-size:15px;font-weight:700;color:var(--g9)">Total</span><span style="font-size:17px;font-weight:700;color:var(--t6)">$13.44</span></div>
-        <button class="btn-lg p" style="width:100%;justify-content:center" onclick="confirmBook()">Confirm & Pay $13.44</button>
+        <div style="display:flex;justify-content:space-between;margin-bottom:20px"><span style="font-size:15px;font-weight:700;color:var(--g9)">Total</span><span style="font-size:17px;font-weight:700;color:#077A3E">Free</span></div>
+        <button class="btn-lg p" style="width:100%;justify-content:center" onclick="confirmBook()">Book your free session →</button>
       </div>
     </div>
   </div>
@@ -1119,7 +1124,7 @@ tr:hover td{background:var(--g1)}
 <!-- ══ AI SUMMARY ══ -->
 <div class="screen" id="screen-ai-summary">
   <button class="back-btn" onclick="goTo('sessions')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back to Sessions</button>
-  <div class="pg-head"><div><h1>Session Summary</h1><div class="pg-sub">AI-generated · Organic Chemistry with Kwame Osei</div></div></div>
+  <div class="pg-head"><div><h1>Session Summary</h1><div class="pg-sub" id="ai-summary-sub">AI-generated · your most recent session</div></div></div>
   <div class="g2">
     <div>
       <div class="card" id="sum-loading"><div class="ail"><span></span><span></span><span></span><p style="margin-top:12px;color:var(--g5)">Analysing your session…</p></div></div>
@@ -1405,12 +1410,14 @@ tr:hover td{background:var(--g1)}
     </div>
     <div class="card">
       <div class="ct">Session history &amp; recordings</div>
-      <div style="padding:36px 16px;text-align:center">
-        <div style="width:44px;height:44px;border-radius:var(--rl);background:var(--g0);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--g4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      <div id="recordings-list">
+        <div style="padding:36px 16px;text-align:center">
+          <div style="width:44px;height:44px;border-radius:var(--rl);background:var(--g0);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--g4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:var(--g7);margin-bottom:5px">No recordings yet</div>
+          <div style="font-size:12px;color:var(--g5)">Session recordings appear here after each completed session.</div>
         </div>
-        <div style="font-size:13px;font-weight:600;color:var(--g7);margin-bottom:5px">No recordings yet</div>
-        <div style="font-size:12px;color:var(--g5)">Session recordings appear here after each completed session.</div>
       </div>
     </div>
   </div>
@@ -1741,19 +1748,17 @@ tr:hover td{background:var(--g1)}
 
 <!-- ══ MODALS ══ -->
 
-<!-- PAYMENT SUCCESS -->
+<!-- SESSION BOOKED (UAT: free launch deal) -->
 <div class="m-ov hidden" id="payment-modal" onclick="if(event.target===this)closeModal('payment-modal')">
   <div class="modal" style="text-align:center">
     <div style="width:56px;height:56px;background:var(--ok1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#077A3E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Session booked</h2>
-    <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Your session has been booked successfully.</p>
-    <div style="background:var(--g0);border-radius:var(--r);padding:16px;margin-bottom:20px;text-align:left">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span style="color:var(--g5)">Session fee</span><span id="pay-session-fee">-</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span style="color:var(--g5)">Platform fee</span><span id="pay-platform-fee">-</span></div>
-      <div class="div" style="margin:8px 0"></div>
-      <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800"><span>Total charged</span><span style="color:var(--t6)" id="pay-total">-</span></div>
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Session booked!</h2>
+    <p style="font-size:13px;color:var(--g5);margin-bottom:20px">You're all set. Your tutor will be ready at the scheduled time.</p>
+    <div style="background:var(--ok1);border-radius:var(--r);padding:14px 16px;margin-bottom:20px;text-align:left">
+      <div style="font-size:13px;font-weight:700;color:#077A3E;margin-bottom:4px">Launch Deal — Free session</div>
+      <div style="font-size:12px;color:#077A3E">We're in early access. Sessions are free for the first week so you can explore the full Tutlee experience.</div>
     </div>
     <button class="btn-full btn-full-p" onclick="closeModal('payment-modal');goTo('sessions')">View my sessions</button>
   </div>
@@ -1917,7 +1922,7 @@ tr:hover td{background:var(--g1)}
 
 <script>
 // ═══ STATE ═══
-var S={role:'learner',isPro:false,curMode:'learner',availOn:true,wbColor:'#1A2130',sgWbColor:'#1A2130',timerInt:null,currentSurveySessionId:null,chartsHaveData:false};
+var S={role:'learner',isPro:false,curMode:'learner',availOn:true,wbColor:'#1A2130',sgWbColor:'#1A2130',timerInt:null,currentSurveySessionId:null,chartsHaveData:false,currentAssessmentId:null,currentAssessmentData:null,recordingBlobURL:null,sessionRecorder:null,recordingChunks:[]};
 // Server readiness — ping fires when auth modal opens; submit waits for it
 var _srv={ready:false,promise:null};
 function _ensureServer(onTick){
@@ -1948,7 +1953,6 @@ function _ensureServer(onTick){
   return _srv.promise;
 }
 var obStep=1, selRoleVal='learner', assessAnswers={};
-var assCorrect=[1,2,1];
 var curSelPlan='m';
 
 // ═══ DATA — all loaded from API, no hardcoded data ═══
@@ -1984,69 +1988,69 @@ function showForgotPassword(){
   var fi=document.getElementById('forgot-email');if(fi)fi.value='';
   var fe=document.getElementById('forgot-err');if(fe)fe.style.display='none';
 }
+var _resetEmail='';
 async function sendPasswordReset(){
   var email=(document.getElementById('forgot-email')?.value||'').trim();
   var errEl=document.getElementById('forgot-err');
   var btn=document.getElementById('forgot-btn');
   if(!email){if(errEl){errEl.textContent='Please enter your email address.';errEl.style.display='block';}return;}
   if(errEl)errEl.style.display='none';
-  if(btn){btn.disabled=true;btn.textContent='Sending...';}
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
   try{
     var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
-    var r=await fetch(BASE+'/api/accounts/password-reset/',{
+    await fetch(BASE+'/api/accounts/password-reset/',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({email:email})
     });
-    // Always show success to avoid leaking whether email exists
-    var disp=document.getElementById('reset-email-display');
-    if(disp)disp.textContent=email;
-    showAuthStep('ap-reset-sent');
+    _resetEmail=email;
+    // Redirect to the "set new password" step which now includes code entry
+    var disp=document.getElementById('reset-email-display');if(disp)disp.textContent=email;
+    showAuthStep('ap-new-password');
+    showToast('Check your email for the 6-digit reset code');
   }catch(e){
     if(errEl){errEl.textContent='Something went wrong. Please try again.';errEl.style.display='block';}
   }finally{
-    if(btn){btn.disabled=false;btn.textContent='Send reset link';}
+    if(btn){btn.disabled=false;btn.textContent='Send reset code';}
   }
 }
-var _resetToken=null;
 async function confirmPasswordReset(){
+  var code=(document.getElementById('newpass-code')?.value||'').trim();
   var pass=(document.getElementById('newpass-inp')?.value||'').trim();
   var conf=(document.getElementById('newpass-confirm')?.value||'').trim();
   var errEl=document.getElementById('newpass-err');
   var btn=document.getElementById('newpass-btn');
+  if(!code||code.length<6){if(errEl){errEl.textContent='Enter the 6-digit code from your email.';errEl.style.display='block';}return;}
   if(pass.length<8){if(errEl){errEl.textContent='Password must be at least 8 characters.';errEl.style.display='block';}return;}
   if(pass!==conf){if(errEl){errEl.textContent='Passwords do not match.';errEl.style.display='block';}return;}
   if(errEl)errEl.style.display='none';
-  if(btn){btn.disabled=true;btn.textContent='Saving...';}
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
   try{
     var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
     var r=await fetch(BASE+'/api/accounts/password-reset/confirm/',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({token:_resetToken,password:pass})
+      body:JSON.stringify({email:_resetEmail,code:code,password:pass})
     });
     var data=await r.json();
-    if(!r.ok)throw new Error(data.detail||data.error||'Reset failed. The link may have expired.');
+    if(!r.ok)throw new Error(data.error||data.detail||'Invalid or expired code.');
+    // Auto-login with returned tokens
+    try{
+      localStorage.setItem('_t_a',data.access);
+      if(data.refresh)localStorage.setItem('_t_r',data.refresh);
+      if(data.user)localStorage.setItem('_t_u',JSON.stringify(data.user));
+    }catch(e){}
+    if(window.API&&window.API.Auth&&typeof window.API.Auth.restoreSession==='function'){
+      window.API.Auth.restoreSession();
+    }
     closeAuth();
-    showToast('Password updated! Please sign in with your new password.');
-    // Clean URL
-    window.history.replaceState({},'',window.location.pathname);
+    showToast('Password updated — you are now signed in.');
+    var u=data.user;
+    if(u)launchApp(u.full_name||(u.first_name||'')+' '+(u.last_name||''),u.role);
   }catch(e){
     if(errEl){errEl.textContent=e.message;errEl.style.display='block';}
   }finally{
     if(btn){btn.disabled=false;btn.textContent='Set new password';}
   }
 }
-// On page load — check for ?reset=TOKEN in URL
-(function(){
-  try{
-    var params=new URLSearchParams(window.location.search);
-    var token=params.get('reset');
-    if(token){
-      _resetToken=token;
-      document.getElementById('auth-ov').classList.remove('hidden');
-      showAuthStep('ap-new-password');
-    }
-  }catch(e){}
-})();
 function closeAuth(){document.getElementById('auth-ov').classList.add('hidden');}
 function showAuthStep(id){
   ['ap-signin','ap-signup','ap-forgot','ap-reset-sent','ap-new-password'].forEach(function(x){var el=document.getElementById(x);if(el)el.classList.remove('active');});
@@ -2057,21 +2061,55 @@ function switchAuthTab(t){
   else{showAuthStep('ap-signup');obStep=selRoleVal==='both'?1:2;showOBStep(obStep);}
 }
 async function doSignIn(){
-  var email=document.getElementById('signin-email')?.value?.trim();
-  var pass=document.getElementById('signin-pass')?.value;
+  var email=(document.getElementById('signin-email')?.value||'').trim();
+  var pass=document.getElementById('signin-pass')?.value||'';
   var btn=document.getElementById('signin-btn');
   var errEl=document.getElementById('signin-err');
   if(!email||!pass){if(errEl){errEl.textContent='Please enter your email and password.';errEl.style.display='block';}return;}
+  if(errEl)errEl.style.display='none';
   btn.textContent='Signing in…';btn.disabled=true;
   try{
-    var data=await API.Auth.login(email,pass);
-    if(errEl)errEl.style.display='none';
+    var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
+    var r=await fetch(BASE+'/api/auth/login/',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email,password:pass})
+    });
+    var data=await r.json();
+    if(!r.ok){
+      var msg=data.detail||data.non_field_errors?.[0]||data.error||'Invalid email or password.';
+      if(errEl){errEl.textContent=msg;errEl.style.display='block';}
+      return;
+    }
+    if(data.needs_verification){
+      // Account exists but not verified — take them to OTP screen
+      S._pendingEmail=email;
+      var signup=document.getElementById('ap-signup');if(signup)signup.classList.add('active');
+      var otpEl=document.getElementById('ob-otp');
+      if(otpEl){
+        otpEl.classList.add('active');
+        var ed=document.getElementById('otp-email-display');if(ed)ed.textContent=email;
+        var inp=document.getElementById('otp-code-input');if(inp)inp.value='';
+      }
+      showToast('Check your email — we just sent a verification code');
+      return;
+    }
+    // Store tokens
+    try{
+      localStorage.setItem('_t_a',data.access);
+      if(data.refresh)localStorage.setItem('_t_r',data.refresh);
+      if(data.user)localStorage.setItem('_t_u',JSON.stringify(data.user));
+    }catch(e){}
+    // Also hydrate API client in-memory state
+    if(window.API&&window.API.Auth&&typeof window.API.Auth.restoreSession==='function'){
+      window.API.Auth.restoreSession();
+    }
     closeAuth();
-    launchApp(data.user.full_name||data.user.first_name+' '+data.user.last_name, data.user.role);
-    // Load user-specific data
-    loadUserDashboard(data.user);
+    var u=data.user;
+    launchApp(u.full_name||(u.first_name||'')+' '+(u.last_name||''), u.role);
+    loadUserDashboard(u);
   }catch(e){
-    if(errEl){errEl.textContent=e.message||'Invalid credentials.';errEl.style.display='block';}
+    if(errEl){errEl.textContent='Connection error — please try again.';errEl.style.display='block';}
   }finally{
     btn.textContent='Sign in';btn.disabled=false;
   }
@@ -2305,7 +2343,10 @@ function goTo(id){
   if(id==='study-groups'){curRingTab='live';document.querySelectorAll('.ring-tab').forEach(function(t){t.classList.remove('active')});var rt=document.getElementById('rtab-live');if(rt)rt.classList.add('active');buildSGGrid();}
   if(id==='ring-detail'){buildSGMembers();setTimeout(initSGWB,100);}
   if(id==='earnings'||id==='t-analytics'||id==='progress')setTimeout(initCharts,100);
+  if(id==='progress')loadRecordings();
   if(id==='settings')populateSettingsForm();
+  if(id==='assessments')loadAssessmentsTab();
+  if(id==='messages')buildMsgList();
 }
 function goHome(){goTo(S.curMode==='tutor'?'tutor-dash':'dashboard');}
 function setMode(m){
@@ -2427,6 +2468,126 @@ async function runAIMatch(){
   }
 }
 
+// ═══ RECORDINGS (progress screen) ═══
+async function loadRecordings(){
+  var el=document.getElementById('recordings-list');if(!el)return;
+  // Show local blob recording first if we have one
+  if(S.recordingBlobURL){
+    el.innerHTML='<div style="padding:12px 0">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:8px">Latest session recording</div>'
+      +'<video src="'+S.recordingBlobURL+'" controls style="width:100%;border-radius:var(--r);margin-bottom:12px"></video>'
+      +'</div>';
+  }
+  try{
+    var sessions=await API.Sessions.list('?status=completed');
+    var list=(sessions.results||sessions).filter(function(s){return s.recording_url;});
+    if(!list.length&&!S.recordingBlobURL){
+      el.innerHTML='<div style="padding:36px 16px;text-align:center">'
+        +'<div style="width:44px;height:44px;border-radius:var(--rl);background:var(--g0);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">'
+        +'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--g4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>'
+        +'</div><div style="font-size:13px;font-weight:600;color:var(--g7);margin-bottom:5px">No recordings yet</div>'
+        +'<div style="font-size:12px;color:var(--g5)">Session recordings appear here after each completed session.</div></div>';
+      return;
+    }
+    if(list.length){
+      var html=S.recordingBlobURL?el.innerHTML:'';
+      html+=list.map(function(s){
+        return'<div style="padding:12px 0;border-top:1px solid var(--g2)">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+          +'<div style="font-size:13px;font-weight:600;color:var(--g9)">'+(s.subject||'Session')+'</div>'
+          +'<div style="font-size:11px;color:var(--g4)">'+new Date(s.scheduled_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+'</div>'
+          +'</div>'
+          +'<video src="'+s.recording_url+'" controls style="width:100%;border-radius:var(--r)"></video>'
+          +'</div>';
+      }).join('');
+      el.innerHTML=html;
+    }
+  }catch(e){console.warn('[RECORDINGS] load failed',e);}
+}
+
+// ═══ ASSESSMENT LOAD ═══
+async function loadPendingAssessment(){
+  try{
+    var list=await API.Assessments.list();
+    var pending=(list||[]).find(function(a){return!a.completed&&!a.score;});
+    if(pending){
+      S.currentAssessmentId=pending.id;
+      S.currentAssessmentData=pending;
+      renderAssessmentQuestions(pending);
+    }
+  }catch(e){console.warn('[ASSESSMENT] load failed',e);}
+}
+async function loadAssessmentsTab(){
+  var pendingEl=document.getElementById('ass-tab-pending');
+  var histEl=document.getElementById('ass-tab-history');
+  if(pendingEl)pendingEl.innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--g4)">Loading…</div>';
+  if(histEl)histEl.innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--g4)">Loading…</div>';
+  try{
+    var list=await API.Assessments.list();
+    var pending=(list||[]).filter(function(a){return!a.score&&!a.completed;});
+    var history=(list||[]).filter(function(a){return a.score||a.completed;});
+    if(pendingEl){
+      if(!pending.length){
+        pendingEl.innerHTML='<div style="padding:40px 16px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:6px">No pending assessments</div><div style="font-size:12px;color:var(--g5)">After each session, a short assessment will appear here automatically.</div></div>';
+      } else {
+        var ass=pending[0];
+        S.currentAssessmentId=ass.id;
+        S.currentAssessmentData=ass;
+        pendingEl.innerHTML='';
+        renderAssessmentQuestions(ass,pendingEl);
+      }
+    }
+    if(histEl){
+      if(!history.length){
+        histEl.innerHTML='<div style="padding:40px 16px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:6px">No completed assessments yet</div><div style="font-size:12px;color:var(--g5)">Your past assessment results will appear here.</div></div>';
+      } else {
+        histEl.innerHTML=history.map(function(a){
+          var passed=a.passed;var score=Math.round(a.score||0);
+          return'<div class="card" style="margin-bottom:12px">'
+            +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+            +'<div style="font-size:14px;font-weight:700;color:var(--g9)">'+(a.subject||'Assessment')+'</div>'
+            +'<span style="font-size:12px;font-weight:700;color:'+(passed?'#077A3E':'var(--err)')+';padding:3px 10px;border-radius:var(--rf);background:'+(passed?'var(--ok1)':'#FEE2E2')+'">'+(passed?'Passed':'Failed')+'</span>'
+            +'</div>'
+            +'<div style="font-size:28px;font-weight:800;color:'+(passed?'#077A3E':'var(--err)')+';margin-bottom:4px">'+score+'%</div>'
+            +(a.suggestion?'<div style="font-size:12px;color:var(--g5)">'+a.suggestion+'</div>':'')
+            +(S.recordingBlobURL&&!passed?'<video src="'+S.recordingBlobURL+'" controls style="width:100%;border-radius:var(--r);margin-top:10px"></video>':'')
+            +'</div>';
+        }).join('');
+      }
+    }
+  }catch(e){
+    if(pendingEl)pendingEl.innerHTML='<div style="padding:24px;text-align:center;font-size:12px;color:var(--g4)">Could not load assessments.</div>';
+  }
+}
+function renderAssessmentQuestions(ass,container){
+  assessAnswers={};
+  var target=container||document.getElementById('ass-tab-pending');
+  if(!target)return;
+  var qs=ass.questions||[];
+  if(!qs.length){
+    target.innerHTML='<div style="padding:32px;text-align:center;font-size:13px;color:var(--g5)">No questions available for this assessment.</div>';
+    return;
+  }
+  var html='<div id="assess-body">'
+    +'<div style="background:var(--t0);border-radius:var(--r);padding:12px 14px;margin-bottom:16px">'
+    +'<div style="font-size:13px;font-weight:700;color:var(--t7);margin-bottom:2px">'+(ass.subject||'Assessment')+'</div>'
+    +'<div style="font-size:12px;color:var(--g5)">Answer all '+qs.length+' questions then submit.</div>'
+    +'</div>';
+  qs.forEach(function(q,i){
+    html+='<div style="margin-bottom:18px">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:10px">'+(i+1)+'. '+q.text+'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px">';
+    (q.options||[]).forEach(function(opt,j){
+      html+='<div class="assess-opt" onclick="selAss(this,'+i+','+j+')" style="padding:10px 12px;border-radius:var(--r);border:1px solid var(--g2);font-size:13px;cursor:pointer;background:var(--g0)">'+opt+'</div>';
+    });
+    html+='</div></div>';
+  });
+  html+='</div>';
+  html+='<div id="assess-result" class="hidden"></div>';
+  html+='<button id="assess-submit-btn" class="btn-full btn-full-p" style="margin-top:8px" onclick="submitAssessment()">Submit answers</button>';
+  target.innerHTML=html;
+}
+
 // ═══ ASSESSMENT TABS ═══
 function switchAssTab(tab){
   ['pending','history','plan'].forEach(function(t){
@@ -2440,46 +2601,89 @@ function selAss(el,q,opt){
   el.parentElement.querySelectorAll('.assess-opt').forEach(function(o){o.classList.remove('sel')});
   el.classList.add('sel');assessAnswers[q]=opt;
 }
-function submitAssessment(){
-  var total=assCorrect.length,correct=0;
-  for(var i=0;i<total;i++){if(assessAnswers[i]===assCorrect[i])correct++;}
-  var score=Math.round(correct/total*100),passed=score>=75;
-  document.getElementById('assess-body').classList.add('hidden');
-  var res=document.getElementById('assess-result');res.classList.remove('hidden');
-  var passIcon='<div style="width:52px;height:52px;border-radius:50%;background:var(--ok1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#077A3E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>';
-  var failIcon='<div style="width:52px;height:52px;border-radius:50%;background:var(--warn1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A6B00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>';
-  res.innerHTML='<div style="background:'+(passed?'var(--ok1)':'var(--warn1)')+';border-radius:var(--rl);padding:24px;text-align:center;margin-bottom:16px">'
-    +(passed?passIcon:failIcon)
-    +'<div style="font-size:26px;font-weight:700;color:'+(passed?'#077A3E':'#8A6B00')+';margin-bottom:6px">'+score+'%</div>'
-    +'<div style="font-size:15px;font-weight:600;color:'+(passed?'#077A3E':'#8A6B00')+';">'+(passed?'Passed':'Needs more work')+'</div>'
-    +'<div style="font-size:13px;color:var(--g6);margin-top:4px">'+(passed?'You demonstrated solid understanding of this topic.':'We recommend rebooking this topic with a tutor.')+'</div>'
-    +'</div>';
-  if(passed){
-    setTimeout(function(){closeModal('survey-modal');showModal('next-session-modal');},400);
-  } else {
-    res.innerHTML+='<div class="card" style="border:1.5px solid var(--err)">'
-      +'<div style="font-size:13px;font-weight:700;color:var(--g9);margin-bottom:6px">Recommendation</div>'
-      +'<div style="font-size:13px;color:var(--g6);margin-bottom:14px">Your score is below 75%. Rebook this topic — with the same tutor or find a new match through AI.</div>'
-      +'<div style="display:flex;gap:8px"><button class="btn-join" onclick="goTo(\'book\')">Rebook with Kwame</button><button class="btn-sm" onclick="goTo(\'ai-match\')">New AI match</button></div>'
+async function submitAssessment(){
+  var btn=document.getElementById('assess-submit-btn');
+  if(btn){btn.disabled=true;btn.textContent='Submitting…';}
+  var answersArray=[];
+  var data=S.currentAssessmentData;
+  if(data&&data.questions){
+    for(var i=0;i<data.questions.length;i++){
+      answersArray.push(assessAnswers[i]!==undefined?assessAnswers[i]:null);
+    }
+  }
+  try{
+    var result;
+    if(S.currentAssessmentId){
+      result=await API.Assessments.submit(S.currentAssessmentId,{answers:answersArray});
+    } else {
+      // Fallback: local grade from cached data
+      var total=answersArray.length,correct=0;
+      if(data&&data.questions){
+        data.questions.forEach(function(q,i){if(answersArray[i]===q.answer)correct++;});
+      }
+      result={score:total?Math.round(correct/total*100):0,passed:total?correct/total>=0.6:false,suggestion:''};
+    }
+    var score=Math.round(result.score||0),passed=!!result.passed;
+    var suggestion=result.suggestion||'';
+    document.getElementById('assess-body').classList.add('hidden');
+    var res=document.getElementById('assess-result');res.classList.remove('hidden');
+    var passIcon='<div style="width:52px;height:52px;border-radius:50%;background:var(--ok1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#077A3E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>';
+    var failIcon='<div style="width:52px;height:52px;border-radius:50%;background:var(--warn1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A6B00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>';
+    res.innerHTML='<div style="background:'+(passed?'var(--ok1)':'var(--warn1)')+';border-radius:var(--rl);padding:24px;text-align:center;margin-bottom:16px">'
+      +(passed?passIcon:failIcon)
+      +'<div style="font-size:26px;font-weight:700;color:'+(passed?'#077A3E':'#8A6B00')+';margin-bottom:6px">'+score+'%</div>'
+      +'<div style="font-size:15px;font-weight:600;color:'+(passed?'#077A3E':'#8A6B00')+';">'+(passed?'Passed':'Needs more work')+'</div>'
+      +'<div style="font-size:13px;color:var(--g6);margin-top:4px">'+(passed?'You demonstrated solid understanding of this topic.':suggestion||'We recommend reviewing the material or booking another session.')+'</div>'
       +'</div>';
+    if(passed){
+      setTimeout(function(){showModal('next-session-modal');},400);
+    } else {
+      res.innerHTML+='<div class="card" style="border:1.5px solid var(--err)">'
+        +'<div style="font-size:13px;font-weight:700;color:var(--g9);margin-bottom:6px">Recommendation</div>'
+        +'<div style="font-size:13px;color:var(--g6);margin-bottom:14px">'+(suggestion||'Your score is below the pass threshold. Rebook this topic — with the same tutor or find a new match through AI.')+'</div>'
+        +'<div style="display:flex;gap:8px"><button class="btn-join" onclick="goTo(\'book\')">Book again</button><button class="btn-sm" onclick="goTo(\'ai-match\')">New AI match</button></div>'
+        +'</div>';
+      if(S.recordingBlobURL){
+        res.innerHTML+='<div class="card" style="margin-top:12px">'
+          +'<div style="font-size:13px;font-weight:700;color:var(--g9);margin-bottom:8px">Review your session recording</div>'
+          +'<video src="'+S.recordingBlobURL+'" controls style="width:100%;border-radius:var(--r)"></video>'
+          +'</div>';
+      }
+    }
+  }catch(e){
+    showToast('Could not submit: '+(e.message||'Try again'));
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Submit answers';}
   }
 }
 
 // ═══ MESSAGES ═══
-function buildMsgList(){
+async function buildMsgList(){
   var el=document.getElementById('msg-list');if(!el)return;
-  var data=[{av:'KO',bg:'#0E8F84',n:'Kwame Osei',p:'See you at 8 PM!',u:2,exp:'2d 14h left'},
-            {av:'RC',bg:'#5243F5',n:'Rohan Chandra',p:'Practice sheet sent.',u:1,exp:'1d 6h left'},
-            {av:'MA',bg:'#7B3F9E',n:'Maria Alves',p:'À demain!',u:0,exp:'Expired'}];
-  el.innerHTML=data.map(function(m,i){
-    return'<div class="msg-item'+(i===0?' active':'')+'" onclick="document.querySelectorAll(\'.msg-item\').forEach(function(x){x.classList.remove(\'active\')});this.classList.add(\'active\')">'
-      +'<div class="sav" style="background:'+m.bg+';width:36px;height:36px;font-size:11px">'+m.av+'</div>'
-      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+m.n+'</div>'
-      +'<div style="font-size:11px;color:var(--g5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+m.p+'</div>'
-      +'<div style="font-size:10px;font-weight:600;margin-top:2px;color:'+(m.exp==='Expired'?'var(--err)':'#8A6B00')+'">'+m.exp+'</div></div>'
-      +(m.u?'<span style="background:var(--t5);color:var(--g9);font-size:10px;font-weight:800;padding:1px 6px;border-radius:var(--rf);flex-shrink:0">'+m.u+'</span>':'')
-      +'</div>';
-  }).join('');
+  el.innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--g4)">Loading…</div>';
+  try{
+    var sessions=await API.Sessions.list('?status=scheduled');
+    var items=(sessions||[]).slice(0,20);
+    if(!items.length){
+      el.innerHTML='<div style="padding:32px 16px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:6px">No messages yet</div><div style="font-size:12px;color:var(--g5)">Messages from your tutors and learners will appear here after a session is booked.</div></div>';
+      return;
+    }
+    var u=API.Auth.currentUser();
+    el.innerHTML=items.map(function(s,i){
+      var other=u&&u.id===s.learner_id?s.tutor_name:s.learner_name;
+      var initials=(other||'?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      var bg=['#0E8F84','#5243F5','#B85F00','#7B3F9E','#E05C00'][i%5];
+      var when=s.scheduled_at?new Date(s.scheduled_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+      return'<div class="msg-item'+(i===0?' active':'')+'" onclick="document.querySelectorAll(\'.msg-item\').forEach(function(x){x.classList.remove(\'active\')});this.classList.add(\'active\')">'
+        +'<div class="sav" style="background:'+bg+';width:36px;height:36px;font-size:11px">'+initials+'</div>'
+        +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(other||'Tutor')+'</div>'
+        +'<div style="font-size:11px;color:var(--g5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(s.subject||'Session')+'</div>'
+        +'<div style="font-size:10px;font-weight:600;margin-top:2px;color:var(--g4)">'+when+'</div></div>'
+        +'</div>';
+    }).join('');
+  }catch(e){
+    el.innerHTML='<div style="padding:24px;text-align:center;font-size:12px;color:var(--g4)">Could not load messages.</div>';
+  }
 }
 function sendMsgApp(){
   var inp=document.getElementById('msg-inp'),msgs=document.getElementById('msg-msgs');
@@ -2487,10 +2691,6 @@ function sendMsgApp(){
   var m=inp.value;inp.value='';
   msgs.innerHTML+='<div style="display:flex;justify-content:flex-end"><div class="cown">'+m+'</div></div>';
   msgs.scrollTop=msgs.scrollHeight;
-  setTimeout(function(){
-    msgs.innerHTML+='<div style="display:flex;gap:8px;align-items:flex-start"><div class="sav" style="background:var(--t7);width:26px;height:26px;font-size:9px">KO</div><div class="cbbl">Got it, see you tonight!</div></div>';
-    msgs.scrollTop=msgs.scrollHeight;
-  },700);
 }
 
 // ═══ STUDY RINGS ═══
@@ -2606,28 +2806,18 @@ function selSt(v){['60','90','120'].forEach(function(x){var b=document.getElemen
 function selBookT(t){['ko','rc'].forEach(function(x){var el=document.getElementById('book-'+x);if(!el)return;el.style.background=x===t?'var(--t0)':'var(--g0)';el.style.border=x===t?'1.5px solid var(--t4)':'1px solid var(--g2)';});}
 async function confirmBook(){
   var btn=document.querySelector('#screen-book .btn-lg.p[onclick="confirmBook()"]');
-  if(btn){btn.disabled=true;btn.textContent='Processing…';}
+  if(btn){btn.disabled=true;btn.textContent='Booking…';}
   try{
     var subj=(document.querySelector('#screen-book textarea.fi')||{}).value||'General';
     var slot=S._selectedSlot||new Date(Date.now()+86400000).toISOString();
     var dur=S._selectedDuration||60;
     var tutorId=S._selectedTutorId||null;
-    var rate=parseFloat((document.getElementById('book-rate')||{}).textContent||'12')||12;
-    var fee=parseFloat((rate*dur/60*0.12).toFixed(2));
-    var total=parseFloat((rate*dur/60+fee).toFixed(2));
     var sess=await bookSession(tutorId,subj,'',slot,dur);
     if(sess){
-      var pf=document.getElementById('pay-session-fee');
-      var pfee=document.getElementById('pay-platform-fee');
-      var pt=document.getElementById('pay-total');
-      if(pf)pf.textContent='$'+(rate*dur/60).toFixed(2);
-      if(pfee)pfee.textContent='$'+fee.toFixed(2);
-      if(pt)pt.textContent='$'+total.toFixed(2);
       showModal('payment-modal');
-      showToast('Session booked successfully ✓');
     }
   }catch(e){showToast('Booking failed: '+(e.message||'Try again'));}
-  finally{if(btn){btn.disabled=false;btn.textContent='Confirm & Pay';}}
+  finally{if(btn){btn.disabled=false;btn.textContent='Book your free session →';}}
 }
 
 // ═══ SESSION ROOM ═══
@@ -2636,12 +2826,16 @@ function startTimer(){
   var s=0;S.timerInt=setInterval(function(){s++;var m=Math.floor(s/60),sec=s%60;var el=document.getElementById('sess-timer');if(el)el.textContent=(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;},1000);
 }
 function endSess(){
+  if(S.sessionRecorder&&S.sessionRecorder.state!=='inactive'){S.sessionRecorder.stop();}
   if(typeof rtcStream!=='undefined'&&rtcStream)rtcStream.getTracks().forEach(function(t){t.stop();});
   if(typeof rtcPeer!=='undefined'&&rtcPeer){rtcPeer.close();rtcPeer=null;}
   if(typeof rtcWS!=='undefined'&&rtcWS){rtcWS.close();rtcWS=null;}
   if(S.timerInt){clearInterval(S.timerInt);S.timerInt=null;}
   goTo('ai-summary');
-  setTimeout(function(){showModal('survey-modal');},1200);
+  setTimeout(function(){
+    loadPendingAssessment();
+    showModal('survey-modal');
+  },1200);
 }
 function tCtrl(t){var el=document.getElementById('ctrl-'+t);if(el){el.classList.toggle('ctrl-on');el.classList.toggle('ctrl-d');}}
 function sTab(t){
@@ -2658,10 +2852,6 @@ function sendSRChat(){
   var m=inp.value;inp.value='';
   chat.innerHTML+='<div style="display:flex;justify-content:flex-end"><div class="cown">'+m+'</div></div>';
   chat.scrollTop=chat.scrollHeight;
-  setTimeout(function(){
-    chat.innerHTML+='<div style="display:flex;gap:8px;align-items:flex-start"><div class="sav" style="background:var(--t7);width:26px;height:26px;font-size:9px">KO</div><div class="cbbl">Got it — drawing on the whiteboard.</div></div>';
-    chat.scrollTop=chat.scrollHeight;
-  },500);
 }
 
 // ═══ WHITEBOARD ═══
@@ -3400,6 +3590,22 @@ async function startSessionRoom(roomId){
     showToast('Camera/mic access denied. Check browser permissions.');
     return;
   }
+  // ── Start recording ──
+  S.recordingChunks=[];S.recordingBlobURL=null;
+  try{
+    var mimeType=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+      ?'video/webm;codecs=vp9'
+      :MediaRecorder.isTypeSupported('video/webm')?'video/webm':'';
+    S.sessionRecorder=new MediaRecorder(rtcStream,mimeType?{mimeType:mimeType}:{});
+    S.sessionRecorder.ondataavailable=function(e){if(e.data&&e.data.size>0)S.recordingChunks.push(e.data);};
+    S.sessionRecorder.onstop=function(){
+      var blob=new Blob(S.recordingChunks,{type:S.sessionRecorder.mimeType||'video/webm'});
+      S.recordingBlobURL=URL.createObjectURL(blob);
+    };
+    S.sessionRecorder.start(5000); // collect in 5 s chunks
+  }catch(e){
+    console.warn('[REC] MediaRecorder not supported:',e);S.sessionRecorder=null;
+  }
   var wsBase='wss://tutlee-backend.onrender.com';
   rtcWS=new WebSocket(wsBase+'/ws/signal/'+(roomId||'session')+'/');
   rtcWS.onopen=function(){rtcWS.send(JSON.stringify({type:'join',room:roomId}));createRTCOffer(roomId);};
@@ -3491,29 +3697,50 @@ async function toggleScreenShare(){
   }
 }
 function endSessionCall(){
+  // Stop recording first so onstop fires and builds the blob
+  if(S.sessionRecorder&&S.sessionRecorder.state!=='inactive'){
+    S.sessionRecorder.stop();
+  }
   if(rtcStream)rtcStream.getTracks().forEach(function(t){t.stop();});
   if(rtcPeer){rtcPeer.close();rtcPeer=null;}
   if(rtcWS){rtcWS.close();rtcWS=null;}
   if(S.timerInt){clearInterval(S.timerInt);S.timerInt=null;}
   showToast('Session ended');
+  goTo('ai-summary');
+  // Give recording blob time to form, then load assessment + survey
   setTimeout(function(){
-    closeModal('survey-modal');
-    S.currentSurveySessionId=null;
+    loadPendingAssessment();
     showModal('survey-modal');
-  },500);
-  goTo('sessions');
+  },1000);
 }
-function loadSummary(){
+async function loadSummary(){
   var el=document.getElementById('ai-summary-body');
   if(!el)return;
-  el.innerHTML='<div style="padding:32px;text-align:center;color:var(--g5);font-size:13px">Generating AI summary…</div>';
-  setTimeout(function(){
-    el.innerHTML='<div style="font-size:13px;color:var(--g7);line-height:1.8">'
-      +'<strong style="display:block;margin-bottom:8px;color:var(--g9)">Key topics covered</strong>'
-      +'<p style="margin-bottom:12px">The session covered the fundamentals of the subject discussed. Please complete your assessment to generate a personalised summary.</p>'
-      +'<button class="btn-lg p" onclick="goTo(\'assessments\')" style="justify-content:center;width:100%;max-width:300px">Take your assessment now</button>'
-      +'</div>';
-  },1200);
+  el.innerHTML='<div style="padding:32px;text-align:center;color:var(--g5);font-size:13px">Loading session summary…</div>';
+  try{
+    var sessions=await API.Sessions.list('?status=completed');
+    var list=sessions.results||sessions;
+    var last=list&&list[0];
+    if(last){
+      var sub=document.getElementById('ai-summary-sub');
+      if(sub)sub.textContent='AI-generated · '+(last.subject||'session')+' with '+(last.tutor_name||'your tutor');
+      el.innerHTML='<div style="font-size:13px;color:var(--g7);line-height:1.8">'
+        +'<strong style="display:block;margin-bottom:8px;color:var(--g9)">Session: '+(last.subject||'')+'</strong>'
+        +'<div style="display:flex;gap:16px;margin-bottom:14px;font-size:12px;color:var(--g5)">'
+        +'<span>Tutor: '+(last.tutor_name||'—')+'</span>'
+        +'<span>Duration: '+(last.duration_mins||'—')+' min</span>'
+        +'<span>'+new Date(last.scheduled_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+'</span>'
+        +'</div>'
+        +(last.notes?'<p style="margin-bottom:12px">'+last.notes+'</p>':'<p style="margin-bottom:12px">The session covered the fundamentals of '+(last.subject||'the topic')+'. Complete your assessment below to receive a personalised progress update.</p>')
+        +(S.recordingBlobURL?'<div style="margin-bottom:16px"><div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:8px">Session recording</div><video src="'+S.recordingBlobURL+'" controls style="width:100%;border-radius:var(--r)"></video></div>':'')
+        +'<button class="btn-lg p" onclick="goTo(\'assessments\')" style="justify-content:center;width:100%;max-width:300px">Take your assessment now</button>'
+        +'</div>';
+    }else{
+      el.innerHTML='<div style="padding:32px;text-align:center;color:var(--g5);font-size:13px">No completed sessions yet. Your summary will appear here after your first session.</div>';
+    }
+  }catch(e){
+    el.innerHTML='<div style="padding:32px;text-align:center;color:var(--g5);font-size:13px">Generating AI summary…</div>';
+  }
 }
 
 // ═══ WEBRTC — STUDY RINGS (multi-party mesh) ═══
@@ -3771,11 +3998,17 @@ async function createRing(){
         var safeScreens=['dashboard','ai-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
         if(safeScreens.indexOf(lastScreen)!==-1)setTimeout(function(){goTo(lastScreen);},200);
       }
-      // Validate token with server — if stale (e.g. DB was reset), sign out immediately
+      // Validate token with server — ONLY sign out on 401 (invalid token).
+      // Network errors (Render cold start, slow connection) must NOT kill the session.
       API.Users.me().then(function(me){
         try{localStorage.setItem('_t_u',JSON.stringify(me));}catch(e){}
-      }).catch(function(){
-        signOut();
+      }).catch(function(err){
+        // Only sign out if the server explicitly rejected the token (401/403)
+        var httpStatus=err&&(err.status||err.statusCode||(err.response&&err.response.status));
+        if(httpStatus===401||httpStatus===403){
+          signOut();
+        }
+        // For any other error (network timeout, 500, etc.) — keep the user logged in
       });
     }
   }catch(e){}
