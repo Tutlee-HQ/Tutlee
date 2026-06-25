@@ -220,6 +220,8 @@ tr:hover td{background:var(--p9)}
 .kyt-step{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g1)}
 .kyt-step:last-child{border-bottom:none}
 .kyt-step-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kyt-step-icon.done{background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.kyt-step-icon.missing{background:color-mix(in srgb,var(--err) 12%,transparent)}
 
 /* ── RING CARDS ── */
 .rings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--sp4)}
@@ -1350,6 +1352,7 @@ function navTo(id, el) {
   if (id === 'dashboard') drawCharts();
   if (id === 'assessments') { setTimeout(drawAssessChart, 50); renderSubjectBars(); }
   if (id === 'cms') loadCMSContent();
+  if (id === 'kyt') loadKYT();
   closeSidebar(); // auto-close on mobile after navigation
 }
 
@@ -1511,41 +1514,114 @@ document.getElementById('modal-confirm-btn').onclick = function() {
 };
 
 /* ── KYT ── */
+async function loadKYT() {
+  const grid = document.getElementById('kyt-grid');
+  const countEl = document.getElementById('kyt-count-text');
+  if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;font-size:13px;color:var(--g4)">Loading applications…</div>';
+  try {
+    const res = await API.KYT.list('pending');
+    const apps = res.results || res || [];
+    // Update count text
+    if (countEl) countEl.textContent = apps.length + ' application' + (apps.length !== 1 ? 's' : '') + ' awaiting review';
+    // Update nav badge
+    const badge = document.getElementById('kyt-badge');
+    if (badge) { badge.textContent = apps.length; badge.style.display = apps.length > 0 ? 'inline' : 'none'; }
+    // Store globally
+    window.kytApps = apps.map(a => ({
+      id: a.id,
+      name: a.tutor_name || a.tutor_email || 'Unknown',
+      email: a.tutor_email || '',
+      subject: Array.isArray(a.subjects) ? (a.subjects[0] || 'General') : 'General',
+      score: a.proficiency_score || 0,
+      steps: a.steps || { id: false, degree: false, demo: false, interview: false },
+      raw: a,
+    }));
+    renderKYT();
+  } catch(e) {
+    console.error('[KYT] load failed', e);
+    if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;font-size:13px;color:var(--err)">Could not load applications. Please refresh.</div>';
+  }
+}
+
 function renderKYT() {
+  const grid = document.getElementById('kyt-grid');
+  if (!grid) return;
   const stepLabels = {id:'ID Document', degree:'Academic Degree', demo:'Demo Video', interview:'Interview'};
-  document.getElementById('kyt-grid').innerHTML = kytApps.map(a => `
-    <div class="kyt-card">
+
+  if (!window.kytApps || !window.kytApps.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:48px;text-align:center"><div style="font-size:14px;font-weight:600;color:var(--g7);margin-bottom:6px">No pending applications</div><div style="font-size:13px;color:var(--g4)">New KYT submissions will appear here automatically.</div></div>';
+    return;
+  }
+
+  grid.innerHTML = window.kytApps.map(a => {
+    const initial = (a.name || '?')[0].toUpperCase();
+    const scoreColor = a.score >= 75 ? 'var(--ok)' : a.score >= 60 ? 'var(--warn)' : 'var(--err)';
+    const steps = a.steps || {};
+    const stepRows = Object.entries(steps).map(([k, v]) => `
+      <div class="kyt-step">
+        <div class="kyt-step-icon ${v ? 'done' : 'missing'}">
+          ${v
+            ? '<svg width="12" height="12" fill="none" stroke="var(--ok)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+            : '<svg width="12" height="12" fill="none" stroke="var(--err)" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'}
+        </div>
+        <div style="font-size:13px;color:${v ? 'var(--g7)' : 'var(--g4)'}">${stepLabels[k] || k}</div>
+        <div style="margin-left:auto;font-size:11px;font-weight:600;color:${v ? 'var(--ok)' : 'var(--err)'}">${v ? 'Submitted' : 'Missing'}</div>
+      </div>`).join('');
+
+    // Build document links if available
+    const raw = a.raw || {};
+    const docLinks = [
+      raw.id_document   ? `<a href="${raw.id_document}"   target="_blank" style="font-size:12px;color:var(--p);text-decoration:none;font-weight:600">View ID →</a>` : '',
+      raw.degree_document ? `<a href="${raw.degree_document}" target="_blank" style="font-size:12px;color:var(--p);text-decoration:none;font-weight:600">View Degree →</a>` : '',
+      raw.demo_video    ? `<a href="${raw.demo_video}"    target="_blank" style="font-size:12px;color:var(--p);text-decoration:none;font-weight:600">View Demo →</a>` : '',
+    ].filter(Boolean).join('<span style="margin:0 6px;color:var(--g3)">·</span>');
+
+    return `
+    <div class="kyt-card" id="kyt-card-${a.id}">
       <div class="kyt-card-head">
-        <div class="av av-i" style="width:40px;height:40px;font-size:15px;border-radius:var(--rf)">${a.name[0]}</div>
+        <div class="av av-i" style="width:40px;height:40px;font-size:15px;border-radius:var(--rf)">${initial}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:700;color:var(--g8)">${a.name}</div>
-          <div style="font-size:12px;color:var(--g4)">${a.subject} · Score: <strong style="color:${a.score>=75?'var(--ok)':a.score>=60?'var(--warn)':'var(--err)'}">${a.score}%</strong></div>
+          <div style="font-size:12px;color:var(--g4)">
+            ${a.subject !== 'General' ? a.subject + ' · ' : ''}
+            Score: <strong style="color:${scoreColor}">${a.score > 0 ? a.score + '%' : 'Not set'}</strong>
+          </div>
         </div>
         <span class="pill amber">Pending</span>
       </div>
       <div class="kyt-card-body">
-        ${Object.entries(a.steps).map(([k,v]) => `
-        <div class="kyt-step">
-          <div class="kyt-step-icon ${v?'done':'missing'}">
-            ${v
-              ? '<svg width="12" height="12" fill="none" stroke="var(--ok)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
-              : '<svg width="12" height="12" fill="none" stroke="var(--err)" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
-            }
-          </div>
-          <div style="font-size:13px;color:${v?'var(--g7)':'var(--g4)'}">${stepLabels[k]}</div>
-          <div style="margin-left:auto;font-size:11px;font-weight:600;color:${v?'var(--ok)':'var(--err)'}">${v?'Submitted':'Missing'}</div>
-        </div>`).join('')}
+        ${stepRows}
+        ${docLinks ? `<div style="padding:10px 0 2px;display:flex;gap:12px;flex-wrap:wrap">${docLinks}</div>` : ''}
       </div>
       <div class="kyt-card-foot">
         <button class="act-btn primary" style="flex:1;justify-content:center" onclick="approveKYT(${a.id})">Approve</button>
-        <button class="act-btn danger" style="flex:1;justify-content:center" onclick="rejectKYT(${a.id})">Reject</button>
+        <button class="act-btn danger"  style="flex:1;justify-content:center" onclick="rejectKYT(${a.id})">Reject</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-function approveKYT(id) {
-  toast('Tutor application approved. They have been notified.', 'var(--ok)');
-  var _kbd=document.getElementById('kyt-badge');var _kvd=Math.max(0,parseInt(_kbd.textContent)-1);_kbd.textContent=_kvd;_kbd.style.display=_kvd>0?'inline':'none';
+async function approveKYT(id) {
+  try {
+    await API.KYT.approve(id);
+    toast('Tutor application approved. They can now go live.', 'var(--ok)');
+    // Remove card from DOM
+    const card = document.getElementById('kyt-card-' + id);
+    if (card) card.remove();
+    // Update badge
+    const badge = document.getElementById('kyt-badge');
+    if (badge) {
+      const n = Math.max(0, parseInt(badge.textContent || '0') - 1);
+      badge.textContent = n;
+      badge.style.display = n > 0 ? 'inline' : 'none';
+    }
+    // Update count text
+    const remaining = document.querySelectorAll('.kyt-card').length;
+    const ct = document.getElementById('kyt-count-text');
+    if (ct) ct.textContent = remaining + ' application' + (remaining !== 1 ? 's' : '') + ' awaiting review';
+  } catch(e) {
+    toast('Approval failed: ' + (e.message || 'Try again'), 'var(--err)');
+  }
 }
 
 let rejectingKYTId = null;
@@ -1553,9 +1629,26 @@ function rejectKYT(id) {
   rejectingKYTId = id;
   openModal('modal-reject');
 }
-function confirmReject() {
+async function confirmReject() {
   closeModal('modal-reject');
-  toast('Application rejected. Tutor has been notified with the reason.', 'var(--err)');
+  const reason = document.querySelector('#modal-reject textarea')?.value || '';
+  try {
+    await API.KYT.reject(rejectingKYTId, { reason });
+    toast('Application rejected. Tutor has been notified.', 'var(--err)');
+    const card = document.getElementById('kyt-card-' + rejectingKYTId);
+    if (card) card.remove();
+    const badge = document.getElementById('kyt-badge');
+    if (badge) {
+      const n = Math.max(0, parseInt(badge.textContent || '0') - 1);
+      badge.textContent = n;
+      badge.style.display = n > 0 ? 'inline' : 'none';
+    }
+    const remaining = document.querySelectorAll('.kyt-card').length;
+    const ct = document.getElementById('kyt-count-text');
+    if (ct) ct.textContent = remaining + ' application' + (remaining !== 1 ? 's' : '') + ' awaiting review';
+  } catch(e) {
+    toast('Rejection failed: ' + (e.message || 'Try again'), 'var(--err)');
+  }
   rejectingKYTId = null;
 }
 
@@ -1868,21 +1961,8 @@ async function initApp() {
       renderTutors(window.tutors);
     }
 
-    // KYT queue
-    if (kytRes.status === 'fulfilled') {
-      const apps = kytRes.value.results || kytRes.value;
-      if (apps.length) {
-        // Build live kytApps and re-render
-        window.kytApps = apps.map(a => ({
-          id: a.id,
-          name: a.tutor_name,
-          subject: (a.tutor?.tutor_profile?.subjects || ['Unknown'])[0],
-          score: a.proficiency_score || 0,
-          steps: a.steps || { id: false, degree: false, demo: false, interview: false },
-        }));
-        renderKYT();
-      }
-    }
+    // KYT queue — always call loadKYT() so it can handle errors gracefully
+    loadKYT();
 
     // Sessions
     if (sessionsRes.status === 'fulfilled') {

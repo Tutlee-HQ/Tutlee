@@ -72,6 +72,63 @@ class StartSessionView(APIView):
         return Response(SessionSerializer(s).data)
 
 
+def _generate_assessment_questions(subject, topic=''):
+    """Generate 5 subject-specific comprehension questions for post-session assessment."""
+    t = topic or subject
+    return [
+        {
+            'text': f'Which statement best describes a core concept you worked on in this {t} session?',
+            'options': [
+                f'A fundamental principle within {subject}',
+                'An unrelated concept from a different field',
+                f'A technique not applicable to {subject}',
+                'None of the above',
+            ],
+            'answer': 0,
+        },
+        {
+            'text': f'In the context of {t}, which approach most effectively reinforces understanding?',
+            'options': [
+                'Memorising definitions without applying them',
+                'Practising problems that apply the concepts covered',
+                'Skipping foundational material and jumping ahead',
+                'Reading theory only, without any practice',
+            ],
+            'answer': 1,
+        },
+        {
+            'text': f'After a session on {t}, what is the best immediate next step?',
+            'options': [
+                'Move on to a completely new topic immediately',
+                'Review your notes and attempt practice questions',
+                'Avoid revisiting any of the material',
+                'Watch a general video unrelated to the session',
+            ],
+            'answer': 1,
+        },
+        {
+            'text': f'Which statement about mastering {subject} is most accurate?',
+            'options': [
+                f'Consistent practice and repetition are essential to mastering {subject}',
+                f'{subject} can be fully learned in a single session',
+                f'Prior knowledge is never needed for {subject}',
+                f'All topics within {subject} are completely independent of each other',
+            ],
+            'answer': 0,
+        },
+        {
+            'text': f'To improve your performance in {subject}, which action would be most beneficial?',
+            'options': [
+                'Booking a follow-up session focused on your identified weak areas',
+                'Avoiding further practice until the next scheduled session',
+                'Relying solely on a textbook without any guided help',
+                'Skipping the assessment review and moving forward',
+            ],
+            'answer': 0,
+        },
+    ]
+
+
 class EndSessionView(APIView):
     def post(self, request, pk):
         try:
@@ -89,6 +146,20 @@ class EndSessionView(APIView):
             tp.save()
         except Exception:
             pass
+        # Auto-create assessment if one doesn't exist yet
+        try:
+            from assessments.models import Assessment
+            if not Assessment.objects.filter(session=s).exists():
+                questions = _generate_assessment_questions(s.subject, s.topic)
+                Assessment.objects.create(
+                    session=s,
+                    learner=s.learner,
+                    subject=s.subject,
+                    questions=questions,
+                )
+        except Exception as _ae:
+            import sys
+            print(f'[ASSESSMENT] auto-create failed: {_ae}', file=sys.stderr)
         return Response(SessionSerializer(s).data)
 
 

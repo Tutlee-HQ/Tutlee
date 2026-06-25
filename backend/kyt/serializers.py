@@ -3,8 +3,9 @@ from .models import KYTApplication
 
 
 class KYTApplicationSerializer(serializers.ModelSerializer):
-    tutor_name = serializers.SerializerMethodField()
-    steps      = serializers.ReadOnlyField()
+    tutor_name  = serializers.SerializerMethodField()
+    tutor_email = serializers.SerializerMethodField()
+    steps       = serializers.ReadOnlyField()
 
     class Meta:
         model  = KYTApplication
@@ -13,3 +14,6 @@ class KYTApplicationSerializer(serializers.ModelSerializer):
 
     def get_tutor_name(self, obj):
         return obj.tutor.full_name
+
+    def get_tutor_email(self, obj):
+        return obj.tutor.email
