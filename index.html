@@ -783,7 +783,7 @@ tr:hover td{background:var(--g1)}
       <div class="sb-sec">Teaching</div>
       <div class="sbi" id="nav-tutor-dash" onclick="goTo('tutor-dash')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
       <div class="sbi" id="nav-t-sessions" onclick="goTo('t-sessions')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>My Sessions</div>
-      <div class="sbi" id="nav-t-messages" onclick="goTo('messages')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages<span class="sb-bdg bdg-w">3</span></div>
+      <div class="sbi" id="nav-t-messages" onclick="goTo('messages')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages</div>
       
       <div class="sb-sec">Analytics</div>
       <div class="sbi" id="nav-earnings" onclick="goTo('earnings')"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Earnings</div>
@@ -1171,7 +1171,7 @@ tr:hover td{background:var(--g1)}
 
   <!-- Assessment tabs -->
   <div style="display:flex;gap:0;border-bottom:1px solid var(--g1);margin-bottom:20px">
-    <button id="atab-pending" class="ring-tab active" onclick="switchAssTab('pending')">Pending <span class="sb-bdg bdg-w" style="margin-left:6px">1</span></button>
+    <button id="atab-pending" class="ring-tab active" onclick="switchAssTab('pending')">Pending <span class="sb-bdg bdg-w" style="margin-left:6px;display:none" id="assess-pending-count"></span></button>
     <button id="atab-history" class="ring-tab" onclick="switchAssTab('history')">History</button>
     <button id="atab-plan" class="ring-tab" onclick="switchAssTab('plan')">Plan</button>
   </div>
@@ -2129,7 +2129,7 @@ async function obCreate(){
 
   function _resetBtn(){btn.textContent='Create account';btn.classList.remove('loading');btn.disabled=false;}
   function _showErr(msg){if(errEl){errEl.textContent=msg;errEl.style.display='block';}}
-  function _showOTP(devCode){
+  function _showOTP(){
     S._pendingEmail=email;
     ['ob-s1','ob-s2'].forEach(function(id){
       var el=document.getElementById(id);if(el)el.classList.remove('active');
@@ -2141,18 +2141,10 @@ async function obCreate(){
       otpEl.classList.add('active');
       var ed=document.getElementById('otp-email-display');if(ed)ed.textContent=email;
       var inp=document.getElementById('otp-code-input');
-      if(inp){
-        if(devCode){
-          inp.value=devCode;
-          // Trigger input event so any listeners pick it up
-          inp.dispatchEvent(new Event('input'));
-        }else{
-          inp.value='';
-        }
-      }
+      if(inp)inp.value='';
     }
     if(errEl)errEl.style.display='none';
-    showToast(devCode?'Code filled in below — email delivery unavailable':'Check your email for the verification code');
+    showToast('Check your email for the verification code');
     _resetBtn();
   }
   function _isExists(e){
@@ -2164,7 +2156,7 @@ async function obCreate(){
   try{
     var data=await API.Auth.register(payload);
     S._pendingUser=data.user;
-    _showOTP(data.dev_otp_code||null);
+    _showOTP();
   }catch(e){
     // Any failure — wait 3s and retry once. Backend resends OTP for existing
     // accounts so this is always safe regardless of what failed first time.
@@ -2174,7 +2166,7 @@ async function obCreate(){
     try{
       var data2=await API.Auth.register(payload);
       S._pendingUser=data2.user;
-      _showOTP(data2.dev_otp_code||null);
+      _showOTP();
     }catch(e2){
       var _em=e2.message||'';
       var _et=e2.name||'Error';
@@ -2293,6 +2285,12 @@ var NAV_MAP={
   'book':'sessions','session-room':'sessions','ai-summary':'sessions'
 };
 function goTo(id){
+  // Block tutor-only users from learner-only screens
+  var learnerOnly=['study-groups','ring-detail','ai-match','assessments','progress'];
+  if(learnerOnly.indexOf(id)!==-1 && S.role==='tutor'){
+    showToast('This section is for learners only');
+    return;
+  }
   try { localStorage.setItem('_t_screen', id); } catch(e){}
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
   var el=document.getElementById('screen-'+id);if(el)el.classList.add('active');
@@ -3071,13 +3069,15 @@ async function loadUserDashboard(user) {
     // Assessments
     const assessments = await API.Assessments.list();
     var pendingAssess = (assessments.results || assessments).filter(function(a){ return a.status === 'pending'; });
-    if (pendingAssess.length > 0) {
-      var note = document.createElement('div');
-      note.style.cssText='position:fixed;bottom:80px;right:24px;background:var(--t5);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:900;cursor:pointer';
-      note.textContent = 'You have ' + pendingAssess.length + ' pending assessment' + (pendingAssess.length > 1 ? 's' : '');
-      note.onclick = function(){ goTo('my-progress'); note.remove(); };
-      document.body.appendChild(note);
-      setTimeout(function(){ if(note.parentNode) note.remove(); }, 8000);
+    // Update assessment tab badge dynamically
+    var assessBadge = document.getElementById('assess-pending-count');
+    if(assessBadge){
+      if(pendingAssess.length > 0){
+        assessBadge.textContent = pendingAssess.length;
+        assessBadge.style.display = '';
+      } else {
+        assessBadge.style.display = 'none';
+      }
     }
 
     // Study Rings — populate SG_DATA from API
