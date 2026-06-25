@@ -197,7 +197,7 @@ class SuspendUserView(APIView):
 
 
 class TutorMatchView(generics.ListAPIView):
-    """AI match: return tutors filtered by subject and weak areas."""
+    """Tutor match: return KYT-verified tutors filtered by subject and weak areas."""
     serializer_class   = PublicTutorSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -208,17 +208,19 @@ class TutorMatchView(generics.ListAPIView):
             role__in=['tutor', 'both'],
             is_suspended=False,
             tutor_profile__isnull=False,
+            kyt_application__status='approved',   # Only KYT-verified tutors are visible
         ).select_related('tutor_profile').order_by('-tutor_profile__rating')
 
         if subject:
-            # Filter tutors whose subjects contain the requested subject
-            qs = [u for u in qs if subject in (u.tutor_profile.subjects or [])]
+            # Case-insensitive partial match against each tutor's subjects list
+            s_lower = subject.lower()
+            qs = [u for u in qs if any(s_lower in s.lower() for s in (u.tutor_profile.subjects or []))]
 
         if weak_areas:
             # Further filter by tutors whose specialities overlap with requested weak areas
             def overlaps(u):
-                specs = set(u.tutor_profile.specialities or [])
-                return bool(specs & set(weak_areas))
+                specs = set(s.lower() for s in (u.tutor_profile.specialities or []))
+                return bool(specs & set(a.lower() for a in weak_areas))
             qs = [u for u in qs if overlaps(u)]
 
         return qs

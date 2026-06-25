@@ -244,7 +244,7 @@ const TutleeAPI = (() => {
     payouts:        (status='')=> get(`/api/payments/payouts/${status ? '?status='+status : ''}`),
     approvePayout:  (id)     => post(`/api/payments/payouts/${id}/approve/`),
     declinePayout:  (id)     => post(`/api/payments/payouts/${id}/decline/`),
-    revenueStats:   () => get('/api/payments/revenue-stats/'),
+    revenueStats:   () => get('/api/payments/stats/'),
   };
 
   // ── HEALTH CHECK ─────────────────────────────────────────────────────────────

@@ -396,9 +396,9 @@ tr:hover td{background:var(--g1)}
 .ring-tab{padding:10px 20px;border:none;border-bottom:2px solid transparent;background:none;font-size:13px;font-weight:500;color:var(--g5);cursor:pointer;font-family:var(--f);transition:all .15s;display:inline-flex;align-items:center}
 .ring-tab:hover{color:var(--g8)}.ring-tab.active{color:var(--p4);font-weight:600;border-bottom-color:var(--p4)}
 
-/* AI MATCH */
-.ai-match-card{background:var(--w);border:1px solid var(--g2);border-radius:var(--rl);padding:20px;transition:all .2s;cursor:pointer;box-shadow:var(--sh)}
-.ai-match-card:hover{border-color:var(--p4);box-shadow:var(--shl)}
+/* TUTOR MATCH */
+.tutor-match-card{background:var(--w);border:1px solid var(--g2);border-radius:var(--rl);padding:20px;transition:all .2s;cursor:pointer;box-shadow:var(--sh)}
+.tutor-match-card:hover{border-color:var(--p4);box-shadow:var(--shl)}
 .strength-tag{padding:4px 10px;border:1.5px solid var(--p6);border-radius:var(--rf);font-size:11px;color:var(--p4);font-weight:600;background:var(--p9)}
 .ail{text-align:center;padding:40px}
 .ail span{display:inline-block;width:7px;height:7px;background:var(--p4);border-radius:50%;margin:0 3px;animation:aidot 1.2s ease-in-out infinite}
@@ -557,7 +557,7 @@ tr:hover td{background:var(--g1)}
             <span class="tag tg" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px"><span style="width:6px;height:6px;background:var(--ok);border-radius:50%;display:inline-block"></span>Online</span>
           </div>
           <div style="background:var(--t0);border-radius:var(--r);padding:14px;margin-bottom:16px">
-            <div style="font-size:12px;color:var(--t7);font-weight:600;margin-bottom:6px">AI match in progress</div>
+            <div style="font-size:12px;color:var(--t7);font-weight:600;margin-bottom:6px">Tutor match in progress</div>
             <div style="height:6px;background:var(--t2);border-radius:3px;overflow:hidden"><div style="height:100%;width:70%;background:var(--t5);border-radius:3px"></div></div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 12px;background:var(--g0);border-radius:var(--r)">
@@ -575,7 +575,7 @@ tr:hover td{background:var(--g1)}
     <div class="lsec-in">
       <span class="eyebrow">How it works</span>
       <h2 class="sec-h2">From sign-up to session in minutes</h2>
-      <p class="sec-sub">Our AI matches you to tutors strong in your exact weak areas, not just a broad subject.</p>
+      <p class="sec-sub">Our matching algorithm connects you to tutors who are strong in your exact weak areas, not just a broad subject.</p>
       <div class="how-grid">
         <div class="how-step"><div class="how-n">1</div><h3>Tell us your weaknesses</h3><p>Share the specific topics you struggle with. Our AI uses this to find tutors who are strong exactly there.</p></div>
         <div class="how-step"><div class="how-n">2</div><h3>AI finds your match</h3><p>Matched by subject, specific weak area, availability, and timezone.</p></div>
@@ -804,7 +804,7 @@ tr:hover td{background:var(--g1)}
     <div id="nav-learner-group">
       <div class="sb-sec">Main</div>
       <div class="sbi" id="nav-dashboard" onclick="goTo('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
-      <div class="sbi" id="nav-ai-match" onclick="goTo('ai-match')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v3l2 2"/></svg>AI Match</div>
+      <div class="sbi" id="nav-tutor-match" onclick="goTo('tutor-match')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v3l2 2"/></svg>Tutor Match</div>
       <div class="sbi" id="nav-sessions" onclick="goTo('sessions')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>My Sessions</div>
       <div class="sbi" id="nav-messages" onclick="goTo('messages')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages</div>
       <div class="sbi" id="nav-study-groups" onclick="goTo('study-groups')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Study Rings</div>
@@ -911,7 +911,7 @@ tr:hover td{background:var(--g1)}
           </div>
           <div style="font-size:14px;font-weight:600;color:var(--g9);margin-bottom:6px">No sessions yet</div>
           <div style="font-size:13px;color:var(--g5);margin-bottom:20px;max-width:240px;margin-left:auto;margin-right:auto">Book your first session with a tutor matched to your specific weak areas.</div>
-          <button class="btn-lg p" style="width:100%;justify-content:center" onclick="goTo('ai-match')">Find a tutor with AI Match</button>
+          <button class="btn-lg p" style="width:100%;justify-content:center" onclick="goTo('tutor-match')">Find a Tutor Match</button>
         </div>
       </div>
 
@@ -921,8 +921,8 @@ tr:hover td{background:var(--g1)}
         <div style="display:flex;flex-direction:column;gap:0">
           <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--g0)">
             <div style="width:32px;height:32px;border-radius:50%;background:var(--t5);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--g9);flex-shrink:0">1</div>
-            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:2px">Run AI Match</div><div style="font-size:12px;color:var(--g5)">Tell us your weak areas - we find your best tutor</div></div>
-            <button class="btn-sm p" onclick="goTo('ai-match')">Start →</button>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:2px">Find a Tutor</div><div style="font-size:12px;color:var(--g5)">Tell us your weak areas - we find your best tutor</div></div>
+            <button class="btn-sm p" onclick="goTo('tutor-match')">Start →</button>
           </div>
           <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--g0)">
             <div style="width:32px;height:32px;border-radius:50%;background:var(--g1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--g5);flex-shrink:0">2</div>
@@ -948,7 +948,7 @@ tr:hover td{background:var(--g1)}
           </div>
           <div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:5px">No weak areas tracked yet</div>
           <div style="font-size:12px;color:var(--g5);margin-bottom:16px">Weak areas appear here after you complete your first assessment.</div>
-          <button class="btn-sm p" onclick="goTo('ai-match')">Set up AI match →</button>
+          <button class="btn-sm p" onclick="goTo('tutor-match')">Find a tutor →</button>
         </div>
       </div>
 
@@ -962,10 +962,10 @@ tr:hover td{background:var(--g1)}
   </div>
 </div>
 
-<!-- ══ AI MATCH ══ -->
-<div class="screen" id="screen-ai-match">
+<!-- ══ TUTOR MATCH ══ -->
+<div class="screen" id="screen-tutor-match">
   <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
-  <div class="pg-head"><div><h1>AI Match</h1><div class="pg-sub">Search for a subject, describe what you struggle with, and we match you to the right tutor</div></div></div>
+  <div class="pg-head"><div><h1>Tutor Match</h1><div class="pg-sub">Search for a subject, describe what you struggle with, and we match you to the right tutor</div></div></div>
   <div class="g65">
     <div>
       <div class="card" style="margin-bottom:16px">
@@ -1063,13 +1063,13 @@ tr:hover td{background:var(--g1)}
       <div class="card" style="margin-bottom:16px">
         <div class="ct">Select tutor</div>
         <div id="book-tutors-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
-          <div id="book-tutors-empty" style="padding:20px;text-align:center;background:var(--g0);border-radius:var(--r);font-size:13px;color:var(--g5)">No previous tutors yet. Use AI Match to find one.</div>
-          <div style="background:var(--g0);border:1px dashed var(--g3);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="goTo('ai-match')">
+          <div id="book-tutors-empty" style="padding:20px;text-align:center;background:var(--g0);border-radius:var(--r);font-size:13px;color:var(--g5)">No previous tutors yet. Use Tutor Match to find one.</div>
+          <div style="background:var(--g0);border:1px dashed var(--g3);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="goTo('tutor-match')">
             <div style="width:38px;height:38px;border-radius:var(--r);background:var(--t1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v3l2 2"/></svg>
             </div>
             <div>
-              <div style="font-size:13px;font-weight:600;color:var(--g8)">Request new AI match</div>
+              <div style="font-size:13px;font-weight:600;color:var(--g8)">Request a tutor match</div>
               <div style="font-size:12px;color:var(--g5)">Find a tutor matched to your specific weak area</div>
             </div>
             <div style="margin-left:auto;font-size:12px;font-weight:600;color:var(--t6)">Go →</div>
@@ -1227,7 +1227,7 @@ tr:hover td{background:var(--g1)}
         </div>
         <div style="font-size:15px;font-weight:700;color:var(--g9);margin-bottom:8px">No assessments pending</div>
         <div style="font-size:13px;color:var(--g5);line-height:1.6;max-width:320px;margin:0 auto 24px">Assessments are triggered automatically after every session. Book your first session to get started.</div>
-        <button class="btn-lg p" onclick="goTo('ai-match')" style="width:100%;justify-content:center;max-width:280px">Find a tutor with AI Match</button>
+        <button class="btn-lg p" onclick="goTo('tutor-match')" style="width:100%;justify-content:center;max-width:280px">Find a Tutor Match</button>
       </div>
     </div>
   </div><!-- /ass-tab-pending -->
@@ -1293,7 +1293,7 @@ tr:hover td{background:var(--g1)}
     </div>
     <div style="font-size:16px;font-weight:700;color:var(--g9);margin-bottom:8px">No messages yet</div>
     <div style="font-size:13px;color:var(--g5);line-height:1.6;margin-bottom:24px">When you book a session with a tutor, a message thread opens here. You can share files, send voice notes, and stay in sync before and after your session.</div>
-    <button class="btn-lg p" style="width:100%;justify-content:center" onclick="goTo('ai-match')">Find a tutor to message</button>
+    <button class="btn-lg p" style="width:100%;justify-content:center" onclick="goTo('tutor-match')">Find a tutor to message</button>
   </div>
 </div>
 
@@ -1441,7 +1441,7 @@ tr:hover td{background:var(--g1)}
         </div>
         <div style="font-size:13px;font-weight:600;color:var(--g7);margin-bottom:5px">No topic scores yet</div>
         <div style="font-size:12px;color:var(--g5);margin-bottom:16px;line-height:1.5">Topic scores are generated from your assessments - one after each session.</div>
-        <button class="btn-sm p" onclick="goTo('ai-match')">Book your first session →</button>
+        <button class="btn-sm p" onclick="goTo('tutor-match')">Book your first session →</button>
       </div>
     </div>
     <div class="card">
@@ -1476,7 +1476,7 @@ tr:hover td{background:var(--g1)}
       </div>
       <div style="font-size:14px;font-weight:600;color:var(--g7);margin-bottom:6px">No transactions yet</div>
       <div style="font-size:13px;color:var(--g5);margin-bottom:20px;max-width:300px;margin-left:auto;margin-right:auto">Your payment history will appear here after you book and complete your first session.</div>
-      <button class="btn-sm p" onclick="goTo('ai-match')">Book your first session</button>
+      <button class="btn-sm p" onclick="goTo('tutor-match')">Book your first session</button>
     </div>
   </div>
 </div>
@@ -1496,7 +1496,7 @@ tr:hover td{background:var(--g1)}
       </div>
       <div class="card">
         <div class="ct">Subjects I learn</div>
-        <div id="settings-subjects-wrap" class="subj-wrap"><div style="font-size:13px;color:var(--g5)">No subjects selected. Add subjects from the AI Match page.</div></div>
+        <div id="settings-subjects-wrap" class="subj-wrap"><div style="font-size:13px;color:var(--g5)">No subjects selected. Add subjects from the Tutor Match page.</div></div>
         <button class="btn-lg p" style="width:100%;justify-content:center;margin-top:4px" onclick="saveSettings()">Save subjects</button>
       </div>
     </div>
@@ -1692,7 +1692,7 @@ tr:hover td{background:var(--g1)}
           </div>
           <div>
             <div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:3px">Verified badge on profile</div>
-            <p style="font-size:13px;color:var(--g5)">Ranked higher in AI matching for learners searching your subjects.</p>
+            <p style="font-size:13px;color:var(--g5)">Ranked higher in tutor matching for learners searching your subjects.</p>
           </div>
         </div>
         <div style="display:flex;gap:12px;align-items:flex-start">
@@ -1700,7 +1700,7 @@ tr:hover td{background:var(--g1)}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v3l2 2"/></svg>
           </div>
           <div>
-            <div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:3px">Priority AI matching</div>
+            <div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:3px">Priority tutor matching</div>
             <p style="font-size:13px;color:var(--g5)">Matched first for learner weak areas that align with your verified subjects.</p>
           </div>
         </div>
@@ -1935,7 +1935,7 @@ tr:hover td{background:var(--g1)}
     <div style="font-size:13px;font-weight:600;color:var(--g7);margin-bottom:10px">Book your next session</div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <button class="btn-full btn-full-p" onclick="closeModal('next-session-modal');goTo('book')">Continue with same tutor</button>
-      <button class="btn-full btn-full-s" onclick="closeModal('next-session-modal');goTo('ai-match')">Find a new AI match for this topic</button>
+      <button class="btn-full btn-full-s" onclick="closeModal('next-session-modal');goTo('tutor-match')">Find a new tutor match for this topic</button>
     </div>
   </div>
 </div>
@@ -2351,7 +2351,7 @@ function launchApp(name,role){
 
 // ═══ NAV ═══
 var NAV_MAP={
-  'dashboard':'dashboard','ai-match':'ai-match','sessions':'sessions','messages':'messages',
+  'dashboard':'dashboard','tutor-match':'tutor-match','sessions':'sessions','messages':'messages',
   'study-groups':'study-groups','ring-detail':'study-groups','progress':'progress',
   'assessments':'assessments','payments':'payments','settings':'settings',
   'tutor-dash':'tutor-dash','t-sessions':'t-sessions','earnings':'earnings',
@@ -2360,7 +2360,7 @@ var NAV_MAP={
 };
 function goTo(id){
   // Block tutor-only users from learner-only screens
-  var learnerOnly=['study-groups','ring-detail','ai-match','assessments','progress'];
+  var learnerOnly=['study-groups','ring-detail','tutor-match','assessments','progress'];
   if(learnerOnly.indexOf(id)!==-1 && S.role==='tutor'){
     showToast('This section is for learners only');
     return;
@@ -2447,7 +2447,7 @@ function toggleDots(btn){
 }
 function closeDots(){document.querySelectorAll('.dots-dd.open').forEach(function(d){d.classList.remove('open')});}
 
-// ═══ AI MATCH ═══
+// ═══ TUTOR MATCH ═══
 var curMatchSubj='';
 function onMatchSubjInput(val){
   curMatchSubj=val.trim();
@@ -2485,7 +2485,7 @@ async function runAIMatch(){
         var initials=(t.full_name||'?').split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
         var colors=['#0E8F84','#5243F5','#B85F00','#3D6B5A','#7B3F9E'];
         var bg=colors[Math.abs(initials.charCodeAt(0))%colors.length];
-        return '<div class="ai-match-card" onclick="goTo(\'book\')">'
+        return '<div class="tutor-match-card" onclick="goTo(\'book\')">'
           +'<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'
           +'<div class="sav" style="background:'+bg+';width:44px;height:44px;font-size:14px">'+initials+'</div>'
           +'<div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--g9)">'+t.full_name+'</div>'
@@ -2676,8 +2676,8 @@ async function submitAssessment(){
     } else {
       res.innerHTML+='<div class="card" style="border:1.5px solid var(--err)">'
         +'<div style="font-size:13px;font-weight:700;color:var(--g9);margin-bottom:6px">Recommendation</div>'
-        +'<div style="font-size:13px;color:var(--g6);margin-bottom:14px">'+(suggestion||'Your score is below the pass threshold. Rebook this topic — with the same tutor or find a new match through AI.')+'</div>'
-        +'<div style="display:flex;gap:8px"><button class="btn-join" onclick="goTo(\'book\')">Book again</button><button class="btn-sm" onclick="goTo(\'ai-match\')">New AI match</button></div>'
+        +'<div style="font-size:13px;color:var(--g6);margin-bottom:14px">'+(suggestion||'Your score is below the pass threshold. Rebook this topic — with the same tutor or find a new match.')+'</div>'
+        +'<div style="display:flex;gap:8px"><button class="btn-join" onclick="goTo(\'book\')">Book again</button><button class="btn-sm" onclick="goTo(\'tutor-match\')">New tutor match</button></div>'
         +'</div>';
       if(S.recordingBlobURL){
         res.innerHTML+='<div class="card" style="margin-top:12px">'
@@ -3264,7 +3264,7 @@ function removeSubjectSetting(subj){
 // ═══════════════════════════════════════════════════
 //  BACKEND INTEGRATION — loadUserDashboard
 //  Called after login/register with the user object.
-//  Fetches live sessions, assessments, rings, and AI match data.
+//  Fetches live sessions, assessments, rings, and tutor match data.
 // ═══════════════════════════════════════════════════
 async function loadUserDashboard(user) {
   if (!API || !API.Auth.isLoggedIn()) return;
@@ -3330,9 +3330,9 @@ async function loadUserDashboard(user) {
       buildSGGrid();
     }
 
-    // Refresh AI match tutors if on that screen
-    if (document.getElementById('ai-match') && document.getElementById('ai-match').classList.contains('active')) {
-      loadAIMatch();
+    // Refresh tutor match results if on that screen
+    if (document.getElementById('screen-tutor-match') && document.getElementById('screen-tutor-match').classList.contains('active')) {
+      loadTutorMatch();
     }
 
     // KYT status for tutors
@@ -3383,8 +3383,8 @@ async function bookSession(tutorId, subject, topic, scheduledAt, durationMins) {
   }
 }
 
-// Load AI match tutors from API
-async function loadAIMatch() {
+// Load tutor match results from API
+async function loadTutorMatch() {
   if (!API.Auth.isLoggedIn()) return;
   try {
     var user = API.Auth.currentUser();
@@ -3392,7 +3392,7 @@ async function loadAIMatch() {
     var subject   = user?.learner_profile?.subjects?.[0] || '';
     var tutors    = await API.Users.matchTutors(subject, weakAreas);
     var list      = tutors.results || tutors;
-    var container = document.getElementById('ai-match-results');
+    var container = document.getElementById('tutor-match-results');
     if (!container || !list.length) return;
     container.innerHTML = list.map(function(t){
       return '<div class="tutor-match-card">' +
@@ -3404,7 +3404,7 @@ async function loadAIMatch() {
         '</div>';
     }).join('');
   } catch(e) {
-    console.info('AI match load failed:', e.message);
+    console.info('Tutor match load failed:', e.message);
   }
 }
 
@@ -3536,8 +3536,8 @@ function guardedBookSession() {
   var profile = user.learner_profile || {};
   var hasSubjects = profile.subjects && profile.subjects.length > 0;
   if (!hasSubjects) {
-    showToast('Find a tutor first - search for your subject in AI Match.');
-    goTo('ai-match');
+    showToast('Find a tutor first - search for your subject in Tutor Match.');
+    goTo('tutor-match');
     return;
   }
   goTo('book');
@@ -3546,7 +3546,7 @@ function guardedBookSession() {
 // ═══ ONBOARDING TOUR ═══
 var TOUR_LEARNER = [
   {sel:'#nav-dashboard',    title:'Dashboard',       body:'Your home base. See upcoming sessions, assessment prompts, and quick actions here.'},
-  {sel:'#nav-ai-match',     title:'AI Match',        body:'Search for a subject, describe your weak areas, and our AI finds the right tutor for you specifically.'},
+  {sel:'#nav-tutor-match',  title:'Tutor Match',     body:'Search for a subject, describe your weak areas, and our matching system finds the right tutor for you specifically.'},
   {sel:'#nav-sessions',     title:'My Sessions',     body:'View and manage all your booked sessions. Join live sessions directly from here.'},
   {sel:'#nav-assessments',  title:'Assessments',     body:'After every session an assessment is automatically triggered. Complete it to track your progress.'},
   {sel:'#nav-progress',     title:'My Progress',     body:'See how your scores improve over time, topic by topic, based on your assessments.'},
@@ -4031,7 +4031,7 @@ async function createRing(){
       launchApp(_name,user.role);
       var lastScreen=localStorage.getItem('_t_screen');
       if(lastScreen){
-        var safeScreens=['dashboard','ai-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
+        var safeScreens=['dashboard','tutor-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
         if(safeScreens.indexOf(lastScreen)!==-1)setTimeout(function(){goTo(lastScreen);},200);
       }
       // Validate token with server — ONLY sign out on 401 (invalid token).
