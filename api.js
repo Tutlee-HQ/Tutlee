@@ -97,7 +97,7 @@ const TutleeAPI = (() => {
       _refresh = data.refresh;
       _user    = data.user;
       if (_onAuthChange) _onAuthChange(_user);
-      try { sessionStorage.setItem('_t_a', data.access); sessionStorage.setItem('_t_r', data.refresh); sessionStorage.setItem('_t_u', JSON.stringify(data.user)); } catch(e){}
+      try { localStorage.setItem('_t_a', data.access); localStorage.setItem('_t_r', data.refresh); localStorage.setItem('_t_u', JSON.stringify(data.user)); } catch(e){}
       return data;
     },
 
@@ -107,21 +107,21 @@ const TutleeAPI = (() => {
       _refresh = data.refresh;
       _user    = data.user;
       if (_onAuthChange) _onAuthChange(_user);
-      try { sessionStorage.setItem('_t_a', data.access); sessionStorage.setItem('_t_r', data.refresh); sessionStorage.setItem('_t_u', JSON.stringify(data.user)); } catch(e){}
+      try { localStorage.setItem('_t_a', data.access); localStorage.setItem('_t_r', data.refresh); localStorage.setItem('_t_u', JSON.stringify(data.user)); } catch(e){}
       return data;
     },
 
     logout() {
       _access = _refresh = _user = null;
       if (_onAuthChange) _onAuthChange(null);
-      try { sessionStorage.removeItem('_t_a'); sessionStorage.removeItem('_t_r'); sessionStorage.removeItem('_t_u'); } catch(e){}
+      try { localStorage.removeItem('_t_a'); localStorage.removeItem('_t_r'); localStorage.removeItem('_t_u'); localStorage.removeItem('_t_screen'); } catch(e){}
     },
 
     restoreSession() {
       try {
-        var a = sessionStorage.getItem('_t_a');
-        var r = sessionStorage.getItem('_t_r');
-        var u = sessionStorage.getItem('_t_u');
+        var a = localStorage.getItem('_t_a');
+        var r = localStorage.getItem('_t_r');
+        var u = localStorage.getItem('_t_u');
         if (a && u) {
           _access  = a;
           _refresh = r || null;
@@ -151,7 +151,7 @@ const TutleeAPI = (() => {
       _refresh = data.refresh;
       _user    = data.user;
       if (_onAuthChange) _onAuthChange(_user);
-      try { sessionStorage.setItem('_t_a', data.access); sessionStorage.setItem('_t_r', data.refresh); sessionStorage.setItem('_t_u', JSON.stringify(data.user)); } catch(e){}
+      try { localStorage.setItem('_t_a', data.access); localStorage.setItem('_t_r', data.refresh); localStorage.setItem('_t_u', JSON.stringify(data.user)); } catch(e){}
       return data;
     },
 

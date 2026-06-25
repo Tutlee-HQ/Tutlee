@@ -237,6 +237,13 @@ textarea.fi{resize:none}
 .tb-ic svg{width:17px;height:17px;fill:none;stroke:var(--g7);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ndot{position:absolute;top:7px;right:7px;width:6px;height:6px;background:var(--err);border-radius:50%;border:1.5px solid var(--w)}
 
+/* HAMBURGER BUTTON (mobile only) */
+#ham-btn{display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--r);background:var(--g1);border:1px solid var(--g2);cursor:pointer;flex-shrink:0;transition:background .15s}
+#ham-btn:hover{background:var(--p9);border-color:var(--p6)}
+#ham-btn svg{width:18px;height:18px;fill:none;stroke:var(--g7);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Sidebar overlay */
+#sb-overlay{display:none}
+
 /* MAIN CONTENT AREA */
 #appmain{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--g0)}
 #content{flex:1;overflow-y:auto;padding:32px;background:var(--g0)}
@@ -450,16 +457,22 @@ tr:hover td{background:var(--g1)}
   .cta-in{padding:0 20px}.cta-in h2{font-size:26px}.cta-sec{padding:56px 0}
   .auth-ov{padding:0;align-items:flex-end}
   .auth-modal{border-radius:var(--rxl) var(--rxl) 0 0;max-height:92dvh;max-width:100%;width:100%}.auth-head{padding:20px 20px 0}.auth-body{padding:16px 20px 32px}.role-grid{grid-template-columns:1fr 1fr 1fr}
-  #vapp{flex-direction:column}
-  #sb{width:100%;min-width:0;height:60px;flex-direction:row;position:fixed;bottom:0;left:0;right:0;z-index:100;overflow-x:auto;overflow-y:hidden;padding:0;border-top:1px solid var(--g2);border-right:none;box-shadow:0 -2px 12px rgba(15,7,32,.08)}
-  .sb-logo,.sb-sec,.sb-user{display:none}
-  #nav-learner-group,#nav-tutor-group{display:flex;flex-direction:row;flex:1;overflow-x:auto}
-  #nav-learner-group::-webkit-scrollbar,#nav-tutor-group::-webkit-scrollbar{display:none}
-  .sbi{flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 8px;margin:0;border-radius:0;font-size:9px;font-weight:600;min-width:52px;max-width:72px;flex:1;text-align:center;position:relative}
-  .sbi svg{width:18px;height:18px}.sbi.active::before{display:none}.sbi.active{background:var(--p9);color:var(--p4)}
-  .sb-bdg{font-size:7px;padding:1px 4px;margin-left:0;position:absolute;top:4px;right:4px}
-  #topbar{padding:0 16px;gap:10px;height:48px}.tb-search,.tb-mode{display:none}
-  #appmain{padding-bottom:60px}#content{padding:16px}
+  #vapp{flex-direction:row}
+  /* Sidebar: hidden off-screen left, slides in on .open */
+  #sb{position:fixed;top:0;left:0;bottom:0;width:260px;min-width:0;z-index:300;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:none;border-right:1px solid var(--g2)}
+  #sb.open{transform:translateX(0);box-shadow:4px 0 24px rgba(15,7,32,.14)}
+  /* Overlay behind the sidebar */
+  #sb-overlay{display:none;position:fixed;inset:0;background:rgba(15,7,32,.35);z-index:299;backdrop-filter:blur(2px)}
+  #sb-overlay.open{display:block}
+  /* Show hamburger, hide search & mode toggle */
+  #ham-btn{display:flex}
+  #topbar{padding:0 16px;gap:10px;height:52px}.tb-search,.tb-mode{display:none}
+  #appmain{width:100%;padding-bottom:0}#content{padding:16px}
+  /* Restore sidebar nav items to vertical stack */
+  .sb-logo,.sb-sec,.sb-user{display:flex}
+  #nav-learner-group,#nav-tutor-group{display:flex;flex-direction:column}
+  .sbi{flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;padding:9px 16px;margin:1px 8px;border-radius:var(--r);font-size:13px;font-weight:500;min-width:0;flex:none;text-align:left}
+  .sbi svg{width:16px;height:16px}.sbi.active::before{display:block}
   .pg-head h1{font-size:18px}.pg-head{margin-bottom:16px;flex-wrap:wrap}
   .mg4,.mg3,.mg2{grid-template-columns:1fr 1fr}.g2,.g3,.g65{grid-template-columns:1fr}.mg{gap:12px}
   .card{padding:16px}.mc{padding:16px}.mc-val{font-size:20px}
@@ -479,8 +492,6 @@ tr:hover td{background:var(--g1)}
   .card{overflow-x:auto}
   table{font-size:12px;min-width:480px}th,td{padding:8px 10px;white-space:nowrap}
   .ni{padding:12px}
-  /* Bottom nav — bump font slightly */
-  .sbi{font-size:10px}
   /* Page actions — full width on mobile */
   .pg-head{margin-bottom:16px;flex-wrap:wrap}
   .pg-head h1{font-size:18px}
@@ -506,10 +517,11 @@ tr:hover td{background:var(--g1)}
   .footer-g{grid-template-columns:1fr}
 }
 
-/* Safe area bottom padding for bottom nav */
+/* Safe area support */
 @supports(padding-bottom:env(safe-area-inset-bottom)){
-  #sb{padding-bottom:env(safe-area-inset-bottom)}
-  #appmain{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+  @media(max-width:768px){
+    #topbar{padding-top:env(safe-area-inset-top)}
+  }
 }
 </style>
 </head>
@@ -841,8 +853,15 @@ tr:hover td{background:var(--g1)}
   </div>
 
   <!-- MAIN -->
+  <!-- Mobile sidebar overlay -->
+  <div id="sb-overlay" onclick="closeNav()"></div>
+
   <div id="appmain">
     <div id="topbar">
+      <!-- Hamburger (mobile only) -->
+      <button id="ham-btn" onclick="toggleNav()" aria-label="Open menu">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <div class="tb-mode hidden" id="mode-toggle">
         <button class="tb-mb active" id="tb-learn" onclick="setMode('learner')">Learn</button>
         <button class="tb-mb" id="tb-teach" onclick="setMode('tutor')">Teach</button>
@@ -2105,18 +2124,8 @@ async function doSignIn(){
   if(errEl)errEl.style.display='none';
   btn.textContent='Signing in…';btn.disabled=true;
   try{
-    var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
-    var r=await fetch(BASE+'/api/auth/login/',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email:email,password:pass})
-    });
-    var data=await r.json();
-    if(!r.ok){
-      var msg=data.detail||data.non_field_errors?.[0]||data.error||'Invalid email or password.';
-      if(errEl){errEl.textContent=msg;errEl.style.display='block';}
-      return;
-    }
+    // Use the API module so _access is set in memory immediately
+    var data=await API.Auth.login(email,pass);
     if(data.needs_verification){
       // Account exists but not verified — take them to OTP screen
       S._pendingEmail=email;
@@ -2130,22 +2139,13 @@ async function doSignIn(){
       showToast('Check your email — we just sent a verification code');
       return;
     }
-    // Store tokens
-    try{
-      localStorage.setItem('_t_a',data.access);
-      if(data.refresh)localStorage.setItem('_t_r',data.refresh);
-      if(data.user)localStorage.setItem('_t_u',JSON.stringify(data.user));
-    }catch(e){}
-    // Also hydrate API client in-memory state
-    if(window.API&&window.API.Auth&&typeof window.API.Auth.restoreSession==='function'){
-      window.API.Auth.restoreSession();
-    }
     closeAuth();
     var u=data.user;
-    launchApp(u.full_name||(u.first_name||'')+' '+(u.last_name||''), u.role);
+    launchApp(u.full_name||(u.first_name||'')+' '+(u.last_name||'').trim(), u.role);
     loadUserDashboard(u);
   }catch(e){
-    if(errEl){errEl.textContent='Connection error — please try again.';errEl.style.display='block';}
+    var msg=e.message||'Connection error — please try again.';
+    if(errEl){errEl.textContent=msg;errEl.style.display='block';}
   }finally{
     btn.textContent='Sign in';btn.disabled=false;
   }
@@ -2259,24 +2259,14 @@ async function verifyOTP(){
   if(errEl)errEl.style.display='none';
   if(btn){btn.disabled=true;btn.textContent='Verifying…';}
   try{
-    var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
-    var r=await fetch(BASE+'/api/accounts/otp/verify/',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email:S._pendingEmail,code:code})
-    });
-    var data=await r.json();
-    if(!r.ok)throw new Error(data.detail||data.error||'Verification failed. Check the code and try again.');
-    // Store tokens
-    try{
-      localStorage.setItem('_t_a',data.access);
-      if(data.refresh)localStorage.setItem('_t_r',data.refresh);
-      if(data.user)localStorage.setItem('_t_u',JSON.stringify(data.user));
-    }catch(e){}
+    // Use the API module so _access is set in memory and tokens go to localStorage
+    var data=await API.Auth.verifyOTP(S._pendingEmail, code);
     closeAuth();
-    launchApp(data.user.full_name||(data.user.first_name+' '+data.user.last_name).trim(),data.user.role);
+    launchApp(data.user.full_name||(data.user.first_name+' '+data.user.last_name).trim(), data.user.role);
     loadUserDashboard(data.user);
-  }catch(e){if(errEl){errEl.textContent=e.message||'Verification failed.';errEl.style.display='block';}}
+  }catch(e){
+    if(errEl){errEl.textContent=e.message||'Verification failed. Check the code and try again.';errEl.style.display='block';}
+  }
   finally{if(btn){btn.disabled=false;btn.textContent='Verify & continue';}}
 }
 
@@ -2358,6 +2348,26 @@ var NAV_MAP={
   't-analytics':'t-analytics','passport':'passport','verification':'verification',
   'book':'sessions','session-room':'sessions','ai-summary':'sessions'
 };
+// ═══ MOBILE NAV DRAWER ═══
+function openNav(){
+  var sb=document.getElementById('sb');
+  var ov=document.getElementById('sb-overlay');
+  if(sb)sb.classList.add('open');
+  if(ov){ov.style.display='block';ov.classList.add('open');}
+  document.body.style.overflow='hidden';
+}
+function closeNav(){
+  var sb=document.getElementById('sb');
+  var ov=document.getElementById('sb-overlay');
+  if(sb)sb.classList.remove('open');
+  if(ov){ov.classList.remove('open');setTimeout(function(){ov.style.display='none';},250);}
+  document.body.style.overflow='';
+}
+function toggleNav(){
+  var sb=document.getElementById('sb');
+  if(sb&&sb.classList.contains('open'))closeNav();else openNav();
+}
+
 function goTo(id){
   // Block tutor-only users from learner-only screens
   var learnerOnly=['study-groups','ring-detail','tutor-match','assessments','progress'];
@@ -2366,6 +2376,7 @@ function goTo(id){
     return;
   }
   try { localStorage.setItem('_t_screen', id); } catch(e){}
+  closeNav(); // close mobile drawer on every navigation
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
   var el=document.getElementById('screen-'+id);if(el)el.classList.add('active');
   document.querySelectorAll('.sbi').forEach(function(e){e.classList.remove('active')});
