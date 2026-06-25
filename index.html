@@ -448,7 +448,8 @@ tr:hover td{background:var(--g1)}
   .feat-grid{grid-template-columns:1fr;gap:16px}.how-grid{grid-template-columns:1fr 1fr;gap:16px}
   .footer-g{grid-template-columns:1fr;gap:28px}.footer-in{padding:0 20px}.fb-bot{flex-direction:column;gap:12px;align-items:flex-start}
   .cta-in{padding:0 20px}.cta-in h2{font-size:26px}.cta-sec{padding:56px 0}
-  .auth-modal{border-radius:var(--rl);max-height:96vh}.auth-head{padding:20px 20px 0}.auth-body{padding:16px 20px 24px}.role-grid{grid-template-columns:1fr 1fr 1fr}
+  .auth-ov{padding:0;align-items:flex-end}
+  .auth-modal{border-radius:var(--rxl) var(--rxl) 0 0;max-height:92dvh;max-width:100%;width:100%}.auth-head{padding:20px 20px 0}.auth-body{padding:16px 20px 32px}.role-grid{grid-template-columns:1fr 1fr 1fr}
   #vapp{flex-direction:column}
   #sb{width:100%;min-width:0;height:60px;flex-direction:row;position:fixed;bottom:0;left:0;right:0;z-index:100;overflow-x:auto;overflow-y:hidden;padding:0;border-top:1px solid var(--g2);border-right:none;box-shadow:0 -2px 12px rgba(15,7,32,.08)}
   .sb-logo,.sb-sec,.sb-user{display:none}
@@ -466,14 +467,49 @@ tr:hover td{background:var(--g1)}
   .msg-layout{grid-template-columns:1fr;height:auto}.msg-list{display:none}.msg-panel{min-height:440px}
   .sr-wrap{flex-direction:column}.sr-vids{grid-template-columns:1fr 1fr;gap:6px}.sr-vp{height:120px}
   .sr-side{width:100%;border-top:1px solid rgba(255,255,255,.08);border-left:none}.sr-side .chat-area{height:160px}
-  .notif-panel{right:8px;left:8px;width:auto}.m-ov{padding:12px}.modal{padding:24px 20px;max-height:92vh;border-radius:var(--rl)}
-  .bcal{gap:2px}.bc-day{height:30px;font-size:12px}.survey-scale{gap:4px}.scale-btn{padding:8px 4px;font-size:12px}
-  table{font-size:12px}th,td{padding:8px 10px}.ni{padding:12px}
+  .notif-panel{right:8px;left:8px;width:auto}
+  /* Modal — bottom sheet pattern */
+  .m-ov{padding:0;align-items:flex-end;padding-bottom:env(safe-area-inset-bottom)}
+  .modal{padding:24px 20px 32px;max-height:88dvh;border-radius:var(--rxl) var(--rxl) 0 0;width:100%;max-width:100%;margin:0}
+  /* Calendar */
+  .bcal{gap:2px}.bc-day{height:30px;font-size:12px}
+  /* Survey */
+  .survey-scale{gap:4px}.scale-btn{padding:8px 4px;font-size:12px}
+  /* Tables — horizontal scroll */
+  .card{overflow-x:auto}
+  table{font-size:12px;min-width:480px}th,td{padding:8px 10px;white-space:nowrap}
+  .ni{padding:12px}
+  /* Bottom nav — bump font slightly */
+  .sbi{font-size:10px}
+  /* Page actions — full width on mobile */
+  .pg-head{margin-bottom:16px;flex-wrap:wrap}
+  .pg-head h1{font-size:18px}
+  .hero-stats{flex-wrap:wrap;gap:16px}
 }
 @media (max-width: 480px) {
-  .hero-h1{font-size:26px}.how-grid{grid-template-columns:1fr}.mg4,.mg3,.mg2{grid-template-columns:1fr}
-  .sg-grid{grid-template-columns:1fr}.role-grid{grid-template-columns:1fr}.hero-stats{flex-direction:column;gap:12px}
-  .ring-tab{padding:8px 10px;font-size:11px}.sr-vids{grid-template-columns:1fr}.sr-vp{height:140px}
+  .hero-h1{font-size:26px}
+  .how-grid{grid-template-columns:1fr}
+  .mg4,.mg3,.mg2{grid-template-columns:1fr}
+  .g2,.g3{grid-template-columns:1fr}
+  .sg-grid{grid-template-columns:1fr}
+  .role-grid{grid-template-columns:1fr}
+  .hero-stats{flex-direction:column;gap:12px}
+  .ring-tab{padding:8px 10px;font-size:11px}
+  .sr-vids{grid-template-columns:1fr}
+  .sr-vp{height:140px}
+  #content{padding:12px}
+  .tb-right{gap:8px}
+  .sbi{min-width:44px;font-size:9px}
+  .modal{padding:20px 16px 28px}
+  .auth-body{padding:12px 16px 28px}
+  .feat-grid{grid-template-columns:1fr}
+  .footer-g{grid-template-columns:1fr}
+}
+
+/* Safe area bottom padding for bottom nav */
+@supports(padding-bottom:env(safe-area-inset-bottom)){
+  #sb{padding-bottom:env(safe-area-inset-bottom)}
+  #appmain{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
 }
 </style>
 </head>
@@ -4103,4 +4139,33 @@ async function createRing(){
       }).catch(function(){});
   }catch(e){}
 })();
+
+// ─── Mobile: wrap tables for horizontal scroll ─────────────────────────────
+(function wrapTables(){
+  function doWrap(){
+    document.querySelectorAll('#content table').forEach(function(t){
+      if(t.parentElement&&!t.parentElement.classList.contains('tbl-scroll')){
+        var w=document.createElement('div');
+        w.className='tbl-scroll';
+        w.style.cssText='overflow-x:auto;-webkit-overflow-scrolling:touch';
+        t.parentNode.insertBefore(w,t);w.appendChild(t);
+      }
+    });
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',doWrap);}
+  else{doWrap();}
+  // Also run when app screens become active
+  var origGoTo=window.goTo;
+  if(typeof goTo==='function'){
+    var _origGoTo=goTo;
+    window.goTo=function(id){_origGoTo(id);setTimeout(doWrap,100);};
+  }
+})();
+
+// ─── Mobile: close bottom-nav sidebar on resize back to desktop ───────────
+window.addEventListener('resize',function(){
+  if(window.innerWidth>768){
+    // Nothing needed — bottom nav is just CSS-driven
+  }
+});
 </script></body></html>

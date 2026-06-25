@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tutlee Admin</title>
 <script src="api.js" onerror="var s=document.createElement('script');s.src='https://tutlee-backend.onrender.com/api.js';document.head.appendChild(s);"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -302,19 +302,80 @@ tr:hover td{background:var(--p9)}
 .active{display:block}
 
 /* ── RESPONSIVE ── */
-@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.chart-grid,.dash-bottom{grid-template-columns:1fr}}
+@media(max-width:1100px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .chart-grid,.dash-bottom{grid-template-columns:1fr}
+}
+
 @media(max-width:768px){
-  .sidebar{position:fixed;left:-100%;top:0;bottom:0;transition:left .25s;z-index:50}
+  /* Sidebar drawer */
+  .sidebar{position:fixed;left:-100%;top:0;bottom:0;height:100dvh;transition:transform .25s cubic-bezier(.4,0,.2,1),left .25s cubic-bezier(.4,0,.2,1);z-index:50;width:240px;box-shadow:var(--shl)}
   .sidebar.open{left:0}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,7,32,.45);backdrop-filter:blur(3px);z-index:40}
   .sidebar-overlay.open{display:block}
   .hamburger{display:flex}
-  .kpi-grid{grid-template-columns:repeat(2,1fr)}
-  .kyt-grid,.rings-grid{grid-template-columns:1fr}
-  .topbar{padding:0 var(--sp4)}
+
+  /* App layout */
+  #app{display:flex;flex-direction:column}
+  .app-body{min-height:0;flex:1;overflow:hidden}
+
+  /* Topbar */
+  .topbar{padding:0 var(--sp4);gap:var(--sp3)}
   .topbar-search{display:none}
-  #app{flex-direction:column}
+  .topbar-actions{gap:var(--sp2)}
+  .topbar-btn span{display:none}
+
+  /* Main content */
+  .main{overflow-y:auto}
+  .screen{padding:var(--sp4)}
+
+  /* KPI grid */
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+
+  /* KYT & Rings grids */
+  .kyt-grid,.rings-grid{grid-template-columns:1fr}
+
+  /* Chart & dashboard grids */
+  .chart-grid,.dash-bottom{grid-template-columns:1fr}
+
+  /* CMS layout */
+  .cms-layout{flex-direction:column}
+  .cms-preview-panel{position:static;width:100%;flex:none}
+
+  /* Filters */
+  .filters{flex-wrap:wrap;gap:var(--sp2)}
+  .filter-select{flex:1 1 140px}
+
+  /* Tables — horizontal scroll */
+  .screen table{font-size:12px;min-width:520px}
+  .screen th,.screen td{padding:8px 10px;white-space:nowrap}
+  .card:has(table),.screen > div > .card{overflow-x:auto}
+
+  /* Modal — bottom sheet */
+  .m-ov,.modal-ov{padding:0;align-items:flex-end}
+  .modal-box,.modal{border-radius:var(--rxl) var(--rxl) 0 0;width:100%;max-width:100%;max-height:88dvh;margin:0;padding:var(--sp6) var(--sp5) calc(var(--sp6) + env(safe-area-inset-bottom))}
+
+  /* Toast */
+  .toast-wrap{bottom:calc(var(--sp4) + env(safe-area-inset-bottom));left:var(--sp4);right:var(--sp4);width:auto}
 }
-@media(max-width:480px){.kpi-grid{grid-template-columns:1fr}.filters{flex-direction:column;align-items:stretch}}
+
+@media(max-width:480px){
+  .kpi-grid{grid-template-columns:1fr}
+  .filters{flex-direction:column;align-items:stretch}
+  .screen{padding:var(--sp3)}
+  .topbar-title{font-size:13px}
+  .topbar-sub{display:none}
+  .kpi-card{padding:var(--sp4)}
+  .kpi-value{font-size:22px}
+
+  /* Sidebar narrower */
+  .sidebar{width:220px}
+}
+
+/* Safe area for modern phones */
+@supports(padding:env(safe-area-inset-bottom)){
+  .main{padding-bottom:env(safe-area-inset-bottom)}
+}
 
 /* ── CMS PREVIEW ── */
 .cms-layout{display:flex;gap:var(--sp6);align-items:flex-start}
@@ -1338,11 +1399,27 @@ const screenMeta = {
   settings:    {title:'Settings',       sub:'Platform configuration'},
 };
 
+/* ── SIDEBAR (mobile) ── */
+function openSidebar() {
+  document.querySelector('.sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function toggleSidebar() {
+  if (document.querySelector('.sidebar').classList.contains('open')) { closeSidebar(); } else { openSidebar(); }
+}
+
 function navTo(id, el) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   if (el) el.classList.add('active');
+  closeSidebar(); // auto-close on mobile
   try { localStorage.setItem('tutlee_admin_nav', id); } catch(e) {}
   const m = screenMeta[id];
   if (m) {
@@ -2451,6 +2528,24 @@ async function saveCMSContent() {
     localStorage.removeItem('tutlee_admin_token');
   }
 })();
+
+/* ── MOBILE TABLE SCROLL: wrap all tables in a scroll container ── */
+document.addEventListener('DOMContentLoaded', function() {
+  // Close sidebar on resize to desktop
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) closeSidebar();
+  });
+  // Wrap static tables in overflow divs
+  document.querySelectorAll('.card table, .screen table').forEach(function(t) {
+    if (t.parentElement && !t.parentElement.classList.contains('tbl-scroll')) {
+      var wrap = document.createElement('div');
+      wrap.className = 'tbl-scroll';
+      wrap.style.cssText = 'overflow-x:auto;-webkit-overflow-scrolling:touch';
+      t.parentNode.insertBefore(wrap, t);
+      wrap.appendChild(t);
+    }
+  });
+});
 
 </script>
 </body>
