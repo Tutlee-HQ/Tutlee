@@ -86,7 +86,7 @@ class RegisterView(generics.CreateAPIView):
                     html_body = f'<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px"><h2>Verify your email</h2><p>Hi {user.first_name or "there"}, your Tutlee verification code is:</p><div style="font-size:36px;font-weight:800;letter-spacing:8px;padding:20px;text-align:center;background:#F5F3FF;border-radius:12px">{code}</div><p style="color:#888;font-size:13px">Expires in 10 minutes.</p></div>'
                     plain_body = f'Hi {user.first_name or "there"},\n\nYour Tutlee verification code is: {code}\n\nThis expires in 10 minutes.\n\n— Tutlee'
                     req_body = _ujson.dumps({'from': from_addr, 'to': [user.email], 'subject': 'Your Tutlee verification code', 'html': html_body, 'text': plain_body}).encode('utf-8')
-                    req = _ureq.Request('https://api.resend.com/emails', data=req_body, headers={'Authorization': f'Bearer {resend_key}', 'Content-Type': 'application/json'}, method='POST')
+                    req = _ureq.Request('https://api.resend.com/emails', data=req_body, headers={'Authorization': f'Bearer {resend_key}', 'Content-Type': 'application/json', 'User-Agent': 'Tutlee/1.0 (contact@tutlee.com)'}, method='POST')
                     with _ureq.urlopen(req, timeout=15) as resp:
                         resp_data = _ujson.loads(resp.read().decode())
                     print(f'[TUTLEE OTP] Resend OK → {user.email}: {resp_data}', file=sys.stderr, flush=True)
@@ -263,7 +263,7 @@ class SendOTPView(APIView):
             try:
                 from_addr = _os2.environ.get('RESEND_FROM', 'onboarding@resend.dev')
                 req_body = _ujson2.dumps({'from': from_addr, 'to': [email], 'subject': 'Your Tutlee verification code', 'text': f'Your Tutlee verification code is: {code}\n\nExpires in 10 minutes.'}).encode('utf-8')
-                req = _ureq2.Request('https://api.resend.com/emails', data=req_body, headers={'Authorization': f'Bearer {resend_key}', 'Content-Type': 'application/json'}, method='POST')
+                req = _ureq2.Request('https://api.resend.com/emails', data=req_body, headers={'Authorization': f'Bearer {resend_key}', 'Content-Type': 'application/json', 'User-Agent': 'Tutlee/1.0 (contact@tutlee.com)'}, method='POST')
                 with _ureq2.urlopen(req, timeout=15) as resp:
                     _ujson2.loads(resp.read().decode())
                 email_sent = True
