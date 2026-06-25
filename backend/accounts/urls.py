@@ -5,6 +5,7 @@ from .views import (
     TutorMatchView, TutorProfileUpdateView, LearnerProfileUpdateView,
     admin_stats,
     SendOTPView, VerifyOTPView, SiteContentView,
+    PasswordResetRequestView, PasswordResetConfirmView,
 )
 
 urlpatterns = [
@@ -22,5 +23,8 @@ urlpatterns = [
     path('otp/send/',          SendOTPView.as_view(),         name='otp-send'),
     path('otp/verify/',        VerifyOTPView.as_view(),       name='otp-verify'),
     path('site-content/',       SiteContentView.as_view(),     name='site-content'),
+    # Password reset (OTP-based)
+    path('password-reset/',         PasswordResetRequestView.as_view(),  name='password-reset-request'),
+    path('password-reset/confirm/', PasswordResetConfirmView.as_view(),  name='password-reset-confirm'),
 ]
 

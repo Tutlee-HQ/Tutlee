@@ -15,9 +15,46 @@ class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        import sys
         s = LoginSerializer(data=request.data)
         s.is_valid(raise_exception=True)
-        user    = s.validated_data['user']
+        user  = s.validated_data['user']
+        needs = s.validated_data.get('needs_verification', False)
+        if needs:
+            # Account exists but email not verified — resend OTP so they can verify & log in
+            try:
+                from .models import EmailOTP
+                import random, string, urllib.request as _ureq, json as _ujson, os as _os
+                code = ''.join(random.choices(string.digits, k=6))
+                EmailOTP.objects.create(user=user, code=code)
+                print(f'[LOGIN unverified] {user.email} new OTP={code}', file=sys.stderr, flush=True)
+                resend_key = _os.environ.get('RESEND_API_KEY', '').strip()
+                if resend_key:
+                    try:
+                        from_addr = _os.environ.get('RESEND_FROM', 'onboarding@resend.dev')
+                        req_body  = _ujson.dumps({
+                            'from': from_addr, 'to': [user.email],
+                            'subject': 'Your Tutlee verification code',
+                            'html': f'<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px"><h2>Verify your email</h2><p>Hi {user.first_name or "there"}, your Tutlee verification code is:</p><div style="font-size:36px;font-weight:800;letter-spacing:8px;padding:20px;text-align:center;background:#F5F3FF;border-radius:12px">{code}</div><p style="color:#888;font-size:13px">Expires in 10 minutes.</p></div>',
+                            'text': f'Hi {user.first_name or "there"},\n\nYour Tutlee verification code is: {code}\n\nExpires in 10 minutes.\n\n— Tutlee',
+                        }).encode('utf-8')
+                        req = _ureq.Request(
+                            'https://api.resend.com/emails', data=req_body,
+                            headers={'Authorization': f'Bearer {resend_key}',
+                                     'Content-Type': 'application/json',
+                                     'User-Agent': 'Tutlee/1.0 (contact@tutlee.com)'},
+                            method='POST')
+                        with _ureq.urlopen(req, timeout=15) as resp:
+                            _ujson.loads(resp.read().decode())
+                    except Exception as _re:
+                        print(f'[LOGIN unverified] Resend error: {_re}', file=sys.stderr, flush=True)
+            except Exception as _otp_err:
+                print(f'[LOGIN unverified] OTP error: {_otp_err}', file=sys.stderr, flush=True)
+            return Response({
+                'needs_verification': True,
+                'email': user.email,
+                'detail': 'Please verify your email. A new code has been sent.',
+            }, status=status.HTTP_200_OK)
         refresh = RefreshToken.for_user(user)
         return Response({
             'access':  str(refresh.access_token),
@@ -297,6 +334,72 @@ class VerifyOTPView(APIView):
         refresh = RefreshToken.for_user(user)
         return Response({
             'detail': 'Email verified',
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': UserSerializer(user).data,
+        })
+
+
+# ─── PASSWORD RESET (OTP-based) ──────────────────────────────────────────────
+class PasswordResetRequestView(APIView):
+    """Step 1: user provides email → send OTP code."""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        import sys, urllib.request as _ureq3, json as _ujson3, os as _os3, random, string
+        email = request.data.get('email', '').strip().lower()
+        # Always respond 200 to avoid leaking whether the email exists
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'detail': 'If that email exists we have sent a reset code.'})
+        code = ''.join(random.choices(string.digits, k=6))
+        EmailOTP.objects.create(user=user, code=code)
+        print(f'[PWD RESET] {email} code={code}', file=sys.stderr, flush=True)
+        resend_key = _os3.environ.get('RESEND_API_KEY', '').strip()
+        if resend_key:
+            try:
+                from_addr = _os3.environ.get('RESEND_FROM', 'onboarding@resend.dev')
+                html_body = f'<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px"><h2>Reset your password</h2><p>Hi {user.first_name or "there"}, use this code to reset your Tutlee password:</p><div style="font-size:36px;font-weight:800;letter-spacing:8px;padding:20px;text-align:center;background:#F5F3FF;border-radius:12px">{code}</div><p style="color:#888;font-size:13px">Expires in 10 minutes. If you did not request this, ignore this email.</p></div>'
+                req_body  = _ujson3.dumps({'from': from_addr, 'to': [email], 'subject': 'Reset your Tutlee password', 'html': html_body, 'text': f'Your Tutlee password reset code is: {code}\n\nExpires in 10 minutes.'}).encode('utf-8')
+                req = _ureq3.Request('https://api.resend.com/emails', data=req_body, headers={'Authorization': f'Bearer {resend_key}', 'Content-Type': 'application/json', 'User-Agent': 'Tutlee/1.0 (contact@tutlee.com)'}, method='POST')
+                with _ureq3.urlopen(req, timeout=15) as resp:
+                    _ujson3.loads(resp.read().decode())
+            except Exception as _re3:
+                print(f'[PWD RESET] Resend error: {_re3}', file=sys.stderr, flush=True)
+        return Response({'detail': 'If that email exists we have sent a reset code.', 'dev_code': code if not resend_key else None})
+
+
+class PasswordResetConfirmView(APIView):
+    """Step 2: user provides email + OTP code + new password."""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        from django.utils import timezone
+        import datetime
+        email    = request.data.get('email', '').strip().lower()
+        code     = request.data.get('code', '').strip()
+        password = request.data.get('password', '')
+        if not email or not code or not password:
+            return Response({'error': 'email, code, and password are required.'}, status=400)
+        if len(password) < 8:
+            return Response({'error': 'Password must be at least 8 characters.'}, status=400)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid code.'}, status=400)
+        cutoff = timezone.now() - datetime.timedelta(minutes=10)
+        otp = EmailOTP.objects.filter(user=user, code=code, is_used=False, created_at__gte=cutoff).first()
+        if not otp:
+            return Response({'error': 'Invalid or expired code.'}, status=400)
+        otp.is_used = True
+        otp.save()
+        user.set_password(password)
+        user.is_active = True  # activate account if it was inactive
+        user.save()
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'detail': 'Password reset successfully.',
             'access': str(refresh.access_token),
             'refresh': str(refresh),
             'user': UserSerializer(user).data,

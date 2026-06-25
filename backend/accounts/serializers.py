@@ -68,8 +68,19 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, data):
+        from django.contrib.auth.backends import ModelBackend
         user = authenticate(username=data['email'], password=data['password'])
         if not user:
+            # Check if an inactive account exists with correct password (unverified email)
+            try:
+                candidate = User.objects.get(email=data['email'])
+                if not candidate.is_active and candidate.check_password(data['password']):
+                    # Correct credentials but email not verified — signal the frontend
+                    data['user'] = candidate
+                    data['needs_verification'] = True
+                    return data
+            except User.DoesNotExist:
+                pass
             raise serializers.ValidationError('Invalid credentials.')
         if user.is_suspended:
             raise serializers.ValidationError('This account has been suspended.')
