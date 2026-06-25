@@ -9,6 +9,7 @@ from .serializers import (
     UserSerializer, RegisterSerializer, LoginSerializer,
     TutorProfileSerializer, LearnerProfileSerializer, PublicTutorSerializer,
 )
+from .permissions import IsAdminOrStaff
 
 
 class LoginView(APIView):
@@ -164,7 +165,7 @@ class MeView(generics.RetrieveUpdateAPIView):
 class UserListView(generics.ListAPIView):
     """Admin: list all users with optional role filter."""
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def get_queryset(self):
         qs   = User.objects.select_related('tutor_profile', 'learner_profile').order_by('-created_at')
@@ -179,12 +180,12 @@ class UserListView(generics.ListAPIView):
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class   = UserSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
     queryset           = User.objects.select_related('tutor_profile', 'learner_profile')
 
 
 class SuspendUserView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request, pk):
         try:
@@ -241,7 +242,7 @@ class LearnerProfileUpdateView(generics.UpdateAPIView):
 
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAdminUser])
+@permission_classes([IsAdminOrStaff])
 def admin_stats(request):
     """Quick KPI numbers for admin dashboard."""
     from sessions_app.models import Session
@@ -413,7 +414,7 @@ class SiteContentView(APIView):
     def get_permissions(self):
         if self.request.method == 'GET':
             return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
+        return [IsAdminOrStaff()]
 
     def get(self, request, key='homepage'):
         try:

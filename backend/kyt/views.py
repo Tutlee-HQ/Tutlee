@@ -4,11 +4,13 @@ from rest_framework.response import Response
 from django.utils import timezone
 from .models import KYTApplication
 from .serializers import KYTApplicationSerializer
+from accounts.permissions import IsAdminOrStaff
 
 
 class KYTSubmitView(generics.CreateAPIView):
     """Tutor submits/updates their KYT documents."""
-    serializer_class = KYTApplicationSerializer
+    serializer_class   = KYTApplicationSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(tutor=self.request.user)
@@ -34,7 +36,7 @@ class KYTMyApplicationView(generics.RetrieveAPIView):
 class KYTListView(generics.ListAPIView):
     """Admin: list all KYT applications."""
     serializer_class   = KYTApplicationSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def get_queryset(self):
         qs     = KYTApplication.objects.select_related('tutor').order_by('-submitted_at')
@@ -45,7 +47,7 @@ class KYTListView(generics.ListAPIView):
 
 
 class KYTApproveView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request, pk):
         try:
@@ -61,7 +63,7 @@ class KYTApproveView(APIView):
 
 
 class KYTRejectView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request, pk):
         try:

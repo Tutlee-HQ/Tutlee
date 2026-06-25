@@ -7,6 +7,7 @@ from django.utils import timezone
 import uuid
 from .models import Transaction, PayoutRequest
 from .serializers import TransactionSerializer, PayoutRequestSerializer
+from accounts.permissions import IsAdminOrStaff
 
 
 class TransactionListView(generics.ListAPIView):
@@ -51,7 +52,7 @@ class RequestPayoutView(APIView):
 
 class PayoutListView(generics.ListAPIView):
     serializer_class   = PayoutRequestSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def get_queryset(self):
         qs = PayoutRequest.objects.select_related('tutor').order_by('-created_at')
@@ -62,7 +63,7 @@ class PayoutListView(generics.ListAPIView):
 
 
 class ApprovePayoutView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request, pk):
         try:
@@ -91,7 +92,7 @@ class ApprovePayoutView(APIView):
 
 
 class DeclinePayoutView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request, pk):
         try:
@@ -106,7 +107,7 @@ class DeclinePayoutView(APIView):
 
 
 class RevenueStatsView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def get(self, request):
         from django.utils import timezone

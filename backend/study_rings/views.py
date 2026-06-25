@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import StudyRing, RingPost
 from .serializers import StudyRingSerializer, RingPostSerializer
+from accounts.permissions import IsAdminOrStaff
 
 
 class StudyRingListView(generics.ListCreateAPIView):
@@ -26,7 +27,7 @@ class StudyRingDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_permissions(self):
         if self.request.method in ('PUT', 'PATCH', 'DELETE'):
-            return [permissions.IsAdminUser()]
+            return [IsAdminOrStaff()]
         return [permissions.IsAuthenticated()]
 
 
@@ -51,7 +52,7 @@ class LeaveRingView(APIView):
 
 
 class FeatureRingView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request, pk):
         try:

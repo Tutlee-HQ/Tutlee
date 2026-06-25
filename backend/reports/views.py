@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.utils import timezone
 from .models import Report
 from .serializers import ReportSerializer
+from accounts.permissions import IsAdminOrStaff
 
 
 class ReportCreateView(generics.CreateAPIView):
@@ -15,7 +16,7 @@ class ReportCreateView(generics.CreateAPIView):
 
 class ReportListView(generics.ListAPIView):
     serializer_class   = ReportSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def get_queryset(self):
         qs    = Report.objects.select_related('reporter','accused').order_by('-created_at')
@@ -29,7 +30,7 @@ class ReportListView(generics.ListAPIView):
 
 
 class ReportActionView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request, pk):
         try:

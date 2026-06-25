@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.db.models import Avg, Count, Q
 from .models import Assessment
 from .serializers import AssessmentSerializer, SubmitAssessmentSerializer
+from accounts.permissions import IsAdminOrStaff
 
 
 class AssessmentListView(generics.ListAPIView):
@@ -41,7 +42,7 @@ class SubmitAssessmentView(APIView):
 
 class AssessmentStatsView(APIView):
     """Admin analytics endpoint."""
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminOrStaff]
 
     def get(self, request):
         total    = Assessment.objects.filter(status='completed').count()
