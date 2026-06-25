@@ -92,7 +92,14 @@ class RegisterView(generics.CreateAPIView):
                     print(f'[TUTLEE OTP] Resend OK → {user.email}: {resp_data}', file=sys.stderr, flush=True)
                     email_sent = True
                 except Exception as _re:
-                    print(f'[TUTLEE OTP] Resend error: {_re}', file=sys.stderr, flush=True)
+                    _re_body = ''
+                    try:
+                        import urllib.error as _uerr
+                        if hasattr(_re, 'read'):
+                            _re_body = _re.read().decode('utf-8', errors='replace')
+                    except Exception:
+                        pass
+                    print(f'[TUTLEE OTP] Resend error: {_re} | body: {_re_body} | from={from_addr} | key_prefix={resend_key[:8]}', file=sys.stderr, flush=True)
             if not email_sent:
                 dev_otp_code = code  # return code in response so user can get it from logs
         except Exception as _otp_err:
