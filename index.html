@@ -2397,6 +2397,7 @@ function goTo(id){
     return;
   }
   try { localStorage.setItem('_t_screen', id); } catch(e){}
+  try { history.replaceState(null, '', '#' + id); } catch(e){}
   closeNav(); // close mobile drawer on every navigation
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
   var el=document.getElementById('screen-'+id);if(el)el.classList.add('active');
@@ -3620,6 +3621,9 @@ async function bookSession(tutorId, subject, topic, scheduledAt, durationMins) {
   }
 }
 
+// Module-level cache so book-screen buttons can reference tutors by index safely
+var _matchedTutors = [];
+
 // Load tutor match results from API
 async function loadTutorMatch() {
   if (!API.Auth.isLoggedIn()) return;
@@ -3631,16 +3635,18 @@ async function loadTutorMatch() {
     var subject   = (user && user.learner_profile && user.learner_profile.subjects && user.learner_profile.subjects[0]) || '';
     var tutors    = await API.Users.matchTutors(subject, weakAreas);
     var list      = tutors.results || tutors;
+    _matchedTutors = list; // cache for onclick references
     if (!container) return;
     if (!list.length) {
       container.innerHTML = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--g5)">No tutors found for your subject. Try updating your subject preferences in Settings.</div>';
       return;
     }
-    container.innerHTML = list.map(function(t){
+    container.innerHTML = list.map(function(t, i){
       var subjs = (t.subjects || []).join(', ') || 'General';
       var rating = parseFloat(t.rating || 0).toFixed(1);
       var rate   = t.hourly_rate > 0 ? '$' + t.hourly_rate + '/hr' : 'Free';
       var av     = (t.full_name || '?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      // Use index into _matchedTutors — avoids JSON-in-attribute quoting issues
       return '<div class="tutor-match-card" style="display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--g0);border-radius:var(--r);border:1px solid var(--g2)">' +
         '<div style="width:44px;height:44px;border-radius:50%;background:var(--t8);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">' + av + '</div>' +
         '<div style="flex:1;min-width:0">' +
@@ -3652,7 +3658,7 @@ async function loadTutorMatch() {
             '<span>' + rate + '</span>' +
           '</div>' +
         '</div>' +
-        '<button class="btn-lg p" style="white-space:nowrap;font-size:12px;padding:8px 14px" onclick="openBookScreen(' + JSON.stringify(t) + ')">Book Session</button>' +
+        '<button class="btn-lg p" style="white-space:nowrap;font-size:12px;padding:8px 14px" onclick="openBookScreen(_matchedTutors[' + i + '])">Book Session</button>' +
         '</div>';
     }).join('');
   } catch(e) {
@@ -4269,8 +4275,9 @@ function openRingDetail(sg){
     badgeEl.style.display = badgeEl.textContent ? 'inline-flex' : 'none';
   }
   // Reset join button to loading state while we check membership
+  // Also neutralise the hardcoded HTML onclick so it can't fire before we set the real handler
   var btn = document.querySelector('#screen-ring-detail .btn-lg.p');
-  if(btn){btn.textContent='Loading…';btn.disabled=true;}
+  if(btn){btn.textContent='Loading…';btn.disabled=true;btn.onclick=null;}
   // Reset chat to loading state while we fetch
   var chatEl=document.getElementById('sg-chat-msgs-list');
   if(chatEl)chatEl.innerHTML='<div style="padding:24px;text-align:center;color:var(--g4);font-size:13px">Loading messages…</div>';
@@ -4372,9 +4379,12 @@ async function createRing(){
     var user=API.Auth.restoreSession();
     if(user){
       var _name=(user.full_name||(user.first_name||'')+' '+(user.last_name||'')).trim()||'User';
-      var lastScreen=localStorage.getItem('_t_screen');
-      var safeScreens=['dashboard','tutor-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
-      var restoreScreen=(lastScreen&&safeScreens.indexOf(lastScreen)!==-1)?lastScreen:null;
+      // Hash routing takes priority (set by goTo via history.replaceState); fall back to localStorage
+      var hashScreen=(window.location.hash||'').slice(1).replace(/[^a-z0-9-]/g,'');
+      var storedScreen=localStorage.getItem('_t_screen')||'';
+      var candidate=hashScreen||storedScreen;
+      var safeScreens=['dashboard','tutor-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport','verification'];
+      var restoreScreen=(candidate&&safeScreens.indexOf(candidate)!==-1)?candidate:null;
       launchApp(_name,user.role,restoreScreen);
       // Validate token with server — ONLY sign out on 401 (invalid token).
       // Network errors (Render cold start, slow connection) must NOT kill the session.
