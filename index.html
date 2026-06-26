@@ -2952,7 +2952,10 @@ function buildSGGrid(){
     var avs=AV_BG.slice(0,Math.min(3,sg.members)).map(function(bg){return'<div class="sg-av-sm" style="background:'+bg+'"></div>';}).join('');
     if(sg.members>3)avs+='<div class="sg-av-sm" style="background:var(--g5);font-size:7px">+'+(sg.members-3)+'</div>';
     var isLive=sg.status==='Live now';
-    return'<div class="sg-card" onclick="openRingDetail(sg)">'
+    // Pass sg.id (a number) — openRingDetailById looks it up from SG_DATA
+    // Never pass the sg object directly in an onclick string: it is a closure variable
+    // that is NOT in global scope when the event fires.
+    return'<div class="sg-card" onclick="openRingDetailById('+sg.id+')">'
       +'<div class="sg-banner" style="background:'+sg.bg+'"><span style="font-size:34px">'+sg.icon+'</span>'
       +(isLive?'<span class="bdg bt" style="position:absolute;top:10px;right:10px;font-size:10px">● Live</span>':'<span class="bdg bs" style="position:absolute;top:10px;right:10px;font-size:10px">'+sg.status+'</span>')
       +'</div>'
@@ -2964,7 +2967,7 @@ function buildSGGrid(){
       +'<div style="font-size:11px;color:var(--g4);margin-bottom:14px">Hosted by '+sg.host+'</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between">'
       +'<div style="display:flex;align-items:center;gap:6px"><div class="sg-av-stack">'+avs+'</div><span style="font-size:11px;color:var(--g5)">'+sg.members+' members</span></div>'
-      +'<button class="btn-sm p" onclick="event.stopPropagation();openRingDetail(sg)">'+(isLive?'Join live':'View')+'</button>'
+      +'<button class="btn-sm p" onclick="event.stopPropagation();openRingDetailById('+sg.id+')">'+(isLive?'Join live':'View')+'</button>'
       +'</div></div></div>';
   }).join('');
 }
@@ -4254,6 +4257,13 @@ function leaveStudyRing(){
 }
 
 // ═══ OPEN RING DETAIL ═══
+// Safe entry point called from inline onclick — looks up the full sg object by ID
+// so we never reference a closure variable from HTML onclick strings.
+function openRingDetailById(id){
+  var sg=SG_DATA.find(function(r){return String(r.id)===String(id);});
+  if(sg){openRingDetail(sg);}else{console.warn('[Rings] ring not found in SG_DATA, id='+id);}
+}
+
 function openRingDetail(sg){
   currentRingId = sg.id || sg;
   var titleEl  = document.getElementById('ring-detail-title');
