@@ -4140,7 +4140,15 @@ async function loadSummary(){
 }
 
 // ═══ WEBRTC — STUDY RINGS (multi-party mesh) ═══
-var sgPeers={},sgStream=null,sgWS=null,sgRoomId=null,sgMicOn=true,sgCamOn=true;
+// sgMyPeerId  — assigned by server on 'init'; used as the "from" field in every message
+// sgPeers     — map of peerId → RTCPeerConnection
+// Signaling protocol:
+//   connect  → server sends {type:'init', peerId, peers:[...]}
+//              newcomer creates peer connections + sends offers to all existing peers
+//   peer_joined → someone else joined; they will send us an offer, we just wait
+//   offer/answer/ICE → always include {peerId: mySelf, to: targetPeer}; server routes point-to-point
+//   peer_left → close that peer's connection + remove their video tile
+var sgPeers={},sgStream=null,sgWS=null,sgRoomId=null,sgMicOn=true,sgCamOn=true,sgMyPeerId=null;
 var _sgAudioCtx=null,_sgAnalyser=null,_sgAudioRAF=null;
 
 // ── AUDIO VISUALIZER ────────────────────────────────────────────────────────
@@ -4218,15 +4226,14 @@ var currentRingId=null;
 
 async function startStudyRing(ringId){
   sgRoomId=ringId;
+  sgMyPeerId=null;
   var grid=document.getElementById('sg-video-grid');
   if(grid)grid.innerHTML='';
 
   // Get local media
   try{
     sgStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-    // Add local tile
     addRingVideo('local',sgStream,true);
-    // Start audio level visualizer
     _startRingAudioViz(sgStream);
   }catch(e){
     showToast('Camera/mic access denied. Check browser permissions.');
@@ -4241,23 +4248,41 @@ async function startStudyRing(ringId){
   // Open WebSocket signaling
   var wsBase='wss://tutlee-backend.onrender.com';
   sgWS=new WebSocket(wsBase+'/ws/signal/ring-'+ringId+'/');
-  sgWS.onopen=function(){
-    sgWS.send(JSON.stringify({type:'join',room:'ring-'+ringId,user:API.Auth.currentUser()?.id||'guest'}));
-  };
+
+  // No onopen send needed — server sends 'init' immediately on connection
+
   sgWS.onmessage=function(e){
-    var msg=JSON.parse(e.data);
-    if(msg.type==='peer_joined'&&msg.peerId!=='local'){
-      createRingPeer(msg.peerId,true);
+    var msg;try{msg=JSON.parse(e.data);}catch(_){return;}
+
+    if(msg.type==='init'){
+      // Server tells me my own peer ID and who's already in the room
+      sgMyPeerId=msg.peerId;
+      // As the newcomer I create peer connections to everyone already here
+      // and immediately send them offers — they will answer
+      (msg.peers||[]).forEach(function(existingPeerId){
+        createRingPeer(existingPeerId,true);
+      });
+
+    }else if(msg.type==='peer_joined'){
+      // A new person just joined. They will send ME an offer — I just wait.
       _addSGActivity('A participant joined');
+
     }else if(msg.type==='offer'){
+      // Someone is offering to connect — create a peer connection and answer
       handleRingOffer(msg);
-    }else if(msg.type==='answer'&&sgPeers[msg.peerId]){
-      sgPeers[msg.peerId].setRemoteDescription(new RTCSessionDescription(msg)).catch(function(){});
-    }else if(msg.type==='ice'&&sgPeers[msg.peerId]){
-      sgPeers[msg.peerId].addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(function(){});
+
+    }else if(msg.type==='answer'){
+      var pc=sgPeers[msg.peerId];
+      if(pc)pc.setRemoteDescription(new RTCSessionDescription({type:'answer',sdp:msg.sdp})).catch(function(){});
+
+    }else if(msg.type==='ice'){
+      var pc=sgPeers[msg.peerId];
+      if(pc&&msg.candidate)pc.addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(function(){});
+
     }else if(msg.type==='peer_left'){
       leaveRingPeer(msg.peerId);
       _addSGActivity('A participant left');
+
     }else if(msg.type==='chat'){
       var colors=['#0E8F84','#5243F5','#B85F00','#7B3F9E','#E04F4F'];
       var ci=(msg.sender||'?').charCodeAt(0)%colors.length;
@@ -4275,52 +4300,53 @@ async function startStudyRing(ringId){
   showToast('Joined study ring — camera and mic are live');
 }
 
-function createRingPeer(peerId,sendOffer){
-  if(sgPeers[peerId])return;
-  var pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
+var _SG_ICE=[
+  {urls:'stun:stun.l.google.com:19302'},
+  {urls:'stun:stun1.l.google.com:19302'},
+  {urls:'stun:stun2.l.google.com:19302'},
+];
+
+function _makePeer(peerId){
+  var pc=new RTCPeerConnection({iceServers:_SG_ICE});
   sgPeers[peerId]=pc;
-
   if(sgStream)sgStream.getTracks().forEach(function(t){pc.addTrack(t,sgStream);});
-
   pc.ontrack=function(e){
     if(e.streams&&e.streams[0])addRingVideo(peerId,e.streams[0],false);
   };
   pc.onicecandidate=function(e){
     if(e.candidate&&sgWS&&sgWS.readyState===1)
-      sgWS.send(JSON.stringify({type:'ice',candidate:e.candidate,peerId:peerId,room:'ring-'+sgRoomId}));
+      sgWS.send(JSON.stringify({type:'ice',candidate:e.candidate,peerId:sgMyPeerId,to:peerId,room:'ring-'+sgRoomId}));
   };
   pc.onconnectionstatechange=function(){
     if(pc.connectionState==='disconnected'||pc.connectionState==='failed')leaveRingPeer(peerId);
   };
+  return pc;
+}
 
+function createRingPeer(peerId,sendOffer){
+  if(sgPeers[peerId])return;
+  var pc=_makePeer(peerId);
   if(sendOffer){
     pc.createOffer().then(function(offer){
       return pc.setLocalDescription(offer).then(function(){
         if(sgWS&&sgWS.readyState===1)
-          sgWS.send(JSON.stringify({type:'offer',sdp:offer.sdp,peerId:peerId,room:'ring-'+sgRoomId}));
+          sgWS.send(JSON.stringify({type:'offer',sdp:offer.sdp,peerId:sgMyPeerId,to:peerId,room:'ring-'+sgRoomId}));
       });
-    }).catch(function(){});
+    }).catch(function(err){console.warn('[Ring] createOffer failed',err);});
   }
 }
 
 async function handleRingOffer(msg){
   var peerId=msg.peerId;
-  if(!sgPeers[peerId]){
-    var pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
-    sgPeers[peerId]=pc;
-    if(sgStream)sgStream.getTracks().forEach(function(t){pc.addTrack(t,sgStream);});
-    pc.ontrack=function(e){if(e.streams&&e.streams[0])addRingVideo(peerId,e.streams[0],false);};
-    pc.onicecandidate=function(e){
-      if(e.candidate&&sgWS&&sgWS.readyState===1)
-        sgWS.send(JSON.stringify({type:'ice',candidate:e.candidate,peerId:peerId,room:'ring-'+sgRoomId}));
-    };
-  }
-  var pc=sgPeers[peerId];
-  await pc.setRemoteDescription(new RTCSessionDescription({type:'offer',sdp:msg.sdp}));
-  var answer=await pc.createAnswer();
-  await pc.setLocalDescription(answer);
-  if(sgWS&&sgWS.readyState===1)
-    sgWS.send(JSON.stringify({type:'answer',sdp:answer.sdp,peerId:peerId,room:'ring-'+sgRoomId}));
+  if(!peerId)return;
+  var pc=sgPeers[peerId]||_makePeer(peerId);
+  try{
+    await pc.setRemoteDescription(new RTCSessionDescription({type:'offer',sdp:msg.sdp}));
+    var answer=await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    if(sgWS&&sgWS.readyState===1)
+      sgWS.send(JSON.stringify({type:'answer',sdp:answer.sdp,peerId:sgMyPeerId,to:peerId,room:'ring-'+sgRoomId}));
+  }catch(err){console.warn('[Ring] handleOffer failed',err);}
 }
 
 function addRingVideo(peerId,stream,isLocal){
@@ -4397,7 +4423,7 @@ function leaveStudyRing(){
   if(sgStream)sgStream.getTracks().forEach(function(t){t.stop();});
   // Close all peers
   Object.keys(sgPeers).forEach(function(id){leaveRingPeer(id);});
-  sgPeers={};sgStream=null;sgMicOn=true;sgCamOn=true;
+  sgPeers={};sgStream=null;sgMicOn=true;sgCamOn=true;sgMyPeerId=null;
   if(sgWS){sgWS.close();sgWS=null;}
   var grid=document.getElementById('sg-video-grid');if(grid)grid.innerHTML='';
   var fsbtn=document.getElementById('sg-fs-btn');if(fsbtn)fsbtn.style.display='none';
