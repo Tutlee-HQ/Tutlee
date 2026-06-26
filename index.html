@@ -1399,9 +1399,13 @@ tr:hover td{background:var(--g1)}
       </div>
       <div style="font-size:13px;color:var(--g5);margin-bottom:4px">Hosted by <strong style="color:var(--g7);font-weight:600" id="ring-detail-host"></strong> &middot; <span id="ring-detail-members" style="color:var(--g5)"></span></div>
       <div style="font-size:13px;color:var(--g5);margin-bottom:16px" id="ring-detail-desc"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button class="btn-lg p" onclick="startStudyRing(currentRingId||'demo')">Join live session</button>
         <button class="btn-lg s" onclick="alert('Following this ring.')">Follow ring</button>
+        <button id="ring-copy-link-btn" onclick="copyRingInviteLink()" style="display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:40px;border-radius:var(--r);border:1.5px solid var(--g2);background:var(--w);color:var(--g7);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--f);transition:border-color .15s,color .15s">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy invite link
+        </button>
       </div>
     </div>
   </div>
@@ -2159,7 +2163,7 @@ async function confirmPasswordReset(){
     closeAuth();
     showToast('Password updated — you are now signed in.');
     var u=data.user;
-    if(u)launchApp(u.full_name||(u.first_name||'')+' '+(u.last_name||''),u.role);
+    if(u){var _prl=_pendingRingInviteId||localStorage.getItem('_t_pending_ring')||null;try{localStorage.removeItem('_t_pending_ring');}catch(e){}launchApp(u.full_name||(u.first_name||'')+' '+(u.last_name||''),u.role,_prl?'ring-detail':null,_prl||null);}
   }catch(e){
     if(errEl){errEl.textContent=e.message;errEl.style.display='block';}
   }finally{
@@ -2201,7 +2205,8 @@ async function doSignIn(){
     }
     closeAuth();
     var u=data.user;
-    launchApp(u.full_name||(u.first_name||'')+' '+(u.last_name||'').trim(), u.role);
+    var _prl2=_pendingRingInviteId||localStorage.getItem('_t_pending_ring')||null;try{localStorage.removeItem('_t_pending_ring');}catch(e){}
+    launchApp(u.full_name||(u.first_name||'')+' '+(u.last_name||'').trim(), u.role, _prl2?'ring-detail':null, _prl2||null);
     loadUserDashboard(u);
   }catch(e){
     var msg=e.message||'Connection error — please try again.';
@@ -2322,7 +2327,8 @@ async function verifyOTP(){
     // Use the API module so _access is set in memory and tokens go to localStorage
     var data=await API.Auth.verifyOTP(S._pendingEmail, code);
     closeAuth();
-    launchApp(data.user.full_name||(data.user.first_name+' '+data.user.last_name).trim(), data.user.role);
+    var _prl3=_pendingRingInviteId||localStorage.getItem('_t_pending_ring')||null;try{localStorage.removeItem('_t_pending_ring');}catch(e){}
+    launchApp(data.user.full_name||(data.user.first_name+' '+data.user.last_name).trim(), data.user.role, _prl3?'ring-detail':null, _prl3||null);
     loadUserDashboard(data.user);
   }catch(e){
     if(errEl){errEl.textContent=e.message||'Verification failed. Check the code and try again.';errEl.style.display='block';}
@@ -2346,7 +2352,7 @@ async function resendOTP(){
   finally{if(btn){btn.textContent='Resend code';btn.style.pointerEvents='';}}
 }
 
-function launchApp(name,role,targetScreen){
+function launchApp(name,role,targetScreen,pendingRingId){
   S.role=role;S.curMode=role==='tutor'?'tutor':'learner';
   var parts=name.trim().split(/\s+/);
   var fname=parts[0]||'User';
@@ -2384,6 +2390,7 @@ function launchApp(name,role,targetScreen){
       app.classList.add('active');
       buildMsgList();buildSGGrid();buildSGMembers();buildBookCal();
       goTo(targetScreen||'verification');
+      if(pendingRingId){setTimeout(function(){_restoreRingById(pendingRingId);},600);}
       if (!tourDone) { setTimeout(function(){ startTour(role); }, 600); }
       setTimeout(loadNotifications, 1000);
       setTimeout(function(){ loadTutorData(); var u=API.Auth.currentUser();if(u)loadUserDashboard(u); }, 800);
@@ -2393,6 +2400,7 @@ function launchApp(name,role,targetScreen){
       app.classList.add('active');
       buildMsgList();buildSGGrid();buildSGMembers();buildBookCal();
       goTo(targetScreen||'dashboard');
+      if(pendingRingId){setTimeout(function(){_restoreRingById(pendingRingId);},600);}
       if (!tourDone) { setTimeout(function(){ startTour(role); }, 600); }
       setTimeout(loadNotifications, 1000);
     });
@@ -4504,7 +4512,43 @@ function _onFSChange(){
   }
 }
 
+// ═══ RING INVITE LINK ═══
+function copyRingInviteLink(){
+  if(!currentRingId){return;}
+  var url=window.location.origin+window.location.pathname+'?ring='+currentRingId;
+  navigator.clipboard.writeText(url).then(function(){
+    var btn=document.getElementById('ring-copy-link-btn');
+    if(btn){
+      var prev=btn.innerHTML;
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      btn.style.color='var(--t4)';btn.style.borderColor='var(--t4)';
+      setTimeout(function(){btn.innerHTML=prev;btn.style.color='';btn.style.borderColor='';},2000);
+    }
+  }).catch(function(){
+    // Fallback for browsers without clipboard API
+    var ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    showToast('Invite link copied!');
+  });
+}
+
 // ═══ OPEN RING DETAIL ═══
+// Restore a ring by ID after page reload — fetches fresh data from the server
+function _restoreRingById(id){
+  if(!id)return;
+  // Try SG_DATA first (already loaded from buildSGGrid)
+  var cached=SG_DATA.find(function(r){return String(r.id)===String(id);});
+  if(cached){openRingDetail(cached);return;}
+  // Fetch the specific ring from server
+  API.Rings.detail(id).then(function(ring){
+    if(ring&&ring.id){
+      // Map server response to the shape openRingDetail expects
+      var sg=_ringToSG(ring,0);
+      SG_DATA.push(sg);
+      openRingDetail(sg);
+    }else{goTo('study-groups');}
+  }).catch(function(){goTo('study-groups');});
+}
 // Safe entry point called from inline onclick — looks up the full sg object by ID
 // so we never reference a closure variable from HTML onclick strings.
 function openRingDetailById(id){
@@ -4514,6 +4558,8 @@ function openRingDetailById(id){
 
 function openRingDetail(sg){
   currentRingId = sg.id || sg;
+  // Persist ring ID so page reload returns to this ring
+  try{localStorage.setItem('_t_ring_id', String(sg.id));}catch(e){}
   var titleEl  = document.getElementById('ring-detail-title');
   var hostEl   = document.getElementById('ring-detail-host');
   var subjEl   = document.getElementById('ring-detail-subj');
@@ -4632,30 +4678,52 @@ async function createRing(){
 }
 
 // ═══ SESSION RESTORE ═══
+// Global pending ring invite — set if URL contains ?ring=<id>
+var _pendingRingInviteId=(function(){
+  try{
+    var p=new URLSearchParams(window.location.search).get('ring');
+    if(p&&/^\d+$/.test(p)){
+      // Clean the ?ring= from the URL immediately so it doesn't persist on refresh
+      var clean=window.location.pathname+(window.location.hash||'');
+      history.replaceState(null,'',clean);
+      return p;
+    }
+  }catch(e){}
+  return null;
+})();
+
 (function(){
   try{
     var user=API.Auth.restoreSession();
     if(user){
       var _name=(user.full_name||(user.first_name||'')+' '+(user.last_name||'')).trim()||'User';
-      // Hash routing takes priority (set by goTo via history.replaceState); fall back to localStorage
+      // Hash routing takes priority; fall back to localStorage
       var hashScreen=(window.location.hash||'').slice(1).replace(/[^a-z0-9-]/g,'');
       var storedScreen=localStorage.getItem('_t_screen')||'';
       var candidate=hashScreen||storedScreen;
-      var safeScreens=['dashboard','tutor-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport','verification'];
+      var safeScreens=['dashboard','tutor-match','sessions','assessments','progress',
+        'study-groups','ring-detail','book','messages','payments','settings',
+        'tutor-dash','t-sessions','earnings','t-analytics','passport','verification'];
       var restoreScreen=(candidate&&safeScreens.indexOf(candidate)!==-1)?candidate:null;
-      launchApp(_name,user.role,restoreScreen);
-      // Validate token with server — ONLY sign out on 401 (invalid token).
-      // Network errors (Render cold start, slow connection) must NOT kill the session.
+      // For ring-detail: restore which ring was open (from reload or invite link)
+      var pendingRingId=_pendingRingInviteId||null;
+      if(!pendingRingId&&restoreScreen==='ring-detail'){
+        pendingRingId=localStorage.getItem('_t_ring_id')||null;
+        if(!pendingRingId){restoreScreen='study-groups';}
+      }
+      if(_pendingRingInviteId){restoreScreen='ring-detail';}
+      launchApp(_name,user.role,restoreScreen,pendingRingId);
+      // Silently refresh user data in background — do NOT sign out on failure.
+      // The _req silent-refresh mechanism handles expired access tokens automatically.
+      // Calling signOut() here kills the session on every cold Render start.
       API.Users.me().then(function(me){
         try{localStorage.setItem('_t_u',JSON.stringify(me));}catch(e){}
-      }).catch(function(err){
-        // Only sign out if the server explicitly rejected the token (401/403)
-        var httpStatus=err&&(err.status||err.statusCode||(err.response&&err.response.status));
-        if(httpStatus===401||httpStatus===403){
-          signOut();
-        }
-        // For any other error (network timeout, 500, etc.) — keep the user logged in
+      }).catch(function(){
+        // Ignore — user stays on their page; next API call will auto-refresh or prompt re-auth
       });
+    } else if(_pendingRingInviteId){
+      // Not logged in — store ring ID; after login we open it
+      try{localStorage.setItem('_t_pending_ring',_pendingRingInviteId);}catch(e){}
     }
   }catch(e){}
 })();

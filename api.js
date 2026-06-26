@@ -54,6 +54,8 @@ const TutleeAPI = (() => {
       const data = await _req('POST', '/api/auth/refresh/', { refresh: _refresh }, { noAuth: true, noRefresh: true });
       _access  = data.access;
       if (data.refresh) _refresh = data.refresh;
+      // Persist refreshed tokens so the next page reload uses the valid token
+      try { localStorage.setItem('_t_a', _access); if (data.refresh) localStorage.setItem('_t_r', _refresh); } catch(e) {}
       return true;
     } catch {
       _access = _refresh = _user = null;
