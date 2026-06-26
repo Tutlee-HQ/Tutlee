@@ -396,6 +396,10 @@ tr:hover td{background:var(--g1)}
 .sg-av-sm{width:22px;height:22px;border-radius:50%;border:2px solid var(--w);margin-left:-5px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:var(--w)}
 .sg-av-sm:first-child{margin-left:0}
 .sg-chat-wrap{background:var(--g1);border-radius:var(--rl);height:320px;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--g2)}
+/* Study ring fullscreen */
+#sg-video-container:fullscreen,#sg-video-container:-webkit-full-screen,#sg-video-container:-moz-full-screen{background:#0A1628;padding:16px;display:flex;flex-direction:column;justify-content:center}
+#sg-video-container:fullscreen #sg-video-grid,#sg-video-container:-webkit-full-screen #sg-video-grid,#sg-video-container:-moz-full-screen #sg-video-grid{flex:1;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;min-height:0}
+#sg-video-container:fullscreen #sg-fs-btn,#sg-video-container:-webkit-full-screen #sg-fs-btn,#sg-video-container:-moz-full-screen #sg-fs-btn{display:inline-flex!important}
 .sg-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
 .sg-inp{padding:10px 12px;border-top:1px solid var(--g2);display:flex;gap:6px;background:var(--w);align-items:center}
 
@@ -1380,19 +1384,29 @@ tr:hover td{background:var(--g1)}
   <!-- Ring body: 3-column on wide, 2-col on smaller -->
   <div class="g2">
     <div>
-      <!-- Video grid -->
-      <div id="sg-video-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:16px;min-height:0"></div>
-      <video id="sg-local-video" autoplay playsinline muted style="width:100%;height:200px;object-fit:cover;border-radius:var(--rl);background:#0A0F1A;display:none;margin-bottom:16px"></video>
+      <!-- Video container with fullscreen support -->
+      <div id="sg-video-container" style="background:#0A1628;border-radius:12px;padding:12px;margin-bottom:12px;position:relative">
+        <!-- Fullscreen toggle -->
+        <button id="sg-fs-btn" onclick="toggleRingFullscreen()" title="Toggle fullscreen"
+          style="position:absolute;top:10px;right:10px;z-index:10;background:rgba(255,255,255,.1);border:none;border-radius:6px;padding:5px 8px;cursor:pointer;display:none;align-items:center;gap:5px;color:rgba(255,255,255,.85);font-size:11px;font-weight:500;font-family:var(--f)">
+          <svg id="sg-fs-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          Fullscreen
+        </button>
+        <div id="sg-video-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;min-height:200px"></div>
+      </div>
 
       <!-- Media controls -->
-      <div id="sg-media-controls" style="display:none;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <div id="sg-media-controls" style="display:none;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
         <button class="btn-sm" id="sg-mic-btn" onclick="toggleRingMic()" style="display:inline-flex;align-items:center;gap:6px">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Mic On
         </button>
         <button class="btn-sm" id="sg-cam-btn" onclick="toggleRingCam()" style="display:inline-flex;align-items:center;gap:6px">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Cam On
         </button>
-        <button class="btn-sm" style="display:inline-flex;align-items:center;gap:6px;color:var(--err)" onclick="leaveStudyRing()">
+        <button class="btn-sm" id="sg-screen-btn" onclick="toggleRingScreenShare()" style="display:inline-flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Share Screen
+        </button>
+        <button class="btn-sm" style="display:inline-flex;align-items:center;gap:6px;color:var(--err);margin-left:auto" onclick="leaveStudyRing()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Leave Ring
         </button>
       </div>
@@ -4211,8 +4225,9 @@ async function startStudyRing(ringId){
   };
   sgWS.onerror=function(){showToast('Ring connection failed.');};
 
-  // Show media controls, update join button
+  // Show media controls + fullscreen button, update join button
   var ctrl=document.getElementById('sg-media-controls');if(ctrl)ctrl.style.display='flex';
+  var fsbtn=document.getElementById('sg-fs-btn');if(fsbtn)fsbtn.style.display='inline-flex';
   var btn=document.querySelector('#screen-ring-detail .btn-lg.p');
   if(btn){btn.textContent='Leave Ring';btn.onclick=function(){leaveStudyRing();};}
   _addSGActivity('You joined the ring');
@@ -4334,6 +4349,9 @@ function _addSGActivity(text){
 
 function leaveStudyRing(){
   _stopRingAudioViz();
+  _stopRingScreenShare(true); // silent — no toast
+  // Exit fullscreen if active
+  if(document.fullscreenElement)document.exitFullscreen().catch(function(){});
   // Stop local tracks
   if(sgStream)sgStream.getTracks().forEach(function(t){t.stop();});
   // Close all peers
@@ -4341,6 +4359,7 @@ function leaveStudyRing(){
   sgPeers={};sgStream=null;sgMicOn=true;sgCamOn=true;
   if(sgWS){sgWS.close();sgWS=null;}
   var grid=document.getElementById('sg-video-grid');if(grid)grid.innerHTML='';
+  var fsbtn=document.getElementById('sg-fs-btn');if(fsbtn)fsbtn.style.display='none';
   // Tell API
   if(currentRingId&&API&&API.Auth.isLoggedIn())API.Rings.leave(currentRingId).catch(function(){});
   showToast('You have left the study ring');
@@ -4349,7 +4368,107 @@ function leaveStudyRing(){
   var joinBtn=document.querySelector('#screen-ring-detail .btn-lg.p');
   if(joinBtn){joinBtn.textContent='Go Live';joinBtn.disabled=false;joinBtn.onclick=function(){startStudyRing(currentRingId);};}
   _addSGActivity('You left the ring');
-  // Log activity
+}
+
+// ── SCREEN SHARE ─────────────────────────────────────────────────────────────
+var sgScreenStream=null,sgScreenSharing=false;
+
+async function toggleRingScreenShare(){
+  if(sgScreenSharing){_stopRingScreenShare();return;}
+  try{
+    sgScreenStream=await navigator.mediaDevices.getDisplayMedia({video:{cursor:'always'},audio:false});
+    sgScreenSharing=true;
+    var screenTrack=sgScreenStream.getVideoTracks()[0];
+    // Replace video track in every peer connection so remote participants see the screen
+    Object.values(sgPeers).forEach(function(pc){
+      var sender=pc.getSenders().find(function(s){return s.track&&s.track.kind==='video';});
+      if(sender)sender.replaceTrack(screenTrack).catch(function(){});
+    });
+    // Show full-width screen tile locally
+    _addScreenShareTile(sgScreenStream);
+    // When user clicks "Stop sharing" in browser UI
+    screenTrack.onended=function(){_stopRingScreenShare();};
+    // Update button
+    var btn=document.getElementById('sg-screen-btn');
+    if(btn){
+      btn.style.background='var(--t1)';btn.style.color='var(--t7)';btn.style.borderColor='var(--t4)';
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="1" y1="1" x2="23" y2="23"/></svg>Stop Sharing';
+    }
+    showToast('Screen sharing started');
+    _addSGActivity('You started sharing your screen');
+  }catch(e){
+    if(e.name!=='NotAllowedError')showToast('Could not share screen. Please check permissions.');
+  }
+}
+
+function _stopRingScreenShare(silent){
+  if(!sgScreenSharing&&!sgScreenStream)return;
+  sgScreenSharing=false;
+  if(sgScreenStream){sgScreenStream.getTracks().forEach(function(t){t.stop();});sgScreenStream=null;}
+  // Restore camera track in all peer connections
+  if(sgStream){
+    var camTrack=sgStream.getVideoTracks()[0];
+    if(camTrack){
+      Object.values(sgPeers).forEach(function(pc){
+        var sender=pc.getSenders().find(function(s){return s.track&&s.track.kind==='video';});
+        if(sender)sender.replaceTrack(camTrack).catch(function(){});
+      });
+    }
+  }
+  // Remove screen tile
+  var tile=document.getElementById('rv-screen');if(tile)tile.remove();
+  // Reset button
+  var btn=document.getElementById('sg-screen-btn');
+  if(btn){
+    btn.style.background='';btn.style.color='';btn.style.borderColor='';
+    btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Share Screen';
+  }
+  if(!silent){showToast('Screen sharing stopped');_addSGActivity('You stopped sharing your screen');}
+}
+
+function _addScreenShareTile(stream){
+  var grid=document.getElementById('sg-video-grid');if(!grid)return;
+  var old=document.getElementById('rv-screen');if(old)old.remove();
+  var wrap=document.createElement('div');
+  wrap.id='rv-screen';
+  // span all columns so screen share is always the dominant tile
+  wrap.style.cssText='position:relative;background:#0A1628;border-radius:10px;overflow:hidden;grid-column:1/-1;border:2px solid var(--t4)';
+  var vid=document.createElement('video');
+  vid.autoplay=true;vid.playsInline=true;vid.muted=true;
+  vid.srcObject=stream;
+  vid.style.cssText='width:100%;max-height:55vh;object-fit:contain;background:#0A1628;display:block';
+  var lbl=document.createElement('div');
+  lbl.textContent='Your screen';
+  lbl.style.cssText='position:absolute;top:10px;left:10px;font-size:11px;font-weight:600;color:#fff;background:rgba(14,143,132,.85);padding:3px 10px;border-radius:20px';
+  var stopBtn=document.createElement('button');
+  stopBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Stop sharing';
+  stopBtn.onclick=function(){_stopRingScreenShare();};
+  stopBtn.style.cssText='position:absolute;top:10px;right:10px;background:var(--err,#D32F2F);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:5px;font-family:var(--f)';
+  wrap.appendChild(vid);wrap.appendChild(lbl);wrap.appendChild(stopBtn);
+  grid.insertBefore(wrap,grid.firstChild);
+}
+
+// ── FULLSCREEN ────────────────────────────────────────────────────────────────
+function toggleRingFullscreen(){
+  var container=document.getElementById('sg-video-container');
+  if(!document.fullscreenElement){
+    (container.requestFullscreen||container.webkitRequestFullscreen||container.mozRequestFullScreen).call(container).catch(function(){});
+  }else{
+    (document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen).call(document).catch(function(){});
+  }
+}
+// Update fullscreen button icon when state changes
+document.addEventListener('fullscreenchange',_onFSChange);
+document.addEventListener('webkitfullscreenchange',_onFSChange);
+function _onFSChange(){
+  var btn=document.getElementById('sg-fs-btn');
+  var icon=document.getElementById('sg-fs-icon');
+  if(!btn||!icon)return;
+  if(document.fullscreenElement){
+    btn.innerHTML='<svg id="sg-fs-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg>Exit';
+  }else{
+    btn.innerHTML='<svg id="sg-fs-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Fullscreen';
+  }
 }
 
 // ═══ OPEN RING DETAIL ═══
