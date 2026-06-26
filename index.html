@@ -4086,6 +4086,79 @@ async function loadSummary(){
 
 // ═══ WEBRTC — STUDY RINGS (multi-party mesh) ═══
 var sgPeers={},sgStream=null,sgWS=null,sgRoomId=null,sgMicOn=true,sgCamOn=true;
+var _sgAudioCtx=null,_sgAnalyser=null,_sgAudioRAF=null;
+
+// ── AUDIO VISUALIZER ────────────────────────────────────────────────────────
+function _startRingAudioViz(stream){
+  try{
+    _sgAudioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    var src=_sgAudioCtx.createMediaStreamSource(stream);
+    _sgAnalyser=_sgAudioCtx.createAnalyser();
+    _sgAnalyser.fftSize=128;
+    _sgAnalyser.smoothingTimeConstant=0.65;
+    src.connect(_sgAnalyser);
+    var buf=new Uint8Array(_sgAnalyser.frequencyBinCount);
+    function tick(){
+      _sgAudioRAF=requestAnimationFrame(tick);
+      var tile=document.getElementById('rv-local');
+      var micBtn=document.getElementById('sg-mic-btn');
+      if(!sgMicOn){
+        if(tile)tile.style.outline='none';
+        if(micBtn)micBtn.style.boxShadow='';
+        return;
+      }
+      _sgAnalyser.getByteFrequencyData(buf);
+      var sum=0;for(var i=0;i<buf.length;i++)sum+=buf[i];
+      var level=Math.min(1,sum/buf.length/35); // 0..1
+      if(tile){
+        if(level>0.06){
+          var px=Math.round(2+level*10);
+          tile.style.outline=px+'px solid rgba(14,143,132,'+(0.35+level*0.65)+')';
+          tile.style.outlineOffset='2px';
+        }else{
+          tile.style.outline='none';
+        }
+      }
+      if(micBtn){
+        if(level>0.08){
+          micBtn.style.boxShadow='0 0 0 '+Math.round(level*8)+'px rgba(14,143,132,0.3)';
+        }else{
+          micBtn.style.boxShadow='';
+        }
+      }
+    }
+    tick();
+  }catch(e){console.warn('[Ring] audio viz failed',e);}
+}
+function _stopRingAudioViz(){
+  if(_sgAudioRAF){cancelAnimationFrame(_sgAudioRAF);_sgAudioRAF=null;}
+  if(_sgAudioCtx){_sgAudioCtx.close().catch(function(){});_sgAudioCtx=null;}
+  _sgAnalyser=null;
+}
+
+// ── CAM-OFF OVERLAY ON LOCAL TILE ───────────────────────────────────────────
+function _syncRingLocalTile(){
+  var tile=document.getElementById('rv-local');if(!tile)return;
+  var vid=tile.querySelector('video');
+  var ov=tile.querySelector('[data-cam-ov]');
+  if(!sgCamOn){
+    if(vid)vid.style.visibility='hidden';
+    if(!ov){
+      ov=document.createElement('div');
+      ov.setAttribute('data-cam-ov','1');
+      ov.style.cssText='position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#0A1628;z-index:2';
+      var user=API.Auth.currentUser();
+      var nm=(user&&(user.full_name||user.first_name))||'You';
+      var av=nm.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'?';
+      ov.innerHTML='<div style="width:52px;height:52px;border-radius:50%;background:var(--t8,#0D9488);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff">'+av+'</div>'
+        +'<div style="font-size:10px;color:rgba(255,255,255,.5)">Camera off</div>';
+      tile.appendChild(ov);
+    }
+  }else{
+    if(vid)vid.style.visibility='visible';
+    if(ov)ov.remove();
+  }
+}
 var currentRingId=null;
 
 async function startStudyRing(ringId){
@@ -4098,6 +4171,8 @@ async function startStudyRing(ringId){
     sgStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
     // Add local tile
     addRingVideo('local',sgStream,true);
+    // Start audio level visualizer
+    _startRingAudioViz(sgStream);
   }catch(e){
     showToast('Camera/mic access denied. Check browser permissions.');
     return;
@@ -4218,13 +4293,33 @@ function toggleRingMic(){
   sgMicOn=!sgMicOn;
   if(sgStream)sgStream.getAudioTracks().forEach(function(t){t.enabled=sgMicOn;});
   var btn=document.getElementById('sg-mic-btn');
-  if(btn){btn.style.color=sgMicOn?'':' var(--err)';btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Mic '+(sgMicOn?'On':'Off');}
+  if(btn){
+    btn.style.background=sgMicOn?'':'var(--err1,#FFE4E4)';
+    btn.style.color=sgMicOn?'':'var(--err,#D32F2F)';
+    btn.style.borderColor=sgMicOn?'':'var(--err,#D32F2F)';
+    btn.style.boxShadow='';
+    if(sgMicOn){
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Mic On';
+    }else{
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Mic Off';
+    }
+  }
 }
 function toggleRingCam(){
   sgCamOn=!sgCamOn;
   if(sgStream)sgStream.getVideoTracks().forEach(function(t){t.enabled=sgCamOn;});
   var btn=document.getElementById('sg-cam-btn');
-  if(btn){btn.style.color=sgCamOn?'':' var(--err)';btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Cam '+(sgCamOn?'On':'Off');}
+  if(btn){
+    btn.style.background=sgCamOn?'':'var(--err1,#FFE4E4)';
+    btn.style.color=sgCamOn?'':'var(--err,#D32F2F)';
+    btn.style.borderColor=sgCamOn?'':'var(--err,#D32F2F)';
+    if(sgCamOn){
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Cam On';
+    }else{
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34M16 16v1a2 2 0 0 1-2 2H4"/></svg>Cam Off';
+    }
+  }
+  _syncRingLocalTile();
 }
 function _addSGActivity(text){
   var log=document.getElementById('sg-activity-log');if(!log)return;
@@ -4238,11 +4333,12 @@ function _addSGActivity(text){
 }
 
 function leaveStudyRing(){
+  _stopRingAudioViz();
   // Stop local tracks
   if(sgStream)sgStream.getTracks().forEach(function(t){t.stop();});
   // Close all peers
   Object.keys(sgPeers).forEach(function(id){leaveRingPeer(id);});
-  sgPeers={};sgStream=null;
+  sgPeers={};sgStream=null;sgMicOn=true;sgCamOn=true;
   if(sgWS){sgWS.close();sgWS=null;}
   var grid=document.getElementById('sg-video-grid');if(grid)grid.innerHTML='';
   // Tell API
