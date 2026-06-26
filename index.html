@@ -2286,7 +2286,7 @@ async function resendOTP(){
   finally{if(btn){btn.textContent='Resend code';btn.style.pointerEvents='';}}
 }
 
-function launchApp(name,role){
+function launchApp(name,role,targetScreen){
   S.role=role;S.curMode=role==='tutor'?'tutor':'learner';
   var parts=name.trim().split(/\s+/);
   var fname=parts[0]||'User';
@@ -2323,7 +2323,7 @@ function launchApp(name,role){
     requestAnimationFrame(function(){
       app.classList.add('active');
       buildMsgList();buildSGGrid();buildSGMembers();buildBookCal();
-      goTo('verification'); // Always start tutors on KYT page
+      goTo(targetScreen||'verification');
       if (!tourDone) { setTimeout(function(){ startTour(role); }, 600); }
       setTimeout(loadNotifications, 1000);
       setTimeout(function(){ loadTutorData(); var u=API.Auth.currentUser();if(u)loadUserDashboard(u); }, 800);
@@ -2332,7 +2332,7 @@ function launchApp(name,role){
     requestAnimationFrame(function(){
       app.classList.add('active');
       buildMsgList();buildSGGrid();buildSGMembers();buildBookCal();
-      goTo('dashboard');
+      goTo(targetScreen||'dashboard');
       if (!tourDone) { setTimeout(function(){ startTour(role); }, 600); }
       setTimeout(loadNotifications, 1000);
     });
@@ -4013,7 +4013,7 @@ function leaveStudyRing(){
   // Hide media controls, reset join button — stay on ring page so they can rejoin
   var ctrl=document.getElementById('sg-media-controls');if(ctrl)ctrl.style.display='none';
   var joinBtn=document.querySelector('#screen-ring-detail .btn-lg.p');
-  if(joinBtn){joinBtn.textContent='Join live session';joinBtn.onclick=function(){startStudyRing(currentRingId);};}
+  if(joinBtn){joinBtn.textContent='Go Live';joinBtn.disabled=false;joinBtn.onclick=function(){startStudyRing(currentRingId);};}
   _addSGActivity('You left the ring');
   // Log activity
 }
@@ -4039,9 +4039,9 @@ function openRingDetail(sg){
     badgeEl.textContent = isLive ? '● Live now · ' + (sg.members||0) + ' active' : sg.status||'';
     badgeEl.style.display = badgeEl.textContent ? 'inline-flex' : 'none';
   }
-  // Reset join button
+  // Reset join button to loading state while we check membership
   var btn = document.querySelector('#screen-ring-detail .btn-lg.p');
-  if(btn){btn.textContent='Join live session';btn.onclick=function(){startStudyRing(currentRingId);};}
+  if(btn){btn.textContent='Loading…';btn.disabled=true;}
   // Reset chat to loading state while we fetch
   var chatEl=document.getElementById('sg-chat-msgs-list');
   if(chatEl)chatEl.innerHTML='<div style="padding:24px;text-align:center;color:var(--g4);font-size:13px">Loading messages…</div>';
@@ -4062,12 +4062,51 @@ function openRingDetail(sg){
       if(membEl)membEl.textContent=cnt+' members';
       if(mc)mc.textContent='('+cnt+')';
       buildSGMembers(rawMembers);
+      // Set join button based on membership
+      var joinBtn=document.querySelector('#screen-ring-detail .btn-lg.p');
+      if(joinBtn){
+        joinBtn.disabled=false;
+        if(!API.Auth.isLoggedIn()){
+          joinBtn.textContent='Sign in to join';
+          joinBtn.onclick=function(){openModal('auth-ov');};
+        }else if(ring.is_member){
+          joinBtn.textContent='Go Live';
+          joinBtn.onclick=function(){startStudyRing(currentRingId);};
+        }else{
+          joinBtn.textContent='Join Ring';
+          joinBtn.onclick=function(){joinRingAsMember(currentRingId,joinBtn);};
+        }
+      }
     }).catch(function(e){
       buildSGMembers([]);
+      var joinBtn=document.querySelector('#screen-ring-detail .btn-lg.p');
+      if(joinBtn){joinBtn.textContent='Join Ring';joinBtn.disabled=false;joinBtn.onclick=function(){joinRingAsMember(currentRingId,joinBtn);};}
       console.warn('[Rings] detail failed',e.message);
     });
     // Load posts
     loadRingPosts(sg.id);
+  }
+}
+
+async function joinRingAsMember(ringId,btn){
+  if(!API.Auth.isLoggedIn()){openModal('auth-ov');return;}
+  if(btn){btn.textContent='Joining…';btn.disabled=true;}
+  try{
+    await API.Rings.join(ringId);
+    showToast('You have joined the ring!');
+    if(btn){btn.textContent='Go Live';btn.disabled=false;btn.onclick=function(){startStudyRing(currentRingId);};}
+    // Refresh member list
+    API.Rings.detail(ringId).then(function(ring){
+      buildSGMembers(ring.members_data||[]);
+      var mc=document.getElementById('sg-member-count');
+      var membEl=document.getElementById('ring-detail-members');
+      var cnt=(ring.members_data||[]).length||ring.member_count||0;
+      if(mc)mc.textContent='('+cnt+')';
+      if(membEl)membEl.textContent=cnt+' members';
+    }).catch(function(){});
+  }catch(e){
+    showToast(e.message||'Failed to join ring. Please try again.');
+    if(btn){btn.textContent='Join Ring';btn.disabled=false;btn.onclick=function(){joinRingAsMember(ringId,btn);};}
   }
 }
 
@@ -4104,12 +4143,10 @@ async function createRing(){
     var user=API.Auth.restoreSession();
     if(user){
       var _name=(user.full_name||(user.first_name||'')+' '+(user.last_name||'')).trim()||'User';
-      launchApp(_name,user.role);
       var lastScreen=localStorage.getItem('_t_screen');
-      if(lastScreen){
-        var safeScreens=['dashboard','tutor-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
-        if(safeScreens.indexOf(lastScreen)!==-1)setTimeout(function(){goTo(lastScreen);},200);
-      }
+      var safeScreens=['dashboard','tutor-match','sessions','assessments','progress','study-groups','messages','payments','settings','tutor-dash','t-sessions','earnings','t-analytics','passport'];
+      var restoreScreen=(lastScreen&&safeScreens.indexOf(lastScreen)!==-1)?lastScreen:null;
+      launchApp(_name,user.role,restoreScreen);
       // Validate token with server — ONLY sign out on 401 (invalid token).
       // Network errors (Render cold start, slow connection) must NOT kill the session.
       API.Users.me().then(function(me){

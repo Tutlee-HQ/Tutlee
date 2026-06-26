@@ -661,10 +661,19 @@ tr:hover td{background:var(--p9)}
               <option>Inactive</option>
             </select>
           </div>
+          <!-- Bulk action toolbar -->
+          <div id="learner-bulk-bar" style="display:none;align-items:center;gap:var(--sp3);padding:var(--sp3) var(--sp4);background:var(--p1);border-radius:var(--r);margin-bottom:var(--sp3);border:1px solid var(--p2)">
+            <span id="learner-bulk-count" style="font-size:13px;font-weight:600;color:var(--p7)">0 selected</span>
+            <div style="margin-left:auto;display:flex;gap:var(--sp2)">
+              <button class="act-btn warn" onclick="bulkAction('Suspend','learner')">Suspend Selected</button>
+              <button class="act-btn danger" onclick="bulkAction('Delete','learner')">Delete Selected</button>
+            </div>
+          </div>
           <div class="table-wrap">
             <table id="learners-table">
               <thead>
                 <tr>
+                  <th style="width:36px"><input type="checkbox" id="learner-select-all" onchange="selectAll('learner',this.checked)" style="cursor:pointer"></th>
                   <th>Learner</th>
                   <th>Joined</th>
                   <th>Sessions</th>
@@ -692,10 +701,19 @@ tr:hover td{background:var(--p9)}
               <option>Pending KYT</option>
             </select>
           </div>
+          <!-- Bulk action toolbar -->
+          <div id="tutor-bulk-bar" style="display:none;align-items:center;gap:var(--sp3);padding:var(--sp3) var(--sp4);background:var(--p1);border-radius:var(--r);margin-bottom:var(--sp3);border:1px solid var(--p2)">
+            <span id="tutor-bulk-count" style="font-size:13px;font-weight:600;color:var(--p7)">0 selected</span>
+            <div style="margin-left:auto;display:flex;gap:var(--sp2)">
+              <button class="act-btn warn" onclick="bulkAction('Suspend','tutor')">Suspend Selected</button>
+              <button class="act-btn danger" onclick="bulkAction('Delete','tutor')">Delete Selected</button>
+            </div>
+          </div>
           <div class="table-wrap">
             <table id="tutors-table">
               <thead>
                 <tr>
+                  <th style="width:36px"><input type="checkbox" id="tutor-select-all" onchange="selectAll('tutor',this.checked)" style="cursor:pointer"></th>
                   <th>Tutor</th>
                   <th>Joined</th>
                   <th>KYT Status</th>
@@ -1480,7 +1498,8 @@ function renderLearners(data) {
   const tb = document.getElementById('learners-tbody');
   if (!data.length) { tb.innerHTML = '<tr><td colspan="6"><div class="empty"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h4>No learners found</h4><p>Try adjusting your search or filter.</p></div></td></tr>'; return; }
   tb.innerHTML = data.map(l => `
-    <tr>
+    <tr data-id="${l.id}" data-role="learner">
+      <td><input type="checkbox" class="row-check learner-check" value="${l.id}" onchange="updateBulkBar('learner')" style="cursor:pointer"></td>
       <td><div class="user-cell"><div class="av av-t">${l.name[0]}</div><div><div class="user-cell-name">${l.name}</div><div class="user-cell-email">${l.email}</div></div></div></td>
       <td>${l.joined}</td>
       <td>${l.sessions}</td>
@@ -1502,7 +1521,8 @@ function renderTutors(data) {
   const tb = document.getElementById('tutors-tbody');
   if (!data.length) { tb.innerHTML = '<tr><td colspan="8"><div class="empty"><h4>No tutors found</h4><p>Try adjusting your search or filter.</p></div></td></tr>'; return; }
   tb.innerHTML = data.map(t => `
-    <tr>
+    <tr data-id="${t.id}" data-role="tutor">
+      <td><input type="checkbox" class="row-check tutor-check" value="${t.id}" onchange="updateBulkBar('tutor')" style="cursor:pointer"></td>
       <td><div class="user-cell"><div class="av av-i">${t.name[0]}</div><div><div class="user-cell-name">${t.name}</div><div class="user-cell-email">${t.email}</div></div></div></td>
       <td>${t.joined}</td>
       <td><span class="pill ${t.kyt==='Verified'?'green':'amber'}">${t.kyt}</span></td>
@@ -1582,13 +1602,60 @@ function confirmAction(action, id, role) {
   pendingAction = {action, id, role};
   openModal('modal-confirm');
 }
-document.getElementById('modal-confirm-btn').onclick = function() {
+document.getElementById('modal-confirm-btn').onclick = async function() {
   if (!pendingAction) return;
-  const {action} = pendingAction;
+  const {action, id, role, ids} = pendingAction;
   closeModal('modal-confirm');
-  toast(`User ${action.toLowerCase()}d successfully.`, action==='Delete'?'var(--err)':'var(--warn)');
+  const targetIds = ids || [id];
+  try {
+    for (const uid of targetIds) {
+      if (action === 'Delete') {
+        await API.Users.delete(uid);
+      } else if (action === 'Suspend') {
+        await API.Users.suspend(uid);
+      }
+    }
+    toast(`${targetIds.length > 1 ? targetIds.length + ' users' : 'User'} ${action.toLowerCase()}d successfully.`, action==='Delete'?'var(--err)':'var(--warn)');
+    // Remove rows from DOM + local data
+    targetIds.forEach(uid => {
+      document.querySelector(`tr[data-id="${uid}"]`)?.remove();
+      if (role === 'learner') learners = learners.filter(x => x.id !== uid);
+      else if (window.tutors) window.tutors = window.tutors.filter(x => x.id !== uid);
+    });
+    updateBulkBar(role);
+  } catch(e) {
+    toast('Action failed: ' + (e.message||'Unknown error'), 'var(--err)');
+  }
   pendingAction = null;
 };
+
+/* ── BULK SELECT HELPERS ── */
+function selectAll(role, checked) {
+  document.querySelectorAll('.' + role + '-check').forEach(function(cb){ cb.checked = checked; });
+  updateBulkBar(role);
+}
+function updateBulkBar(role) {
+  const checks = document.querySelectorAll('.' + role + '-check:checked');
+  const bar = document.getElementById(role + '-bulk-bar');
+  const countEl = document.getElementById(role + '-bulk-count');
+  const allCb = document.getElementById(role + '-select-all');
+  const total = document.querySelectorAll('.' + role + '-check').length;
+  if (bar) bar.style.display = checks.length > 0 ? 'flex' : 'none';
+  if (countEl) countEl.textContent = checks.length + ' selected';
+  if (allCb) allCb.indeterminate = checks.length > 0 && checks.length < total;
+  if (allCb && checks.length === total && total > 0) allCb.checked = true;
+  if (allCb && checks.length === 0) allCb.checked = false;
+}
+function bulkAction(action, role) {
+  const checks = document.querySelectorAll('.' + role + '-check:checked');
+  const ids = Array.from(checks).map(cb => parseInt(cb.value));
+  if (!ids.length) return;
+  document.getElementById('modal-confirm-title').textContent = action + ' ' + ids.length + ' Users';
+  document.getElementById('modal-confirm-text').textContent = `Are you sure you want to ${action.toLowerCase()} ${ids.length} user${ids.length>1?'s':''}? ${action==='Delete'?'This cannot be undone.':''}`;
+  document.getElementById('modal-confirm-btn').textContent = action + ' ' + ids.length + ' Users';
+  pendingAction = {action, ids, role};
+  openModal('modal-confirm');
+}
 
 /* ── KYT ── */
 async function loadKYT() {
@@ -1645,13 +1712,14 @@ function renderKYT() {
         <div style="margin-left:auto;font-size:11px;font-weight:600;color:${v ? 'var(--ok)' : 'var(--err)'}">${v ? 'Submitted' : 'Missing'}</div>
       </div>`).join('');
 
-    // Build document links if available
+    // Build document links — prepend base URL for relative paths
     const raw = a.raw || {};
+    const _docUrl = (u) => u ? (u.startsWith('http') ? u : 'https://tutlee-backend.onrender.com' + u) : null;
     const docLinks = [
-      raw.id_document   ? `<a href="${raw.id_document}"   target="_blank" style="font-size:12px;color:var(--p);text-decoration:none;font-weight:600">View ID →</a>` : '',
-      raw.degree_document ? `<a href="${raw.degree_document}" target="_blank" style="font-size:12px;color:var(--p);text-decoration:none;font-weight:600">View Degree →</a>` : '',
-      raw.demo_video    ? `<a href="${raw.demo_video}"    target="_blank" style="font-size:12px;color:var(--p);text-decoration:none;font-weight:600">View Demo →</a>` : '',
-    ].filter(Boolean).join('<span style="margin:0 6px;color:var(--g3)">·</span>');
+      _docUrl(raw.id_document)      ? `<a href="${_docUrl(raw.id_document)}"      target="_blank" rel="noopener" style="font-size:12px;color:var(--p);text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>View ID</a>` : '',
+      _docUrl(raw.degree_document)  ? `<a href="${_docUrl(raw.degree_document)}"  target="_blank" rel="noopener" style="font-size:12px;color:var(--p);text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>View Degree</a>` : '',
+      _docUrl(raw.demo_video)       ? `<a href="${_docUrl(raw.demo_video)}"       target="_blank" rel="noopener" style="font-size:12px;color:var(--p);text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>View Demo</a>` : '',
+    ].filter(Boolean).join('<span style="margin:0 8px;color:var(--g3)">·</span>');
 
     return `
     <div class="kyt-card" id="kyt-card-${a.id}">
@@ -1789,30 +1857,81 @@ function renderSubjectBars() {
 }
 
 /* ── RINGS ── */
+var _adminRings = [];
+
+async function loadAdminRings() {
+  const grid = document.getElementById('rings-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="grid-column:1/-1;padding:48px;text-align:center;font-size:13px;color:var(--g4)">Loading study rings…</div>';
+  try {
+    const res = await API.Rings.list();
+    _adminRings = res.results || res || [];
+    renderRings();
+  } catch(e) {
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:48px;text-align:center;font-size:13px;color:var(--err)">Could not load rings. Please refresh.</div>';
+  }
+}
+
 function renderRings() {
-  document.getElementById('rings-grid').innerHTML = ringsData.map(r => `
-    <div class="ring-admin-card">
+  const grid = document.getElementById('rings-grid');
+  if (!grid) return;
+  if (!_adminRings.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:48px;text-align:center"><div style="font-size:14px;font-weight:600;color:var(--g7);margin-bottom:6px">No study rings yet</div><div style="font-size:13px;color:var(--g4)">Rings created by tutors will appear here.</div></div>';
+    return;
+  }
+  grid.innerHTML = _adminRings.map(r => {
+    const statusLabel = r.is_featured ? 'Featured' : r.is_active ? 'Active' : 'Inactive';
+    const statusCls   = r.is_featured ? 'green' : r.is_active ? 'blue' : 'gray';
+    return `
+    <div class="ring-admin-card" id="ring-admin-${r.id}">
       <div class="ring-admin-card-head">
         <div style="width:36px;height:36px;border-radius:var(--r);background:var(--t1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <svg width="16" height="16" fill="none" stroke="var(--t5)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
         </div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:700;color:var(--g8)">${r.name}</div>
-          <div style="font-size:12px;color:var(--g4)">${r.subject}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--g8)">${r.name||'Unnamed ring'}</div>
+          <div style="font-size:12px;color:var(--g4)">${r.subject||'General'} · by ${r.creator_name||'Unknown'}</div>
         </div>
-        <span class="pill ${r.status==='Featured'?'green':r.status==='Active'?'blue':'gray'}">${r.status}</span>
+        <span class="pill ${statusCls}">${statusLabel}</span>
       </div>
       <div class="ring-admin-card-body">
-        <div class="ring-stat"><span>Members</span><strong>${r.members}</strong></div>
-        <div class="ring-stat"><span>Sessions held</span><strong>${r.sessions}</strong></div>
+        <div class="ring-stat"><span>Members</span><strong>${r.member_count||0}</strong></div>
+        <div class="ring-stat"><span>Created</span><strong>${r.created_at?new Date(r.created_at).toLocaleDateString():'-'}</strong></div>
       </div>
       <div class="ring-admin-card-foot">
-        <button class="act-btn ghost" style="flex:1;justify-content:center" onclick="toast('${r.name} is now ${r.status==='Featured'?'un-featured':'featured'}.','var(--t5)')">
-          ${r.status==='Featured'?'Remove Feature':'Feature Ring'}
+        <button class="act-btn ghost" style="flex:1;justify-content:center" onclick="adminFeatureRing(${r.id},this)">
+          ${r.is_featured?'Remove Feature':'Feature Ring'}
         </button>
-        <button class="act-btn danger" onclick="toast('Ring removed from platform.','var(--err)')">Remove</button>
+        <button class="act-btn danger" onclick="adminDeleteRing(${r.id})">Remove</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+async function adminFeatureRing(id, btn) {
+  try {
+    const res = await API.Rings.feature(id);
+    const ring = _adminRings.find(r => r.id === id);
+    if (ring) { ring.is_featured = res.is_featured; }
+    if (btn) btn.textContent = res.is_featured ? 'Remove Feature' : 'Feature Ring';
+    const card = document.getElementById('ring-admin-' + id);
+    if (card) {
+      const pill = card.querySelector('.pill');
+      if (pill) { pill.textContent = res.is_featured ? 'Featured' : 'Active'; pill.className = 'pill ' + (res.is_featured ? 'green' : 'blue'); }
+    }
+    toast(res.is_featured ? 'Ring is now featured.' : 'Ring un-featured.', 'var(--t5)');
+  } catch(e) { toast('Failed to update ring: ' + (e.message||''), 'var(--err)'); }
+}
+
+async function adminDeleteRing(id) {
+  if (!confirm('Remove this ring from the platform? This cannot be undone.')) return;
+  try {
+    await API.Rings.delete(id);
+    _adminRings = _adminRings.filter(r => r.id !== id);
+    document.getElementById('ring-admin-' + id)?.remove();
+    if (!_adminRings.length) renderRings();
+    toast('Ring removed from platform.', 'var(--err)');
+  } catch(e) { toast('Failed to remove ring: ' + (e.message||''), 'var(--err)'); }
 }
 
 /* ── REPORTS ── */
@@ -2061,15 +2180,7 @@ async function initApp() {
 
     // Study Rings
     if (ringsRes.status === 'fulfilled') {
-      const list = ringsRes.value.results || ringsRes.value;
-      window.ringsData = list.map(r => ({
-        id: r.id,
-        name: r.name,
-        subject: r.subject,
-        members: r.member_count,
-        sessions: 0,
-        status: r.is_featured ? 'Featured' : r.is_active ? 'Active' : 'Inactive',
-      }));
+      _adminRings = ringsRes.value.results || ringsRes.value || [];
       renderRings();
     }
 
@@ -2198,7 +2309,7 @@ async function initApp() {
   if (!document.getElementById('transactions-tbody').innerHTML) {
     document.getElementById('transactions-tbody').innerHTML = '<tr><td colspan="6"><div class="empty"><h4>No transactions yet</h4><p>Payment transactions will appear here.</p></div></td></tr>';
   }
-  if (!document.getElementById('rings-grid').innerHTML) renderRings();
+  if (!_adminRings.length) loadAdminRings();
   if (!document.getElementById('reports-list').innerHTML) renderReports('all');
 }
 

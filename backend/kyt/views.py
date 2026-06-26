@@ -58,7 +58,17 @@ class KYTApproveView(APIView):
         app.reviewed_at = timezone.now()
         app.reviewed_by = request.user
         app.save()
-        # Mark tutor profile as verified (custom flag via is_featured could be extended)
+        # Activate tutor profile: create if missing, set is_available so they appear in search
+        from accounts.models import TutorProfile
+        TutorProfile.objects.update_or_create(
+            user=app.tutor,
+            defaults={'is_available': True},
+        )
+        # Ensure user role is tutor/both so they appear in tutor match
+        tutor = app.tutor
+        if tutor.role not in ('tutor', 'both'):
+            tutor.role = 'tutor'
+            tutor.save(update_fields=['role'])
         return Response(KYTApplicationSerializer(app).data)
 
 
