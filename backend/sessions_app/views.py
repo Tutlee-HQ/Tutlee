@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Q
 from django.utils import timezone
-from .models import Session, SessionRating
-from .serializers import SessionSerializer, BookSessionSerializer, SessionRatingSerializer
+from .models import Session, SessionRating, Message
+from .serializers import SessionSerializer, BookSessionSerializer, SessionRatingSerializer, MessageSerializer
 
 
 class IsAdminOrReadOwn(permissions.BasePermission):
@@ -161,6 +161,36 @@ class EndSessionView(APIView):
             import sys
             print(f'[ASSESSMENT] auto-create failed: {_ae}', file=sys.stderr)
         return Response(SessionSerializer(s).data)
+
+
+class MessageListView(generics.ListCreateAPIView):
+    """List and send messages for a session — only participants can access."""
+    serializer_class = MessageSerializer
+
+    def _get_session(self):
+        return Session.objects.get(pk=self.kwargs['pk'])
+
+    def get_queryset(self):
+        u = self.request.user
+        try:
+            session = self._get_session()
+        except Session.DoesNotExist:
+            return Message.objects.none()
+        if u.is_staff or u == session.learner or u == session.tutor:
+            return Message.objects.filter(session=session)
+        return Message.objects.none()
+
+    def perform_create(self, serializer):
+        try:
+            session = self._get_session()
+        except Session.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+            raise NotFound('Session not found.')
+        u = self.request.user
+        if not (u.is_staff or u == session.learner or u == session.tutor):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('Not a participant in this session.')
+        serializer.save(sender=u, session=session)
 
 
 class RateSessionView(generics.CreateAPIView):

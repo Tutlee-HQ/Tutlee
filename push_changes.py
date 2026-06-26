@@ -30,6 +30,12 @@ files = [
     "backend/reports/views.py",
     "backend/study_rings/views.py",
     "backend/study_rings/serializers.py",
+    "backend/sessions_app/models.py",
+    "backend/sessions_app/serializers.py",
+    "backend/sessions_app/views.py",
+    "backend/sessions_app/urls.py",
+    "backend/sessions_app/migrations/0002_message.py",
+    "backend/tutlee/urls.py",
     "push_changes.py",
 ]
 
@@ -37,7 +43,7 @@ for f in files:
     run(f'git add "{f}"')
 
 # Commit
-msg = "Fix page reload restore, study ring join for all users, admin KYT docs, admin CRUD bulk-select, study rings admin live data"
+msg = "Fix study ring join, KYT media serving, booking flow, messaging, skill passport live data"
 run(f'git commit -m "{msg}"')
 
 # Push

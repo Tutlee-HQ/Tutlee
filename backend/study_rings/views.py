@@ -38,6 +38,8 @@ class StudyRingDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class JoinRingView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, pk):
         try:
             ring = StudyRing.objects.get(pk=pk)
@@ -48,6 +50,8 @@ class JoinRingView(APIView):
 
 
 class LeaveRingView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, pk):
         try:
             ring = StudyRing.objects.get(pk=pk)

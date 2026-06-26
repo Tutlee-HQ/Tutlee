@@ -1305,14 +1305,35 @@ tr:hover td{background:var(--g1)}
 <!-- ══ MESSAGES ══ -->
 <div class="screen" id="screen-messages">
   <button class="back-btn" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
-  <div class="pg-head"><div><h1>Messages</h1><div class="pg-sub">Chat opens when you book a session - closes 3 days after it ends</div></div></div>
-  <div class="card" style="padding:64px 24px;text-align:center;max-width:480px;margin:0 auto">
-    <div style="width:56px;height:56px;border-radius:var(--rxl);background:var(--t1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--t7)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <div class="pg-head"><div><h1>Messages</h1><div class="pg-sub">Chat with tutors and learners from your booked sessions</div></div></div>
+  <div class="msg-layout card" style="padding:0">
+    <!-- Conversation list -->
+    <div class="msg-list" id="msg-list"></div>
+    <!-- Conversation panel -->
+    <div class="msg-panel" style="display:flex;flex-direction:column;min-height:0">
+      <div class="msg-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--t8);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff" id="msg-conv-av">—</div>
+          <div style="font-size:14px;font-weight:700;color:var(--g9)" id="msg-conv-name">Select a conversation</div>
+        </div>
+      </div>
+      <div class="msg-expiry" id="msg-expiry" style="display:none">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Chat closes 3 days after session ends
+      </div>
+      <div class="msg-msgs" id="msg-msgs">
+        <div style="padding:48px 24px;text-align:center">
+          <div style="font-size:13px;font-weight:600;color:var(--g7);margin-bottom:6px">Select a conversation</div>
+          <div style="font-size:12px;color:var(--g5)">Choose a session thread on the left to start messaging.</div>
+        </div>
+      </div>
+      <div class="msg-inp">
+        <div class="msg-inp-row">
+          <input id="msg-inp" type="text" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMsgApp()">
+          <button class="btn-lg p" style="padding:9px 16px;white-space:nowrap" onclick="sendMsgApp()">Send</button>
+        </div>
+      </div>
     </div>
-    <div style="font-size:16px;font-weight:700;color:var(--g9);margin-bottom:8px">No messages yet</div>
-    <div style="font-size:13px;color:var(--g5);line-height:1.6;margin-bottom:24px">When you book a session with a tutor, a message thread opens here. You can share files, send voice notes, and stay in sync before and after your session.</div>
-    <button class="btn-lg p" style="width:100%;justify-content:center" onclick="goTo('tutor-match')">Find a tutor to message</button>
   </div>
 </div>
 
@@ -2394,6 +2415,8 @@ function goTo(id){
   if(id==='settings')populateSettingsForm();
   if(id==='assessments')loadAssessmentsTab();
   if(id==='messages')buildMsgList();
+  if(id==='passport')loadPassportData();
+  if(id==='tutor-match')loadTutorMatch();
 }
 function goHome(){goTo(S.curMode==='tutor'?'tutor-dash':'dashboard');}
 function setMode(m){
@@ -2704,40 +2727,156 @@ async function submitAssessment(){
   }
 }
 
+// ═══ SKILL PASSPORT ═══
+async function loadPassportData(){
+  var u=API.Auth.currentUser();
+  if(!u)return;
+  // Fill avatar + name
+  var avEl=document.getElementById('pp-av');
+  var nmEl=document.getElementById('pp-name');
+  var av=(u.full_name||u.email||'?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+  if(avEl)avEl.textContent=av;
+  if(nmEl)nmEl.textContent=u.full_name||u.email||'Tutor';
+
+  // Load KYT application
+  var credsEl=document.getElementById('passport-creds');
+  var statsEl=document.getElementById('passport-stats');
+  try{
+    var kyt=await API.KYT.myApp();
+    var tp=u.tutor_profile||{};
+    var subjects=(tp.subjects||[]);
+    var rating=parseFloat(tp.rating||0).toFixed(1);
+    var totalSess=tp.total_sessions||0;
+    var passRate=Math.round((tp.pass_rate||0)*100);
+
+    if(statsEl)statsEl.textContent=totalSess+' session'+(totalSess!==1?'s':'')+' taught · '+rating+' ★';
+
+    if(credsEl){
+      if(kyt&&kyt.status==='approved'){
+        credsEl.innerHTML=
+          '<div style="display:flex;flex-direction:column;gap:10px">'+
+          '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--ok1);border-radius:var(--r)">'
+            +'<div style="width:32px;height:32px;border-radius:50%;background:#077A3E;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+              +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+            +'</div>'
+            +'<div><div style="font-size:13px;font-weight:700;color:#077A3E">KYT Verified Tutor</div>'
+            +'<div style="font-size:12px;color:var(--g5)">Identity, degree and demo verified by Tutlee</div></div>'
+          +'</div>'+
+          (subjects.length?'<div style="padding:12px;background:var(--g0);border-radius:var(--r)">'
+            +'<div style="font-size:11px;font-weight:600;color:var(--g5);letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px">Certified subjects</div>'
+            +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
+            +subjects.map(function(s){return '<span class="tag" style="background:var(--t1);color:var(--t7)">'+s+'</span>';}).join('')
+            +'</div></div>':'')+
+          '<div style="padding:12px;background:var(--g0);border-radius:var(--r);display:flex;justify-content:space-between">'
+            +'<div><div style="font-size:11px;color:var(--g5);margin-bottom:2px">Avg rating</div><div style="font-size:16px;font-weight:700;color:var(--g9)">'+rating+' ★</div></div>'
+            +'<div style="text-align:right"><div style="font-size:11px;color:var(--g5);margin-bottom:2px">Learner pass rate</div><div style="font-size:16px;font-weight:700;color:var(--g9)">'+passRate+'%</div></div>'
+          +'</div>'
+          +'</div>';
+      } else if(kyt&&kyt.status==='pending'){
+        credsEl.innerHTML='<div style="padding:20px;text-align:center;color:var(--g5);font-size:13px">Your KYT documents are under review. Credentials will appear once verified.</div>';
+      } else {
+        credsEl.innerHTML='<div style="padding:20px;text-align:center;color:var(--g5);font-size:13px">No verified credentials yet. Complete KYT to earn your first credential.</div>';
+      }
+    }
+  }catch(e){
+    if(credsEl)credsEl.innerHTML='<div style="padding:20px;text-align:center;color:var(--g5);font-size:13px">No verified credentials yet. Complete KYT to earn your first credential.</div>';
+  }
+}
+
 // ═══ MESSAGES ═══
+var _activeConvSessionId=null;
+
 async function buildMsgList(){
   var el=document.getElementById('msg-list');if(!el)return;
   el.innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--g4)">Loading…</div>';
   try{
-    var sessions=await API.Sessions.list('?status=scheduled');
-    var items=(sessions||[]).slice(0,20);
+    // Load ALL sessions (any status) so both parties can message
+    var sessions=await API.Sessions.list();
+    var raw=sessions.results||sessions||[];
+    var items=raw.slice(0,40);
     if(!items.length){
       el.innerHTML='<div style="padding:32px 16px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:6px">No messages yet</div><div style="font-size:12px;color:var(--g5)">Messages from your tutors and learners will appear here after a session is booked.</div></div>';
       return;
     }
     var u=API.Auth.currentUser();
     el.innerHTML=items.map(function(s,i){
-      var other=u&&u.id===s.learner_id?s.tutor_name:s.learner_name;
+      var isLearner=u&&u.id===s.learner;
+      var other=isLearner?s.tutor_name:s.learner_name;
       var initials=(other||'?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
       var bg=['#0E8F84','#5243F5','#B85F00','#7B3F9E','#E05C00'][i%5];
       var when=s.scheduled_at?new Date(s.scheduled_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
-      return'<div class="msg-item'+(i===0?' active':'')+'" onclick="document.querySelectorAll(\'.msg-item\').forEach(function(x){x.classList.remove(\'active\')});this.classList.add(\'active\')">'
+      return '<div class="msg-item" data-session-id="'+s.id+'" onclick="openMsgConv('+s.id+',\''+other+'\',\''+bg+'\')">'
         +'<div class="sav" style="background:'+bg+';width:36px;height:36px;font-size:11px">'+initials+'</div>'
         +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(other||'Tutor')+'</div>'
         +'<div style="font-size:11px;color:var(--g5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(s.subject||'Session')+'</div>'
         +'<div style="font-size:10px;font-weight:600;margin-top:2px;color:var(--g4)">'+when+'</div></div>'
         +'</div>';
     }).join('');
+    // Auto-open first conversation
+    if(items.length){
+      var u2=API.Auth.currentUser();
+      var s0=items[0];
+      var isL=u2&&u2.id===s0.learner;
+      openMsgConv(s0.id,isL?s0.tutor_name:s0.learner_name,'#0E8F84');
+    }
   }catch(e){
     el.innerHTML='<div style="padding:24px;text-align:center;font-size:12px;color:var(--g4)">Could not load messages.</div>';
   }
 }
-function sendMsgApp(){
+
+async function openMsgConv(sessionId,otherName,color){
+  _activeConvSessionId=sessionId;
+  // Highlight active thread
+  document.querySelectorAll('.msg-item').forEach(function(x){x.classList.remove('active')});
+  var item=document.querySelector('.msg-item[data-session-id="'+sessionId+'"]');
+  if(item)item.classList.add('active');
+  // Set header
+  var hdr=document.getElementById('msg-conv-name');
+  if(hdr)hdr.textContent=otherName||'Conversation';
+  // Load messages
+  var msgs=document.getElementById('msg-msgs');
+  if(!msgs)return;
+  msgs.innerHTML='<div style="padding:20px;text-align:center;font-size:12px;color:var(--g4)">Loading messages…</div>';
+  try{
+    var data=await API.Messages.list(sessionId);
+    var list=data.results||data||[];
+    var u=API.Auth.currentUser();
+    if(!list.length){
+      msgs.innerHTML='<div style="padding:40px 20px;text-align:center;font-size:13px;color:var(--g5)">No messages yet. Say hello!</div>';
+    } else {
+      msgs.innerHTML=list.map(function(m){
+        var isMe=u&&u.id===m.sender;
+        if(isMe){
+          return '<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><div class="cown" style="max-width:70%">'+m.content+'</div></div>';
+        } else {
+          return '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-end">'
+            +'<div style="width:24px;height:24px;border-radius:50%;background:'+(color||'#0E8F84')+';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0">'
+              +(m.sender_name||'?').split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)
+            +'</div>'
+            +'<div class="cbbl" style="max-width:70%">'+m.content+'</div>'
+            +'</div>';
+        }
+      }).join('');
+      msgs.scrollTop=msgs.scrollHeight;
+    }
+  }catch(e){
+    msgs.innerHTML='<div style="padding:20px;text-align:center;font-size:12px;color:var(--g4)">Could not load messages.</div>';
+  }
+}
+
+async function sendMsgApp(){
   var inp=document.getElementById('msg-inp'),msgs=document.getElementById('msg-msgs');
   if(!inp||!inp.value.trim())return;
-  var m=inp.value;inp.value='';
-  msgs.innerHTML+='<div style="display:flex;justify-content:flex-end"><div class="cown">'+m+'</div></div>';
+  if(!_activeConvSessionId){showToast('Select a conversation first.');return;}
+  var m=inp.value.trim();inp.value='';
+  // Optimistically append
+  msgs.innerHTML+='<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><div class="cown" style="max-width:70%">'+m+'</div></div>';
   msgs.scrollTop=msgs.scrollHeight;
+  try{
+    await API.Messages.send(_activeConvSessionId,m);
+  }catch(e){
+    showToast('Message failed to send. Please try again.');
+  }
 }
 
 // ═══ STUDY RINGS ═══
@@ -2903,37 +3042,68 @@ function _appendSGChat(initials,color,sender,text,isMe){
 }
 
 // ═══ BOOK CALENDAR ═══
+var _bookPickedDate=null; // stores the Date object of the selected day
 function buildBookCal(){
   var cal=document.getElementById('book-cal');if(!cal)return;
   cal.innerHTML='';
-  var today=new Date();var d=today.getDate();
+  var today=new Date();
+  var TIMES=['8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM','7:00 PM','8:00 PM'];
   for(var i=0;i<7;i++){
-    var day=document.createElement('div');
-    var dn=d+i;
-    day.className='bc-day'+(i===0?' today':(i%2===0?' avail':''));
-    day.textContent=dn;
-    if(i>0){day.addEventListener('click',function(e){
-      document.querySelectorAll('.bc-day.picked').forEach(function(x){x.classList.remove('picked')});
-      e.target.classList.add('picked');
-      var slots=document.getElementById('book-slots');
-      if(slots)slots.innerHTML='<label class="fl" style="margin-bottom:8px">Available times</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-sm p" onclick="selSlot(this)">6:00 PM</button><button class="btn-sm" onclick="selSlot(this)">7:00 PM</button><button class="btn-sm" onclick="selSlot(this)">8:00 PM</button><button class="btn-sm" onclick="selSlot(this)">9:00 PM</button></div>';
-    });}
-    cal.appendChild(day);
+    (function(offset){
+      var d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+offset);
+      var day=document.createElement('div');
+      day.className='bc-day'+(offset===0?' today':' avail');
+      day.textContent=d.getDate();
+      day.title=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+      day.setAttribute('data-date',d.toISOString().slice(0,10));
+      day.addEventListener('click',function(){
+        document.querySelectorAll('.bc-day.picked').forEach(function(x){x.classList.remove('picked')});
+        day.classList.add('picked');
+        _bookPickedDate=d;
+        S._selectedSlot=null; // reset time when date changes
+        var slots=document.getElementById('book-slots');
+        if(slots){
+          slots.innerHTML='<label class="fl" style="margin-bottom:8px">Pick a time</label>'
+            +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+            +TIMES.map(function(t){return '<button class="btn-sm" onclick="selSlot(this,\''+t+'\')" style="font-size:11px">'+t+'</button>';}).join('')
+            +'</div>';
+        }
+      });
+      cal.appendChild(day);
+    })(i);
   }
 }
-function selSlot(btn){document.querySelectorAll('#book-slots .btn-sm').forEach(function(b){b.classList.remove('p')});btn.classList.add('p');}
+function selSlot(btn,timeStr){
+  document.querySelectorAll('#book-slots .btn-sm').forEach(function(b){b.classList.remove('p')});
+  btn.classList.add('p');
+  if(_bookPickedDate&&timeStr){
+    // Parse "6:00 PM" → hours+minutes
+    var parts=timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if(parts){
+      var h=parseInt(parts[1],10),m=parseInt(parts[2],10),ap=parts[3].toUpperCase();
+      if(ap==='PM'&&h!==12)h+=12;
+      if(ap==='AM'&&h===12)h=0;
+      var dt=new Date(_bookPickedDate.getFullYear(),_bookPickedDate.getMonth(),_bookPickedDate.getDate(),h,m,0,0);
+      S._selectedSlot=dt.toISOString();
+    }
+  }
+}
 function selSt(v){['60','90','120'].forEach(function(x){var b=document.getElementById('st-'+x);if(b){b.className='btn-lg '+(x===v?'p':'s');}});}
 function selBookT(t){['ko','rc'].forEach(function(x){var el=document.getElementById('book-'+x);if(!el)return;el.style.background=x===t?'var(--t0)':'var(--g0)';el.style.border=x===t?'1.5px solid var(--t4)':'1px solid var(--g2)';});}
 async function confirmBook(){
-  var btn=document.querySelector('#screen-book .btn-lg.p[onclick="confirmBook()"]');
+  if(!S._selectedTutorId){showToast('Please select a tutor first — go to Tutor Match.');return;}
+  if(!S._selectedSlot){showToast('Please pick a date and time for your session.');return;}
+  var durEl=document.querySelector('#screen-book .btn-lg.p[id^="st-"]');
+  var dur=durEl?parseInt(durEl.id.replace('st-'),10):60;
+  var subj=(document.querySelector('#screen-book textarea.fi')||{}).value.trim()||'General';
+  var btn=document.querySelector('#screen-book button[onclick="confirmBook()"]');
   if(btn){btn.disabled=true;btn.textContent='Booking…';}
   try{
-    var subj=(document.querySelector('#screen-book textarea.fi')||{}).value||'General';
-    var slot=S._selectedSlot||new Date(Date.now()+86400000).toISOString();
-    var dur=S._selectedDuration||60;
-    var tutorId=S._selectedTutorId||null;
-    var sess=await bookSession(tutorId,subj,'',slot,dur);
+    var sess=await bookSession(S._selectedTutorId,subj,'',S._selectedSlot,dur||60);
     if(sess){
+      showToast('Session booked with '+(S._selectedTutorName||'your tutor')+'!');
+      // Refresh tutor notifications
+      setTimeout(loadNotifications,1000);
       showModal('payment-modal');
     }
   }catch(e){showToast('Booking failed: '+(e.message||'Try again'));}
@@ -3453,25 +3623,84 @@ async function bookSession(tutorId, subject, topic, scheduledAt, durationMins) {
 // Load tutor match results from API
 async function loadTutorMatch() {
   if (!API.Auth.isLoggedIn()) return;
+  var container = document.getElementById('tutor-match-results');
+  if (container) container.innerHTML = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--g4)">Searching for tutors…</div>';
   try {
     var user = API.Auth.currentUser();
-    var weakAreas = user?.learner_profile?.weak_areas || [];
-    var subject   = user?.learner_profile?.subjects?.[0] || '';
+    var weakAreas = (user && user.learner_profile && user.learner_profile.weak_areas) || [];
+    var subject   = (user && user.learner_profile && user.learner_profile.subjects && user.learner_profile.subjects[0]) || '';
     var tutors    = await API.Users.matchTutors(subject, weakAreas);
     var list      = tutors.results || tutors;
-    var container = document.getElementById('tutor-match-results');
-    if (!container || !list.length) return;
+    if (!container) return;
+    if (!list.length) {
+      container.innerHTML = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--g5)">No tutors found for your subject. Try updating your subject preferences in Settings.</div>';
+      return;
+    }
     container.innerHTML = list.map(function(t){
-      return '<div class="tutor-match-card">' +
-        '<div class="tm-name">' + t.full_name + '</div>' +
-        '<div class="tm-subjs">' + (t.subjects || []).join(', ') + '</div>' +
-        '<div class="tm-rating">★ ' + t.rating + ' · ' + t.total_sessions + ' sessions</div>' +
-        '<div class="tm-rate">$' + t.hourly_rate + '/hr</div>' +
-        '<button class="btn-primary-sm" onclick="goTo(\'book\')">Book Session</button>' +
+      var subjs = (t.subjects || []).join(', ') || 'General';
+      var rating = parseFloat(t.rating || 0).toFixed(1);
+      var rate   = t.hourly_rate > 0 ? '$' + t.hourly_rate + '/hr' : 'Free';
+      var av     = (t.full_name || '?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      return '<div class="tutor-match-card" style="display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--g0);border-radius:var(--r);border:1px solid var(--g2)">' +
+        '<div style="width:44px;height:44px;border-radius:50%;background:var(--t8);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">' + av + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:14px;font-weight:700;color:var(--g9)">' + (t.full_name || 'Tutor') + '</div>' +
+          '<div style="font-size:12px;color:var(--g5);margin-top:2px">' + subjs + '</div>' +
+          '<div style="display:flex;gap:10px;margin-top:6px;font-size:12px;color:var(--g6)">' +
+            '<span>★ ' + rating + '</span>' +
+            '<span>' + (t.total_sessions || 0) + ' sessions</span>' +
+            '<span>' + rate + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<button class="btn-lg p" style="white-space:nowrap;font-size:12px;padding:8px 14px" onclick="openBookScreen(' + JSON.stringify(t) + ')">Book Session</button>' +
         '</div>';
     }).join('');
   } catch(e) {
+    if (container) container.innerHTML = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--g4)">Could not load tutors. Please try again.</div>';
     console.info('Tutor match load failed:', e.message);
+  }
+}
+
+// Open book screen with a pre-selected tutor
+function openBookScreen(tutor) {
+  if (typeof tutor === 'string') { try { tutor = JSON.parse(tutor); } catch(e) {} }
+  S._selectedTutorId   = tutor.id;
+  S._selectedTutorName = tutor.full_name || 'Tutor';
+  S._selectedSlot      = null; // reset from previous booking
+  // Populate the book screen tutor slot
+  var emptyEl = document.getElementById('book-tutors-empty');
+  var listEl  = document.getElementById('book-tutors-list');
+  var av = (tutor.full_name || '?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+  if (listEl) {
+    // Replace empty state + match link with the selected tutor card
+    listEl.innerHTML =
+      '<div style="display:flex;gap:12px;align-items:center;padding:12px;background:var(--ok1);border:1px solid #9EDBBF;border-radius:var(--r)">' +
+        '<div style="width:38px;height:38px;border-radius:50%;background:var(--t8);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">' + av + '</div>' +
+        '<div style="flex:1">' +
+          '<div style="font-size:13px;font-weight:700;color:var(--g9)">' + (tutor.full_name || 'Tutor') + '</div>' +
+          '<div style="font-size:12px;color:var(--g5)">' + (tutor.subjects || []).join(', ') + '</div>' +
+        '</div>' +
+        '<button class="btn-sm" onclick="clearBookTutor()" style="font-size:11px">Change</button>' +
+      '</div>';
+  }
+  goTo('book');
+}
+
+// Clear selected tutor and restore empty state
+function clearBookTutor() {
+  S._selectedTutorId   = null;
+  S._selectedTutorName = null;
+  var listEl = document.getElementById('book-tutors-list');
+  if (listEl) {
+    listEl.innerHTML =
+      '<div id="book-tutors-empty" style="padding:20px;text-align:center;background:var(--g0);border-radius:var(--r);font-size:13px;color:var(--g5)">No tutor selected. Use Tutor Match to find one.</div>' +
+      '<div style="background:var(--g0);border:1px dashed var(--g3);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="goTo(\'tutor-match\')">' +
+        '<div style="width:38px;height:38px;border-radius:var(--r);background:var(--t1);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v3l2 2"/></svg>' +
+        '</div>' +
+        '<div><div style="font-size:13px;font-weight:600;color:var(--g8)">Request a tutor match</div><div style="font-size:12px;color:var(--g5)">Find a tutor matched to your specific weak area</div></div>' +
+        '<div style="margin-left:auto;font-size:12px;font-weight:600;color:var(--t6)">Go →</div>' +
+      '</div>';
   }
 }
 

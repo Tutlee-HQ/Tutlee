@@ -43,3 +43,17 @@ class SessionRating(models.Model):
 
     def __str__(self):
         return f'Rating for Session {self.session_id} by {self.rater}'
+
+
+class Message(models.Model):
+    """Direct message between learner and tutor for a shared session."""
+    session    = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='messages')
+    sender     = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
+    content    = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f'Message(session={self.session_id}, sender={self.sender.email})'

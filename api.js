@@ -247,6 +247,12 @@ const TutleeAPI = (() => {
     revenueStats:   () => get('/api/payments/stats/'),
   };
 
+  // ── MESSAGES ─────────────────────────────────────────────────────────────────
+  const Messages = {
+    list: (sessionId)          => get(`/api/sessions/${sessionId}/messages/`),
+    send: (sessionId, content) => post(`/api/sessions/${sessionId}/messages/`, { content }),
+  };
+
   // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
   async function ping() {
     try {
@@ -262,7 +268,7 @@ const TutleeAPI = (() => {
   };
 
   // Public surface
-  return { Auth, Users, Sessions, Assessments, KYT, Rings, Reports, Payments, Content, ping, APIError };
+  return { Auth, Users, Sessions, Assessments, KYT, Rings, Reports, Payments, Content, Messages, ping, APIError };
 
 })();
 

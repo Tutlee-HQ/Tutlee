@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Session, SessionRating
+from .models import Session, SessionRating, Message
 from accounts.serializers import UserSerializer
 
 
@@ -25,6 +25,18 @@ class SessionSerializer(serializers.ModelSerializer):
 
     def get_tutor_name(self, obj):
         return obj.tutor.full_name
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model  = Message
+        fields = ['id', 'session', 'sender', 'sender_name', 'content', 'created_at']
+        read_only_fields = ('sender', 'created_at', 'session')
+
+    def get_sender_name(self, obj):
+        return obj.sender.full_name
 
 
 class BookSessionSerializer(serializers.ModelSerializer):
