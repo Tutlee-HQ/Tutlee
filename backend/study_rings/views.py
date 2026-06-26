@@ -9,8 +9,14 @@ from accounts.permissions import IsAdminOrStaff
 class StudyRingListView(generics.ListCreateAPIView):
     serializer_class = StudyRingSerializer
 
+    def get_permissions(self):
+        # Anyone can browse rings; only authenticated users can create
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+
     def get_queryset(self):
-        qs = StudyRing.objects.prefetch_related('members')
+        qs = StudyRing.objects.prefetch_related('members').filter(is_active=True)
         subject = self.request.query_params.get('subject')
         if subject:
             qs = qs.filter(subject__icontains=subject)
@@ -28,7 +34,7 @@ class StudyRingDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_permissions(self):
         if self.request.method in ('PUT', 'PATCH', 'DELETE'):
             return [IsAdminOrStaff()]
-        return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
 
 
 class JoinRingView(APIView):

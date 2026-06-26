@@ -2387,8 +2387,8 @@ function goTo(id){
   if(id==='book')buildBookCal();
   if(id==='session-room'){startTimer();setTimeout(initWB,100);if(S.activeSessionId){setTimeout(function(){startSessionRoom(S.activeSessionId);},300);}}
   if(id==='ai-summary')loadSummary();
-  if(id==='study-groups'){curRingTab='live';document.querySelectorAll('.ring-tab').forEach(function(t){t.classList.remove('active')});var rt=document.getElementById('rtab-live');if(rt)rt.classList.add('active');buildSGGrid();}
-  if(id==='ring-detail'){buildSGMembers();setTimeout(initSGWB,100);}
+  if(id==='study-groups'){curRingTab='live';document.querySelectorAll('.ring-tab').forEach(function(t){t.classList.remove('active')});var rt=document.getElementById('rtab-live');if(rt)rt.classList.add('active');loadStudyGroups();}
+  if(id==='ring-detail'){setTimeout(initSGWB,100);}
   if(id==='earnings'||id==='t-analytics'||id==='progress')setTimeout(initCharts,100);
   if(id==='progress')loadRecordings();
   if(id==='settings')populateSettingsForm();
@@ -2742,7 +2742,42 @@ function sendMsgApp(){
 
 // ═══ STUDY RINGS ═══
 var AV_BG=['#0E8F84','#5243F5','#B85F00','#7B3F9E','#0E8F84'];
+var BG_PALETTE=['linear-gradient(135deg,#0E8F84,#17CFBF)','linear-gradient(135deg,#5243F5,#8B7CF7)','linear-gradient(135deg,#B85F00,#F5A623)','linear-gradient(135deg,#7B3F9E,#B06CD9)','linear-gradient(135deg,#0E5F8F,#17A0CF)'];
+var ICON_PALETTE=['📚','🔬','📐','🎯','🌍','⚗️','💡','🧬','📊','🎓'];
 var curRingTab='live';
+
+// Convert API ring object → local SG shape
+function _ringToSG(r,i){
+  var idx=(r.id||i)%BG_PALETTE.length;
+  return{
+    id:r.id,
+    title:r.name,
+    subj:r.subject,
+    desc:r.description||'',
+    host:r.host_name||r.creator_name||'Tutor',
+    members:r.member_count||0,
+    mine:r.is_member||false,
+    status:r.is_live||r.is_active?'Live now':'Upcoming',
+    bg:BG_PALETTE[idx],
+    icon:ICON_PALETTE[idx%ICON_PALETTE.length],
+    raw:r,
+  };
+}
+
+// Load rings fresh from API every time the screen is opened
+async function loadStudyGroups(){
+  var g=document.getElementById('sg-grid');if(!g)return;
+  g.innerHTML='<div style="grid-column:1/-1;padding:48px;text-align:center;font-size:13px;color:var(--g4)">Loading rings…</div>';
+  try{
+    var res=await API.Rings.list();
+    var list=res.results||res||[];
+    SG_DATA=list.map(_ringToSG);
+  }catch(e){
+    console.warn('[Rings] load failed',e.message);
+  }
+  buildSGGrid();
+}
+
 function switchRingTab(tab){
   curRingTab=tab;
   document.querySelectorAll('.ring-tab').forEach(function(t){t.classList.remove('active')});
@@ -2751,6 +2786,7 @@ function switchRingTab(tab){
 }
 function buildSGGrid(){
   var g=document.getElementById('sg-grid');if(!g)return;
+  var user=API.Auth.currentUser();
   var filtered=SG_DATA.filter(function(sg){
     if(curRingTab==='live')return sg.status==='Live now';
     if(curRingTab==='upcoming')return sg.status!=='Live now';
@@ -2760,7 +2796,7 @@ function buildSGGrid(){
   // Update live count badge
   var liveCount=SG_DATA.filter(function(r){return r.status==='Live now';}).length;
   var badge=document.getElementById('rtab-live-count');
-  if(badge){badge.textContent=liveCount;badge.style.display=liveCount?'':' none';}
+  if(badge){badge.textContent=liveCount;badge.style.display=liveCount>0?'':'none';}
   if(filtered.length===0){
     g.innerHTML='<div style="grid-column:1/-1;padding:48px 24px;text-align:center;background:var(--g0);border-radius:var(--rxl);border:1px dashed var(--g2)">'
       +'<div style="width:48px;height:48px;border-radius:var(--rl);background:var(--t1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px">'
@@ -2774,7 +2810,7 @@ function buildSGGrid(){
   }
   g.innerHTML=filtered.map(function(sg){
     var avs=AV_BG.slice(0,Math.min(3,sg.members)).map(function(bg){return'<div class="sg-av-sm" style="background:'+bg+'"></div>';}).join('');
-    if(sg.members>3)avs+='<div class="sg-av-sm" style="background:var(--g5);font-size:7px">+'+( sg.members-3)+'</div>';
+    if(sg.members>3)avs+='<div class="sg-av-sm" style="background:var(--g5);font-size:7px">+'+(sg.members-3)+'</div>';
     var isLive=sg.status==='Live now';
     return'<div class="sg-card" onclick="openRingDetail(sg)">'
       +'<div class="sg-banner" style="background:'+sg.bg+'"><span style="font-size:34px">'+sg.icon+'</span>'
@@ -2788,20 +2824,57 @@ function buildSGGrid(){
       +'<div style="font-size:11px;color:var(--g4);margin-bottom:14px">Hosted by '+sg.host+'</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between">'
       +'<div style="display:flex;align-items:center;gap:6px"><div class="sg-av-stack">'+avs+'</div><span style="font-size:11px;color:var(--g5)">'+sg.members+' members</span></div>'
-      +'<button class="btn-sm p" onclick="event.stopPropagation();openRingDetail(sg)">'+(isLive?'Join live':'RSVP')+'</button>'
+      +'<button class="btn-sm p" onclick="event.stopPropagation();openRingDetail(sg)">'+(isLive?'Join live':'View')+'</button>'
       +'</div></div></div>';
   }).join('');
 }
-function buildSGMembers(){
+
+// Render member list for ring detail (from API data)
+function buildSGMembers(members){
   var el=document.getElementById('sg-members');if(!el)return;
-  el.innerHTML=SG_MEMBERS.map(function(m){
+  var user=API.Auth.currentUser();
+  if(!members||!members.length){
+    el.innerHTML='<div style="padding:20px;text-align:center;font-size:13px;color:var(--g4)">No members yet</div>';
+    return;
+  }
+  var bgColors=['#0E8F84','#5243F5','#B85F00','#7B3F9E','#0E5F8F','#166534'];
+  el.innerHTML=members.map(function(m,i){
+    var name=m.full_name||m.name||m.email||'Member';
+    var initials=name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'??';
+    var isYou=user&&(m.id===user.id);
+    var bg=bgColors[i%bgColors.length];
     return'<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--g1)">'
-      +'<div class="sav" style="background:'+m.bg+';width:32px;height:32px;font-size:11px">'+m.i+'</div>'
-      +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+m.n+'</div>'
-      +'<div style="font-size:11px;color:var(--g5)">'+m.r+'</div></div>'
-      +(m.r==='Host'?'<span class="tag tt">Host</span>':m.r==='You'?'<span class="tag tg">You</span>':'')
+      +'<div class="sav" style="background:'+bg+';width:32px;height:32px;font-size:11px">'+initials+'</div>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+name+(isYou?' (you)':'')+'</div>'
+      +'<div style="font-size:11px;color:var(--g5)">'+(m.role||'Member')+'</div></div>'
+      +(isYou?'<span class="tag tg">You</span>':'')
       +'</div>';
   }).join('');
+}
+
+// Load ring posts into the chat panel
+async function loadRingPosts(ringId){
+  try{
+    var res=await API.Rings.posts(ringId);
+    var posts=res.results||res||[];
+    var msgs=document.getElementById('sg-chat-msgs-list');if(!msgs)return;
+    // Clear placeholder
+    msgs.innerHTML='';
+    if(!posts.length){
+      msgs.innerHTML='<div style="padding:24px;text-align:center;color:var(--g5);font-size:13px" data-placeholder>No messages yet. Be the first to contribute.</div>';
+      return;
+    }
+    var user=API.Auth.currentUser();
+    // Posts come newest-first, reverse for chronological
+    posts.slice().reverse().forEach(function(p){
+      var name=p.author_name||'Member';
+      var isMe=user&&(p.author===user.id);
+      var initials=name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'??';
+      _appendSGChat(initials,isMe?'#7C3AED':'#0E8F84',name,p.content,isMe);
+    });
+  }catch(e){
+    console.warn('[Rings] posts load failed',e.message);
+  }
 }
 function sendSGChat(){
   var inp=document.getElementById('sg-inp');
@@ -3320,25 +3393,8 @@ async function loadUserDashboard(user) {
     // Study Rings — populate SG_DATA from API
     const rings = await API.Rings.list();
     var ringList = rings.results || rings;
-    var myRings  = ringList.filter(function(r){ return r.is_member; });
-    var bgPalette=['linear-gradient(135deg,#0E8F84,#17CFBF)','linear-gradient(135deg,#5243F5,#8B7CF7)','linear-gradient(135deg,#B85F00,#F5A623)','linear-gradient(135deg,#7B3F9E,#B06CD9)'];
-    var iconPalette=['📚','🔬','📐','🎯','🌍','⚗️','💡','🧬'];
     if(ringList.length){
-      SG_DATA = ringList.map(function(r,i){
-        return{
-          id:r.id,
-          title:r.name,
-          subj:r.subject,
-          desc:r.description||'',
-          host:r.host_name||'Tutor',
-          members:r.member_count||0,
-          mine:r.is_member||false,
-          status:r.is_live?'Live now':(r.scheduled_at?new Date(r.scheduled_at).toLocaleDateString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'Upcoming'),
-          bg:bgPalette[i%bgPalette.length],
-          icon:iconPalette[i%iconPalette.length],
-        };
-      });
-      buildSGGrid();
+      SG_DATA = ringList.map(_ringToSG);
     }
 
     // Refresh tutor match results if on that screen
@@ -3983,16 +4039,36 @@ function openRingDetail(sg){
     badgeEl.textContent = isLive ? '● Live now · ' + (sg.members||0) + ' active' : sg.status||'';
     badgeEl.style.display = badgeEl.textContent ? 'inline-flex' : 'none';
   }
-  // Reset join button, chat, activity
+  // Reset join button
   var btn = document.querySelector('#screen-ring-detail .btn-lg.p');
   if(btn){btn.textContent='Join live session';btn.onclick=function(){startStudyRing(currentRingId);};}
+  // Reset chat to loading state while we fetch
   var chatEl=document.getElementById('sg-chat-msgs-list');
-  if(chatEl)chatEl.innerHTML='<div style="padding:24px;text-align:center;color:var(--g5);font-size:13px" data-placeholder>No messages yet. Be the first to contribute.</div>';
+  if(chatEl)chatEl.innerHTML='<div style="padding:24px;text-align:center;color:var(--g4);font-size:13px">Loading messages…</div>';
   var actLog=document.getElementById('sg-activity-log');
-  if(actLog)actLog.innerHTML='<div style="text-align:center;padding:16px 0;color:var(--g4)" data-act-ph>No activity yet</div>';
+  if(actLog)actLog.innerHTML='<div style="text-align:center;padding:16px 0;color:var(--g4)">No activity yet</div>';
   var ctrl=document.getElementById('sg-media-controls');if(ctrl)ctrl.style.display='none';
-  var mc=document.getElementById('sg-member-count');if(mc)mc.textContent='('+( sg.members||0)+')';
+  var mc=document.getElementById('sg-member-count');if(mc)mc.textContent='('+(sg.members||0)+')';
+  // Show member skeleton
+  var membersEl=document.getElementById('sg-members');
+  if(membersEl)membersEl.innerHTML='<div style="padding:16px;text-align:center;font-size:13px;color:var(--g4)">Loading members…</div>';
   goTo('ring-detail');
+  // Load live data from API
+  if(sg.id){
+    // Load ring detail (has full member list via members_data)
+    API.Rings.detail(sg.id).then(function(ring){
+      var rawMembers=ring.members_data||[];
+      var cnt=rawMembers.length||ring.member_count||0;
+      if(membEl)membEl.textContent=cnt+' members';
+      if(mc)mc.textContent='('+cnt+')';
+      buildSGMembers(rawMembers);
+    }).catch(function(e){
+      buildSGMembers([]);
+      console.warn('[Rings] detail failed',e.message);
+    });
+    // Load posts
+    loadRingPosts(sg.id);
+  }
 }
 
 // ═══ CREATE RING ═══
@@ -4010,18 +4086,7 @@ async function createRing(){
   try{
     var ring=await API.Rings.create({name:name,subject:subj,description:desc,max_participants:max==='Unlimited'?0:parseInt(max)});
     // Add to local SG_DATA so it shows immediately
-    SG_DATA.unshift({
-      id:ring.id,
-      title:ring.name,
-      subj:ring.subject,
-      desc:ring.description||'',
-      host:API.Auth.currentUser()?.full_name||'You',
-      members:1,
-      mine:true,
-      status:'Live now',
-      bg:'linear-gradient(135deg,var(--t8),var(--t7))',
-      icon:'📚',
-    });
+    SG_DATA.unshift(_ringToSG(ring, 0));
     currentRingId=ring.id;
     closeModal('ring-modal');
     buildSGGrid();
@@ -4147,6 +4212,44 @@ async function createRing(){
             if(fc[2]){fn3('cms-fc3-head',fc[2].head);var fl3=fc[2].links||[];fn3('cms-foot-s1',fl3[0]);fn3('cms-foot-s2',fl3[1]);fn3('cms-foot-s3',fl3[2]);}
           }
         }catch(e){}
+      }).catch(function(){});
+  }catch(e){}
+})();
+
+// ─── Landing page: load live study rings from API (no auth needed) ───────────
+(function loadLandingRings(){
+  try{
+    var BASE='https://tutlee-backend.onrender.com';
+    fetch(BASE+'/api/rings/')
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(data){
+        if(!data)return;
+        var list=data.results||data||[];
+        var emptyEl=document.getElementById('landing-rings-empty');
+        var listEl=document.getElementById('landing-rings-list');
+        if(!listEl)return;
+        if(!list.length){if(emptyEl)emptyEl.style.display='block';return;}
+        // Show up to 3 rings on landing page
+        var bgPalette=['linear-gradient(135deg,#0E8F84,#17CFBF)','linear-gradient(135deg,#5243F5,#8B7CF7)','linear-gradient(135deg,#B85F00,#F5A623)'];
+        var iconPalette=['📚','🔬','📐','🎯','🌍','⚗️'];
+        var shown=list.slice(0,3);
+        listEl.innerHTML=shown.map(function(r,i){
+          var isLive=r.is_live||r.is_active;
+          var bg=bgPalette[i%bgPalette.length];
+          var icon=iconPalette[i%iconPalette.length];
+          return'<div style="background:var(--w);border:1px solid var(--g1);border-radius:var(--rxl);overflow:hidden;box-shadow:var(--shm);cursor:pointer" onclick="openAuth(\'get-started\')">'
+            +'<div style="height:80px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:32px;position:relative">'
+            +icon
+            +(isLive?'<span style="position:absolute;top:8px;right:10px;background:rgba(255,255,255,.18);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;backdrop-filter:blur(4px)">● Live</span>':'')
+            +'</div>'
+            +'<div style="padding:14px 16px 18px">'
+            +'<div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:4px">'+r.name+'</div>'
+            +'<div style="font-size:11px;color:var(--g5);margin-bottom:10px">Hosted by '+(r.host_name||r.creator_name||'Tutor')+' · '+(r.member_count||0)+' members</div>'
+            +'<span style="display:inline-block;font-size:11px;font-weight:600;color:var(--t5);background:var(--t1);padding:3px 10px;border-radius:var(--rf)">'+r.subject+'</span>'
+            +'</div></div>';
+        }).join('');
+        listEl.style.display='grid';
+        if(emptyEl)emptyEl.style.display='none';
       }).catch(function(){});
   }catch(e){}
 })();

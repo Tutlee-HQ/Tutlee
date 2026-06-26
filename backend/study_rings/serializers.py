@@ -20,10 +20,15 @@ class StudyRingSerializer(serializers.ModelSerializer):
     host_name     = serializers.SerializerMethodField()   # alias used by frontend
     is_member     = serializers.SerializerMethodField()
     is_live       = serializers.SerializerMethodField()   # frontend checks this
+    members_data  = serializers.SerializerMethodField()   # [{id, full_name, role}]
 
     class Meta:
         model  = StudyRing
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'subject', 'description', 'creator', 'creator_name',
+            'host_name', 'is_featured', 'is_active', 'is_live', 'avatar_color',
+            'created_at', 'member_count', 'is_member', 'members_data',
+        ]
         read_only_fields = ('creator', 'created_at')
 
     def get_creator_name(self, obj):
@@ -41,3 +46,12 @@ class StudyRingSerializer(serializers.ModelSerializer):
 
     def get_is_live(self, obj):
         return obj.is_active
+
+    def get_members_data(self, obj):
+        try:
+            return [
+                {'id': u.id, 'full_name': u.full_name, 'email': u.email, 'role': u.role}
+                for u in obj.members.all()
+            ]
+        except Exception:
+            return []
