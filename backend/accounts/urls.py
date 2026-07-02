@@ -6,6 +6,7 @@ from .views import (
     admin_stats,
     SendOTPView, VerifyOTPView, SiteContentView,
     PasswordResetRequestView, PasswordResetConfirmView,
+    UserSearchView,
 )
 
 urlpatterns = [
@@ -26,5 +27,6 @@ urlpatterns = [
     # Password reset (OTP-based)
     path('password-reset/',         PasswordResetRequestView.as_view(),  name='password-reset-request'),
     path('password-reset/confirm/', PasswordResetConfirmView.as_view(),  name='password-reset-confirm'),
+    path('search/',                 UserSearchView.as_view(),            name='user-search'),
 ]
 

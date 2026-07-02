@@ -19,6 +19,8 @@ class StudyRingSerializer(serializers.ModelSerializer):
     creator_name  = serializers.SerializerMethodField()
     host_name     = serializers.SerializerMethodField()   # alias used by frontend
     is_member     = serializers.SerializerMethodField()
+    is_invited    = serializers.SerializerMethodField()
+    is_creator    = serializers.SerializerMethodField()
     is_live       = serializers.SerializerMethodField()   # frontend checks this
     members_data  = serializers.SerializerMethodField()   # [{id, full_name, role}]
 
@@ -26,8 +28,9 @@ class StudyRingSerializer(serializers.ModelSerializer):
         model  = StudyRing
         fields = [
             'id', 'name', 'subject', 'description', 'creator', 'creator_name',
-            'host_name', 'is_featured', 'is_active', 'is_live', 'avatar_color',
-            'created_at', 'member_count', 'is_member', 'members_data',
+            'host_name', 'is_featured', 'is_active', 'is_live', 'is_private',
+            'avatar_color', 'created_at', 'member_count', 'is_member',
+            'is_invited', 'is_creator', 'members_data',
         ]
         read_only_fields = ('creator', 'created_at')
 
@@ -42,6 +45,18 @@ class StudyRingSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.members.filter(pk=request.user.pk).exists()
+        return False
+
+    def get_is_invited(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.invited_members.filter(pk=request.user.pk).exists()
+        return False
+
+    def get_is_creator(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.creator_id == request.user.pk
         return False
 
     def get_is_live(self, obj):

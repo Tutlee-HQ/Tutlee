@@ -400,7 +400,10 @@ tr:hover td{background:var(--g1)}
 #sg-video-container:fullscreen,#sg-video-container:-webkit-full-screen,#sg-video-container:-moz-full-screen{background:#0A1628;padding:16px;display:flex;flex-direction:column;justify-content:center}
 #sg-video-container:fullscreen #sg-video-grid,#sg-video-container:-webkit-full-screen #sg-video-grid,#sg-video-container:-moz-full-screen #sg-video-grid{flex:1;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;min-height:0}
 #sg-video-container:fullscreen #sg-fs-btn,#sg-video-container:-webkit-full-screen #sg-fs-btn,#sg-video-container:-moz-full-screen #sg-fs-btn{display:inline-flex!important}
-.sg-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.sg-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--w)}
+/* Override chat bubble colours for the light-background study ring chat */
+.sg-chat-msgs .cbbl{background:var(--g1);color:var(--g8);border-radius:10px 10px 10px 2px}
+.sg-chat-msgs .cbbl-me{background:var(--p4);color:#fff;border-radius:10px 10px 2px 10px}
 .sg-inp{padding:10px 12px;border-top:1px solid var(--g2);display:flex;gap:6px;background:var(--w);align-items:center}
 
 /* RING TABS */
@@ -700,7 +703,13 @@ tr:hover td{background:var(--g1)}
         <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Sign in to your Tutlee account.</p>
         <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="signin-email" placeholder="you@university.edu"></div>
         <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="signin-pass" placeholder="Your password"></div>
-        <div style="text-align:right;margin-bottom:16px"><span style="font-size:13px;color:var(--t6);cursor:pointer;font-weight:600" onclick="showForgotPassword()">Forgot password?</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--g6);user-select:none">
+            <input type="checkbox" id="signin-remember" checked style="width:15px;height:15px;accent-color:var(--t6);cursor:pointer">
+            Remember me
+          </label>
+          <span style="font-size:13px;color:var(--t6);cursor:pointer;font-weight:600" onclick="showForgotPassword()">Forgot password?</span>
+        </div>
         <div id="signin-err" style="display:none;color:#9B0F2B;font-size:13px;margin-bottom:10px;padding:8px;background:#FEE;border-radius:6px"></div>
         <button class="btn-full btn-full-p" id="signin-btn" onclick="doSignIn()">Sign in</button>
         <p style="text-align:center;font-size:13px;color:var(--g5);margin-top:14px">No account? <span style="color:var(--t6);font-weight:600;cursor:pointer" onclick="closeAuth();openAuth('signup-learner')">Create one free</span></p>
@@ -1396,16 +1405,29 @@ tr:hover td{background:var(--g1)}
         <h1 style="font-size:20px;font-weight:700;color:var(--g9)" id="ring-detail-title"></h1>
         <span class="tag tt" id="ring-detail-subj"></span>
         <span class="bdg bt" style="font-size:11px" id="ring-detail-live-badge"></span>
+        <span id="ring-private-badge" style="display:none;font-size:10px;font-weight:700;color:var(--p4);background:var(--p0,#EEF2FF);padding:2px 8px;border-radius:20px;border:1px solid var(--p2,#C7D2FE)">Private</span>
       </div>
       <div style="font-size:13px;color:var(--g5);margin-bottom:4px">Hosted by <strong style="color:var(--g7);font-weight:600" id="ring-detail-host"></strong> &middot; <span id="ring-detail-members" style="color:var(--g5)"></span></div>
       <div style="font-size:13px;color:var(--g5);margin-bottom:16px" id="ring-detail-desc"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <button class="btn-lg p" onclick="startStudyRing(currentRingId||'demo')">Join live session</button>
+        <button class="btn-lg p" onclick="openRingPreJoin(currentRingId)">Join live session</button>
         <button class="btn-lg s" onclick="alert('Following this ring.')">Follow ring</button>
         <button id="ring-copy-link-btn" onclick="copyRingInviteLink()" style="display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:40px;border-radius:var(--r);border:1.5px solid var(--g2);background:var(--w);color:var(--g7);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--f);transition:border-color .15s,color .15s">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copy invite link
         </button>
+      </div>
+      <!-- Invite section — shown only for private rings where current user is creator -->
+      <div id="ring-invite-section" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--g1)">
+        <div style="font-size:13px;font-weight:600;color:var(--g8);margin-bottom:8px">Invite members</div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="flex:1;position:relative">
+            <input class="fi" id="ring-invite-inp" placeholder="Email or username" oninput="_ringInviteSearch(this.value)" autocomplete="off" style="width:100%;box-sizing:border-box">
+            <div id="ring-invite-dd" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--w);border:1px solid var(--g2);border-radius:var(--r);z-index:50;max-height:180px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.08)"></div>
+          </div>
+          <button class="btn-sm p" id="ring-invite-btn" onclick="_sendRingInvite()" style="height:40px;padding:0 16px;white-space:nowrap">Send invite</button>
+        </div>
+        <div id="ring-invite-msg" style="font-size:12px;margin-top:6px;display:none"></div>
       </div>
     </div>
   </div>
@@ -1803,8 +1825,8 @@ tr:hover td{background:var(--g1)}
 
 <!-- KYT SUBMISSION FORM -->
 <div class="card" style="margin-top:20px" id="kyt-submit-card">
-  <div class="ct">Submit your KYT documents</div>
-  <div style="font-size:13px;color:var(--g5);margin-bottom:20px;line-height:1.6">Upload your documents below. Our team reviews submissions within 48 hours. You will be notified by email once approved.</div>
+  <div class="ct">Step 1 — Upload your documents</div>
+  <div style="font-size:13px;color:var(--g5);margin-bottom:20px;line-height:1.6">Upload the required documents below. Our team reviews submissions within 48 hours.</div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
     <div class="fg">
@@ -1817,16 +1839,6 @@ tr:hover td{background:var(--g1)}
       <input class="fi" type="file" accept="image/*,.pdf" id="kyt-degree-file" style="padding:8px">
       <div style="font-size:11px;color:var(--g5);margin-top:4px">Degree certificate or official transcript</div>
     </div>
-    <div class="fg">
-      <label class="fl">Demo teaching video</label>
-      <input class="fi" type="file" accept="video/*" id="kyt-demo-file" style="padding:8px">
-      <div style="font-size:11px;color:var(--g5);margin-top:4px">5-minute recording explaining a concept</div>
-    </div>
-    <div class="fg">
-      <label class="fl">Proficiency test score</label>
-      <input class="fi" type="file" accept="image/*,.pdf" id="kyt-score-file" style="padding:8px">
-      <div style="font-size:11px;color:var(--g5);margin-top:4px">Screenshot or PDF of your test result</div>
-    </div>
   </div>
 
   <div class="fg">
@@ -1838,7 +1850,7 @@ tr:hover td{background:var(--g1)}
   <div class="fg">
     <label class="fl">Your specialist topics within those subjects</label>
     <input class="fi" type="text" id="kyt-topics-input" placeholder="e.g. Calculus, Thermodynamics, Cell Transport">
-    <div style="font-size:11px;color:var(--g5);margin-top:4px">Be specific - this is how learners find you for their exact weak areas.</div>
+    <div style="font-size:11px;color:var(--g5);margin-top:4px">Be specific — this is how learners find you for their exact weak areas.</div>
   </div>
 
   <div class="fg">
@@ -1856,8 +1868,34 @@ tr:hover td{background:var(--g1)}
     <div class="pbar" style="height:6px"><div class="pfill pft" id="kyt-upload-bar" style="width:0%;transition:width .3s"></div></div>
   </div>
 
-  <button class="btn-lg p" style="width:100%;justify-content:center" id="kyt-submit-btn" onclick="submitKYT()">Submit for verification</button>
+  <button class="btn-lg p" style="width:100%;justify-content:center" id="kyt-submit-btn" onclick="submitKYT()">Submit documents</button>
   <p style="font-size:12px;color:var(--g5);text-align:center;margin-top:10px">You can still access your dashboard while awaiting verification. Unverified tutors cannot receive bookings.</p>
+</div>
+
+<!-- KYT PROFICIENCY TEST (in-system) -->
+<div class="card" style="margin-top:16px" id="kyt-test-card">
+  <div class="ct">Step 2 — Subject proficiency test</div>
+  <div style="font-size:13px;color:var(--g5);margin-bottom:20px;line-height:1.6">The proficiency test is set by our admin team and completed here in the platform. Answer all questions, then submit.</div>
+  <div id="kyt-test-loading" style="padding:24px;text-align:center;color:var(--g4);font-size:13px">Loading test…</div>
+  <div id="kyt-test-questions" style="display:none;display:flex;flex-direction:column;gap:20px"></div>
+  <div id="kyt-test-submitted" style="display:none;background:var(--ok1);color:#077A3E;font-size:13px;padding:12px 16px;border-radius:var(--r);margin-top:16px"></div>
+  <div id="kyt-test-no-questions" style="display:none;padding:24px;text-align:center">
+    <div style="font-size:32px;margin-bottom:8px">📋</div>
+    <div style="font-size:14px;font-weight:600;color:var(--g8);margin-bottom:4px">Test not yet available</div>
+    <div style="font-size:13px;color:var(--g5)">The admin team will publish the proficiency test once your documents are reviewed. You'll be notified when it's ready.</div>
+  </div>
+  <button class="btn-lg p" style="width:100%;justify-content:center;margin-top:16px" id="kyt-test-submit-btn" onclick="submitKYTTest()" style="display:none">Submit test answers</button>
+</div>
+
+<!-- KYT DEMO SESSION (in-system) -->
+<div class="card" style="margin-top:16px" id="kyt-demo-card">
+  <div class="ct">Step 3 — Live demo teaching session</div>
+  <div style="font-size:13px;color:var(--g5);margin-bottom:20px;line-height:1.6">Instead of uploading a recording, you will do a short live demo session directly within Tutlee. Our team will observe and provide feedback. Click below to request your demo slot.</div>
+  <div id="kyt-demo-status-row" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--g0);border-radius:var(--r);margin-bottom:16px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--g5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+    <div id="kyt-demo-status-text" style="font-size:13px;color:var(--g6)">You have not yet requested a demo session.</div>
+  </div>
+  <button class="btn-lg p" id="kyt-demo-btn" onclick="requestKYTDemo()">Request demo session</button>
 </div>
 </div>
 
@@ -2024,16 +2062,74 @@ tr:hover td{background:var(--g1)}
 </div>
 
 <!-- CREATE RING -->
+<!-- PRE-JOIN CHECK (camera/mic preview before entering study ring) -->
+<div class="m-ov hidden" id="ring-prejoin-modal" onclick="if(event.target===this)_cancelPreJoin()">
+  <div class="modal" style="max-width:480px;padding:0;overflow:hidden;border-radius:var(--rxl)">
+    <!-- Camera preview area -->
+    <div style="background:#0A1628;position:relative;aspect-ratio:16/9">
+      <video id="pj-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
+      <!-- Cam-off overlay -->
+      <div id="pj-cam-off" style="display:none;position:absolute;inset:0;background:#0A1628;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+        <div id="pj-avatar" style="width:64px;height:64px;border-radius:50%;background:var(--t8,#0D9488);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff">ME</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.5)">Camera is off</div>
+      </div>
+      <!-- Controls overlay -->
+      <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:10px">
+        <button id="pj-mic-btn" onclick="_pjToggleMic()" title="Toggle mic"
+          style="width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);color:#fff;transition:background .15s">
+          <svg id="pj-mic-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <button id="pj-cam-btn" onclick="_pjToggleCam()" title="Toggle camera"
+          style="width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);color:#fff;transition:background .15s">
+          <svg id="pj-cam-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        </button>
+      </div>
+    </div>
+    <!-- Bottom panel -->
+    <div style="padding:20px 24px">
+      <h2 style="font-size:16px;font-weight:700;margin-bottom:4px">Ready to join?</h2>
+      <p id="pj-ring-name" style="font-size:13px;color:var(--g5);margin-bottom:16px"></p>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <span id="pj-mic-lbl" style="font-size:12px;color:var(--g6);padding:4px 10px;border-radius:var(--rf);background:var(--g1)">Mic on</span>
+        <span id="pj-cam-lbl" style="font-size:12px;color:var(--g6);padding:4px 10px;border-radius:var(--rf);background:var(--g1)">Camera on</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="_cancelPreJoin()" style="flex:1;padding:10px;border:1.5px solid var(--g2);border-radius:var(--r);background:var(--w);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--f);color:var(--g7)">Cancel</button>
+        <button id="pj-join-btn" onclick="_confirmPreJoin()" class="btn-lg p" style="flex:2;justify-content:center">Join now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="m-ov hidden" id="ring-modal" onclick="if(event.target===this)closeModal('ring-modal')">
   <div class="modal">
     <div class="mcl" onclick="closeModal('ring-modal')">✕</div>
     <h2 style="font-size:18px;font-weight:800;margin-bottom:4px">Create a Study Ring</h2>
-    <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Open group sessions - anyone on Tutlee can join</p>
+    <p style="font-size:13px;color:var(--g5);margin-bottom:20px">Set up a group study session and invite others</p>
     <div class="fg"><label class="fl">Ring name</label><input class="fi" id="ring-name-inp" placeholder="e.g. Integration by Parts Deep Dive"></div>
     <div class="fg"><label class="fl">Subject</label><input class="fi" id="ring-subj-inp" placeholder="e.g. Mathematics, Chemistry"></div>
     <div class="fg"><label class="fl">Topic / description</label><textarea class="fi" id="ring-desc-inp" rows="2" placeholder="What will you cover?"></textarea></div>
-    <div class="fg"><label class="fl">Scheduled date & time</label><input class="fi" type="datetime-local"></div>
-    <div class="fg"><label class="fl">Max participants</label><select class="fi"><option>10</option><option>20</option><option>30</option><option>Unlimited</option></select></div>
+    <div class="fg"><label class="fl">Scheduled date &amp; time</label><input class="fi" type="datetime-local"></div>
+    <!-- Visibility toggle -->
+    <div class="fg" style="margin-bottom:16px">
+      <label class="fl">Visibility</label>
+      <div style="display:flex;gap:8px">
+        <label id="ring-vis-public" style="flex:1;padding:10px 14px;border:1.5px solid var(--t6);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:8px;background:var(--t0)">
+          <input type="radio" name="ring-visibility" value="public" checked style="accent-color:var(--t6)" onchange="_onRingVisChange(this)">
+          <span>
+            <strong style="font-size:13px;font-weight:600;display:block">Public</strong>
+            <span style="font-size:11px;color:var(--g5)">Anyone on Tutlee can join</span>
+          </span>
+        </label>
+        <label id="ring-vis-private" style="flex:1;padding:10px 14px;border:1.5px solid var(--g2);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:8px;background:var(--w)">
+          <input type="radio" name="ring-visibility" value="private" style="accent-color:var(--t6)" onchange="_onRingVisChange(this)">
+          <span>
+            <strong style="font-size:13px;font-weight:600;display:block">Private</strong>
+            <span style="font-size:11px;color:var(--g5)">Invite-only via email or username</span>
+          </span>
+        </label>
+      </div>
+    </div>
     <button class="btn-full btn-full-p" style="margin-bottom:8px" id="ring-create-btn" onclick="createRing()">Create Ring</button>
     <button class="btn-full btn-full-s" onclick="closeModal('ring-modal')">Cancel</button>
   </div>
@@ -2182,6 +2278,7 @@ function switchAuthTab(t){
 async function doSignIn(){
   var email=(document.getElementById('signin-email')?.value||'').trim();
   var pass=document.getElementById('signin-pass')?.value||'';
+  var rememberMe=(document.getElementById('signin-remember')?.checked!==false); // default true
   var btn=document.getElementById('signin-btn');
   var errEl=document.getElementById('signin-err');
   if(!email||!pass){if(errEl){errEl.textContent='Please enter your email and password.';errEl.style.display='block';}return;}
@@ -2202,6 +2299,10 @@ async function doSignIn(){
       }
       showToast('Check your email — we just sent a verification code');
       return;
+    }
+    // If "Remember me" is unchecked, remove persisted tokens — session ends on tab close
+    if(!rememberMe){
+      try{localStorage.removeItem('_t_a');localStorage.removeItem('_t_r');localStorage.removeItem('_t_u');}catch(e){}
     }
     closeAuth();
     var u=data.user;
@@ -2443,7 +2544,7 @@ function goTo(id){
     showToast('This section is for learners only');
     return;
   }
-  try { localStorage.setItem('_t_screen', id); } catch(e){}
+  try { localStorage.setItem('_t_screen', id); sessionStorage.setItem('_t_screen', id); } catch(e){}
   try { history.replaceState(null, '', '#' + id); } catch(e){}
   closeNav(); // close mobile drawer on every navigation
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
@@ -2462,6 +2563,7 @@ function goTo(id){
   if(id==='progress')loadRecordings();
   if(id==='settings')populateSettingsForm();
   if(id==='assessments')loadAssessmentsTab();
+  if(id==='verification')setTimeout(loadKYTPage,300);
   if(id==='messages')buildMsgList();
   if(id==='passport')loadPassportData();
   if(id==='tutor-match')loadTutorMatch();
@@ -2476,7 +2578,7 @@ function setMode(m){
 }
 function signOut(){
   // Clear all stored tokens so the session is fully destroyed
-  try{['_t_a','_t_r','_t_u','_t_screen'].forEach(function(k){localStorage.removeItem(k);});}catch(e){}
+  try{['_t_a','_t_r','_t_u','_t_screen'].forEach(function(k){localStorage.removeItem(k);sessionStorage.removeItem(k);});}catch(e){}
   try{API.Auth.logout();}catch(e){}
   var app=document.getElementById('vapp');
   if(app){app.classList.remove('active');app.style.display='none';}
@@ -2942,6 +3044,9 @@ function _ringToSG(r,i){
     subj:r.subject,
     desc:r.description||'',
     host:r.host_name||r.creator_name||'Tutor',
+    creator_id:r.creator||null,
+    is_private:r.is_private||false,
+    is_creator:r.is_creator||false,
     members:r.member_count||0,
     mine:r.is_member||false,
     status:r.is_live||r.is_active?'Live now':'Upcoming',
@@ -3087,7 +3192,7 @@ function _appendSGChat(initials,color,sender,text,isMe){
   var row=document.createElement('div');
   row.style.cssText='display:flex;gap:8px;align-items:flex-start'+(isMe?';flex-direction:row-reverse':'');
   row.innerHTML='<div style="width:28px;height:28px;border-radius:50%;background:'+color+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">'+initials+'</div>'
-    +'<div><div style="font-size:11px;color:var(--g4);margin-bottom:2px;'+(isMe?'text-align:right':'')+'">'+sender+'</div><div class="cbbl">'+text+'</div></div>';
+    +'<div style="max-width:75%"><div style="font-size:11px;color:var(--g4);margin-bottom:2px;'+(isMe?'text-align:right':'')+'">'+sender+'</div><div class="cbbl'+(isMe?' cbbl-me':'')+'">'+text+'</div></div>';
   msgs.appendChild(row);
   msgs.scrollTop=msgs.scrollHeight;
 }
@@ -3822,13 +3927,10 @@ function submitKYT() {
   var fd = new FormData();
   var idFile     = document.getElementById('kyt-id-file').files[0];
   var degreeFile = document.getElementById('kyt-degree-file').files[0];
-  var demoFile   = document.getElementById('kyt-demo-file').files[0];
-  var scoreFile  = document.getElementById('kyt-score-file').files[0];
+  // NOTE: demo video and proficiency score file fields removed — handled in-system
 
   if (idFile)     fd.append('id_document', idFile);
   if (degreeFile) fd.append('degree_document', degreeFile);
-  if (demoFile)   fd.append('demo_video', demoFile);
-  if (scoreFile)  fd.append('proficiency_score_doc', scoreFile);
 
   fd.append('subjects', subjects);
   fd.append('specialist_topics', topics);
@@ -3860,11 +3962,13 @@ function submitKYT() {
       progLbl.textContent = 'Upload complete';
       succEl.style.display = 'block';
       document.getElementById('kyt-submit-card').style.opacity = '0.6';
-      btn.textContent = 'Submitted';
+      btn.textContent = 'Submitted'; btn.disabled = true;
       // Update tutor profile subjects
       var subjList = subjects.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
       window.API.Users.updateTutorProfile({ subjects: subjList, hourly_rate: rate }).catch(function(){});
       loadUserDashboard(window.API.Auth.currentUser());
+      // Load proficiency test now that app exists
+      loadKYTTest();
     } else {
       var msg = 'Submission failed. Please try again.';
       try { var r = JSON.parse(xhr.responseText); msg = r.detail || msg; } catch(e2){}
@@ -3886,6 +3990,133 @@ function submitKYT() {
   xhr.open('POST', base + '/api/kyt/submit/');
   if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
   xhr.send(fd);
+}
+
+// ═══ KYT PROFICIENCY TEST ═══
+async function loadKYTTest(){
+  var loadEl=document.getElementById('kyt-test-loading');
+  var questEl=document.getElementById('kyt-test-questions');
+  var noQEl=document.getElementById('kyt-test-no-questions');
+  var subEl=document.getElementById('kyt-test-submitted');
+  var btn=document.getElementById('kyt-test-submit-btn');
+  if(loadEl)loadEl.style.display='block';
+  if(questEl)questEl.style.display='none';
+  if(noQEl)noQEl.style.display='none';
+  if(subEl)subEl.style.display='none';
+  if(btn)btn.style.display='none';
+  try{
+    var data=await API.KYT.getTest();
+    if(loadEl)loadEl.style.display='none';
+    if(data.already_submitted){
+      if(subEl){
+        subEl.innerHTML='<strong>Test submitted!</strong> Your score: <strong>'+(data.score!==null?data.score+'%':'pending review')+'</strong>';
+        subEl.style.display='block';
+      }
+      return;
+    }
+    if(!data.has_questions||!data.questions||!data.questions.length){
+      if(noQEl)noQEl.style.display='block';
+      return;
+    }
+    // Build question UI
+    if(questEl){
+      questEl.innerHTML=data.questions.map(function(q,i){
+        var opts=(q.options||[]).map(function(opt,j){
+          return '<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid var(--g2);border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--g8);transition:border-color .15s;margin-bottom:6px" onmouseover="this.style.borderColor=\'var(--t6)\'" onmouseout="if(!this.querySelector(\'input\').checked)this.style.borderColor=\'var(--g2)\'">'
+            +'<input type="radio" name="kyt-q-'+i+'" value="'+j+'" style="margin-top:2px;accent-color:var(--t6);flex-shrink:0" onchange="_kytOptChange(this,'+i+')">'
+            +'<span>'+opt+'</span></label>';
+        }).join('');
+        return '<div style="padding:16px;background:var(--g0);border-radius:var(--r)" data-q-idx="'+i+'">'
+          +'<div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:12px"><span style="color:var(--t6);font-weight:700">Q'+(i+1)+'.</span> '+q.question+'</div>'
+          +'<div>'+opts+'</div></div>';
+      }).join('');
+      questEl.style.display='flex';
+    }
+    if(btn)btn.style.display='flex';
+  }catch(e){
+    if(loadEl)loadEl.style.display='none';
+    // No application yet — hide test card
+    var tc=document.getElementById('kyt-test-card');
+    if(tc)tc.style.display='none';
+  }
+}
+
+function _kytOptChange(radio,qIdx){
+  // Highlight selected option
+  var group=document.querySelectorAll('input[name="kyt-q-'+qIdx+'"]');
+  group.forEach(function(r){
+    var lbl=r.closest('label');
+    if(lbl)lbl.style.borderColor=r.checked?'var(--t6)':'var(--g2)';
+  });
+}
+
+var _kytAnswers=[];
+async function submitKYTTest(){
+  var btn=document.getElementById('kyt-test-submit-btn');
+  var subEl=document.getElementById('kyt-test-submitted');
+  var questEl=document.getElementById('kyt-test-questions');
+  // Collect answers
+  var questions=questEl?questEl.querySelectorAll('[data-q-idx]'):[];
+  var answers=[];
+  var allAnswered=true;
+  for(var i=0;i<questions.length;i++){
+    var sel=questEl.querySelector('input[name="kyt-q-'+i+'"]:checked');
+    if(!sel){allAnswered=false;break;}
+    answers.push(parseInt(sel.value));
+  }
+  if(!allAnswered){showToast('Please answer all questions before submitting.');return;}
+  if(btn){btn.textContent='Submitting…';btn.disabled=true;}
+  try{
+    var res=await API.KYT.submitTest(answers);
+    if(questEl)questEl.style.display='none';
+    if(btn)btn.style.display='none';
+    if(subEl){
+      var scoreMsg=res.score!==null?'Your score: <strong>'+res.score+'%</strong>.':'';
+      subEl.innerHTML='<strong>Test submitted!</strong> '+scoreMsg+' The admin team will review your result.';
+      subEl.style.display='block';
+    }
+    showToast('Proficiency test submitted!');
+  }catch(e){
+    showToast(e.message||'Failed to submit test. Please try again.');
+    if(btn){btn.textContent='Submit test answers';btn.disabled=false;}
+  }
+}
+
+// ═══ KYT DEMO SESSION ═══
+async function requestKYTDemo(){
+  var btn=document.getElementById('kyt-demo-btn');
+  var statusEl=document.getElementById('kyt-demo-status-text');
+  if(btn){btn.textContent='Requesting…';btn.disabled=true;}
+  try{
+    var res=await API.KYT.requestDemo();
+    if(statusEl)statusEl.textContent=res.message||'Demo session requested — the team will contact you to schedule.';
+    if(btn){btn.textContent='Request sent';btn.disabled=true;}
+    showToast('Demo session request sent!');
+  }catch(e){
+    showToast(e.message||'Could not send request. Please try again.');
+    if(btn){btn.textContent='Request demo session';btn.disabled=false;}
+  }
+}
+
+// Load proficiency test and demo session status when the verification page opens
+function loadKYTPage(){
+  loadKYTTest();
+  // Load demo status
+  API.KYT.myApp().then(function(app){
+    var statusEl=document.getElementById('kyt-demo-status-text');
+    var btn=document.getElementById('kyt-demo-btn');
+    if(app.demo_session_done){
+      if(statusEl)statusEl.textContent='Demo session completed!';
+      if(btn){btn.textContent='Completed';btn.disabled=true;}
+    }else if(app.demo_session_requested){
+      if(statusEl)statusEl.textContent='Demo session requested — the team will contact you to schedule.';
+      if(btn){btn.textContent='Request sent';btn.disabled=true;}
+    }
+  }).catch(function(){
+    // No application yet — hide demo card
+    var dc=document.getElementById('kyt-demo-card');
+    if(dc)dc.style.display='none';
+  });
 }
 
 // ═══ BOOKING GUARD ═══
@@ -4139,6 +4370,87 @@ async function loadSummary(){
   }
 }
 
+// ═══ PRE-JOIN PREVIEW ═══
+var _pjStream=null,_pjMicOn=true,_pjCamOn=true,_pjRingId=null;
+
+async function openRingPreJoin(ringId){
+  if(!ringId){showToast('No ring selected.');return;}
+  _pjRingId=ringId;_pjMicOn=true;_pjCamOn=true;
+
+  // Populate ring name label
+  var sg=SG_DATA.find(function(r){return String(r.id)===String(ringId);});
+  var nameEl=document.getElementById('pj-ring-name');
+  if(nameEl)nameEl.textContent=sg?sg.title||sg.name||'Study Ring':'Study Ring';
+
+  // Set user initials in cam-off avatar
+  var user=API.Auth.currentUser();
+  var nm=(user&&(user.full_name||user.first_name))||'You';
+  var av=nm.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'ME';
+  var avEl=document.getElementById('pj-avatar');if(avEl)avEl.textContent=av;
+
+  // Reset button states
+  _pjSyncButtons();
+
+  // Get camera/mic preview
+  try{
+    _pjStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    var vid=document.getElementById('pj-video');
+    if(vid){vid.srcObject=_pjStream;vid.style.display='block';}
+    var camOff=document.getElementById('pj-cam-off');if(camOff)camOff.style.display='none';
+  }catch(e){
+    // Cam denied — show cam-off overlay and proceed with audio-only
+    _pjCamOn=false;
+    var camOff=document.getElementById('pj-cam-off');if(camOff)camOff.style.display='flex';
+    try{_pjStream=await navigator.mediaDevices.getUserMedia({video:false,audio:true});}catch(_){}
+    _pjSyncButtons();
+    showToast('Camera unavailable — joining audio only');
+  }
+
+  document.getElementById('ring-prejoin-modal').classList.remove('hidden');
+}
+
+function _pjToggleMic(){
+  _pjMicOn=!_pjMicOn;
+  if(_pjStream)_pjStream.getAudioTracks().forEach(function(t){t.enabled=_pjMicOn;});
+  _pjSyncButtons();
+}
+
+function _pjToggleCam(){
+  _pjCamOn=!_pjCamOn;
+  if(_pjStream)_pjStream.getVideoTracks().forEach(function(t){t.enabled=_pjCamOn;});
+  var vid=document.getElementById('pj-video');
+  var camOff=document.getElementById('pj-cam-off');
+  if(vid)vid.style.display=_pjCamOn?'block':'none';
+  if(camOff)camOff.style.display=_pjCamOn?'none':'flex';
+  _pjSyncButtons();
+}
+
+function _pjSyncButtons(){
+  var mb=document.getElementById('pj-mic-btn');
+  var cb=document.getElementById('pj-cam-btn');
+  var ml=document.getElementById('pj-mic-lbl');
+  var cl=document.getElementById('pj-cam-lbl');
+  var RED='rgba(211,47,47,.85)',NORM='rgba(255,255,255,.15)';
+  if(mb){mb.style.background=_pjMicOn?NORM:RED;}
+  if(cb){cb.style.background=_pjCamOn?NORM:RED;}
+  if(ml){ml.textContent=_pjMicOn?'Mic on':'Mic off';ml.style.color=_pjMicOn?'var(--g6)':'var(--err)';}
+  if(cl){cl.textContent=_pjCamOn?'Camera on':'Camera off';cl.style.color=_pjCamOn?'var(--g6)':'var(--err)';}
+}
+
+function _cancelPreJoin(){
+  document.getElementById('ring-prejoin-modal').classList.add('hidden');
+  if(_pjStream){_pjStream.getTracks().forEach(function(t){t.stop();});_pjStream=null;}
+}
+
+function _confirmPreJoin(){
+  var ringId=_pjRingId;
+  var micOn=_pjMicOn,camOn=_pjCamOn;
+  var stream=_pjStream;
+  _pjStream=null; // transfer ownership to startStudyRing
+  document.getElementById('ring-prejoin-modal').classList.add('hidden');
+  startStudyRing(ringId,{micOn:micOn,camOn:camOn,existingStream:stream});
+}
+
 // ═══ WEBRTC — STUDY RINGS (multi-party mesh) ═══
 // sgMyPeerId  — assigned by server on 'init'; used as the "from" field in every message
 // sgPeers     — map of peerId → RTCPeerConnection
@@ -4148,7 +4460,7 @@ async function loadSummary(){
 //   peer_joined → someone else joined; they will send us an offer, we just wait
 //   offer/answer/ICE → always include {peerId: mySelf, to: targetPeer}; server routes point-to-point
 //   peer_left → close that peer's connection + remove their video tile
-var sgPeers={},sgStream=null,sgWS=null,sgRoomId=null,sgMicOn=true,sgCamOn=true,sgMyPeerId=null;
+var sgPeers={},sgStream=null,sgWS=null,sgRoomId=null,sgMicOn=true,sgCamOn=true,sgMyPeerId=null,sgIsHost=false;
 var _sgAudioCtx=null,_sgAnalyser=null,_sgAudioRAF=null;
 
 // ── AUDIO VISUALIZER ────────────────────────────────────────────────────────
@@ -4224,17 +4536,36 @@ function _syncRingLocalTile(){
 }
 var currentRingId=null;
 
-async function startStudyRing(ringId){
+async function startStudyRing(ringId,opts){
+  var initMicOn=(opts&&opts.micOn!==undefined)?opts.micOn:true;
+  var initCamOn=(opts&&opts.camOn!==undefined)?opts.camOn:true;
+  var existingStream=(opts&&opts.existingStream)||null;
+
   sgRoomId=ringId;
   sgMyPeerId=null;
+  // Determine if current user is the ring creator (host)
+  var _curUser=API.Auth.currentUser();
+  var _ring=SG_DATA.find(function(r){return String(r.id)===String(ringId);});
+  sgIsHost=!!((_curUser&&_ring)&&(String(_curUser.id)===String(_ring.creator_id)));
+
   var grid=document.getElementById('sg-video-grid');
   if(grid)grid.innerHTML='';
 
-  // Get local media
+  // Get local media — reuse pre-join stream if caller already acquired it
   try{
-    sgStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-    addRingVideo('local',sgStream,true);
+    if(existingStream){
+      sgStream=existingStream;
+    }else{
+      sgStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    }
+    // Apply pre-join mic/cam preferences immediately
+    sgMicOn=initMicOn; sgCamOn=initCamOn;
+    sgStream.getAudioTracks().forEach(function(t){t.enabled=sgMicOn;});
+    sgStream.getVideoTracks().forEach(function(t){t.enabled=sgCamOn;});
+    addRingVideo('local',sgStream,true,sgIsHost);
     _startRingAudioViz(sgStream);
+    // Show cam-off overlay on local tile if starting with cam off
+    if(!sgCamOn)setTimeout(function(){_syncRingLocalTile();},100);
   }catch(e){
     showToast('Camera/mic access denied. Check browser permissions.');
     return;
@@ -4297,7 +4628,9 @@ async function startStudyRing(ringId){
   var btn=document.querySelector('#screen-ring-detail .btn-lg.p');
   if(btn){btn.textContent='Leave Ring';btn.onclick=function(){leaveStudyRing();};}
   _addSGActivity('You joined the ring');
-  showToast('Joined study ring — camera and mic are live');
+  var micStatus=sgMicOn?'mic on':'mic muted';
+  var camStatus=sgCamOn?'camera on':'camera off';
+  showToast('Joined study ring — '+micStatus+', '+camStatus);
 }
 
 var _SG_ICE=[
@@ -4349,7 +4682,7 @@ async function handleRingOffer(msg){
   }catch(err){console.warn('[Ring] handleOffer failed',err);}
 }
 
-function addRingVideo(peerId,stream,isLocal){
+function addRingVideo(peerId,stream,isLocal,isHost){
   var grid=document.getElementById('sg-video-grid');if(!grid)return;
   if(document.getElementById('rv-'+peerId))return;
   var wrap=document.createElement('div');
@@ -4360,10 +4693,20 @@ function addRingVideo(peerId,stream,isLocal){
   if(isLocal)vid.muted=true;
   vid.srcObject=stream;
   vid.style.cssText='width:100%;height:100%;object-fit:cover';
-  var lbl=document.createElement('div');
+  // Name label row: "You" or "Participant" + optional Host badge
+  var lblRow=document.createElement('div');
+  lblRow.style.cssText='position:absolute;bottom:8px;left:10px;display:flex;align-items:center;gap:6px';
+  var lbl=document.createElement('span');
   lbl.textContent=isLocal?'You':'Participant';
-  lbl.style.cssText='position:absolute;bottom:8px;left:10px;font-size:11px;font-weight:600;color:rgba(255,255,255,.85);background:rgba(0,0,0,.45);padding:2px 8px;border-radius:20px';
-  wrap.appendChild(vid);wrap.appendChild(lbl);
+  lbl.style.cssText='font-size:11px;font-weight:600;color:rgba(255,255,255,.85);background:rgba(0,0,0,.45);padding:2px 8px;border-radius:20px';
+  lblRow.appendChild(lbl);
+  if(isHost){
+    var hostBadge=document.createElement('span');
+    hostBadge.textContent='Host';
+    hostBadge.style.cssText='font-size:10px;font-weight:700;color:#fff;background:var(--p4,#5243F5);padding:2px 7px;border-radius:20px;letter-spacing:.3px';
+    lblRow.appendChild(hostBadge);
+  }
+  wrap.appendChild(vid);wrap.appendChild(lblRow);
   grid.appendChild(wrap);
 }
 
@@ -4604,6 +4947,15 @@ function openRingDetail(sg){
     badgeEl.textContent = isLive ? '● Live now · ' + (sg.members||0) + ' active' : sg.status||'';
     badgeEl.style.display = badgeEl.textContent ? 'inline-flex' : 'none';
   }
+  // Private badge + invite section
+  var privBadge=document.getElementById('ring-private-badge');
+  var invSec=document.getElementById('ring-invite-section');
+  if(privBadge)privBadge.style.display=sg.is_private?'inline-flex':'none';
+  if(invSec)invSec.style.display=(sg.is_private&&sg.is_creator)?'block':'none';
+  // Clear invite input/results
+  var invInp=document.getElementById('ring-invite-inp');if(invInp)invInp.value='';
+  var invMsg=document.getElementById('ring-invite-msg');if(invMsg)invMsg.style.display='none';
+  var invDd=document.getElementById('ring-invite-dd');if(invDd)invDd.style.display='none';
   // Reset join button to loading state while we check membership
   // Also neutralise the hardcoded HTML onclick so it can't fire before we set the real handler
   var btn = document.querySelector('#screen-ring-detail .btn-lg.p');
@@ -4676,27 +5028,91 @@ async function joinRingAsMember(ringId,btn){
   }
 }
 
+// ═══ RING INVITE (private rings) ═══
+var _ringInviteTimer=null;
+var _ringInviteSelected=null; // {id, email, full_name}
+
+function _ringInviteSearch(q){
+  _ringInviteSelected=null;
+  var dd=document.getElementById('ring-invite-dd');
+  if(q.length<2){if(dd)dd.style.display='none';return;}
+  clearTimeout(_ringInviteTimer);
+  _ringInviteTimer=setTimeout(async function(){
+    try{
+      var res=await API.Search.users(q);
+      var list=res.results||res||[];
+      if(!dd)return;
+      if(!list.length){dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--g5)">No users found</div>';dd.style.display='block';return;}
+      dd.innerHTML=list.map(function(u){
+        var name=u.full_name||((u.first_name||'')+' '+(u.last_name||'')).trim()||u.email;
+        return '<div data-uid="'+u.id+'" data-email="'+u.email+'" data-name="'+name+'" onclick="_selectInviteUser(this)" '
+          +'style="padding:10px 14px;cursor:pointer;font-size:13px;color:var(--g8);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--g1)" '
+          +'onmouseover="this.style.background=\'var(--g0)\'" onmouseout="this.style.background=\'\'"><span>'+name+'</span>'
+          +'<span style="font-size:11px;color:var(--g4);margin-left:auto">'+u.email+'</span></div>';
+      }).join('');
+      dd.style.display='block';
+    }catch(e){console.warn('[Invite search]',e);}
+  },300);
+}
+
+function _selectInviteUser(el){
+  _ringInviteSelected={id:el.dataset.uid,email:el.dataset.email,full_name:el.dataset.name};
+  var inp=document.getElementById('ring-invite-inp');
+  if(inp)inp.value=el.dataset.name+' ('+el.dataset.email+')';
+  var dd=document.getElementById('ring-invite-dd');if(dd)dd.style.display='none';
+}
+
+async function _sendRingInvite(){
+  if(!currentRingId){return;}
+  var inp=document.getElementById('ring-invite-inp');
+  var btn=document.getElementById('ring-invite-btn');
+  var msg=document.getElementById('ring-invite-msg');
+  var identifier=_ringInviteSelected?_ringInviteSelected.email:(inp?inp.value.trim():'');
+  if(!identifier){showToast('Enter an email or username to invite.');return;}
+  if(btn){btn.textContent='Sending…';btn.disabled=true;}
+  try{
+    var res=await API.Rings.invite(currentRingId,identifier);
+    var name=res.invitee?res.invitee.full_name||res.invitee.email:identifier;
+    if(msg){msg.textContent='Invite sent to '+name+' — they\'ll receive an email notification.';msg.style.color='var(--t6)';msg.style.display='block';}
+    if(inp){inp.value='';}_ringInviteSelected=null;
+  }catch(e){
+    if(msg){msg.textContent=e.message||'Could not send invite. Check the email or username.';msg.style.color='var(--err)';msg.style.display='block';}
+  }finally{
+    if(btn){btn.textContent='Send invite';btn.disabled=false;}
+    setTimeout(function(){if(msg)msg.style.display='none';},4000);
+  }
+}
+
 // ═══ CREATE RING ═══
+function _onRingVisChange(radio){
+  var pub=document.getElementById('ring-vis-public');
+  var priv=document.getElementById('ring-vis-private');
+  var isPrivate=radio.value==='private';
+  if(pub){pub.style.borderColor=isPrivate?'var(--g2)':'var(--t6)';pub.style.background=isPrivate?'var(--w)':'var(--t0)';}
+  if(priv){priv.style.borderColor=isPrivate?'var(--t6)':'var(--g2)';priv.style.background=isPrivate?'var(--t0)':'var(--w)';}
+}
+
 async function createRing(){
   var btn=document.getElementById('ring-create-btn');
   var name=document.getElementById('ring-name-inp')?.value?.trim();
   var subj=document.getElementById('ring-subj-inp')?.value?.trim();
   var desc=document.getElementById('ring-desc-inp')?.value?.trim();
-  var maxSel=document.querySelector('#ring-modal select.fi');
-  var max=maxSel?maxSel.value:'20';
+  var visEl=document.querySelector('#ring-modal input[name="ring-visibility"]:checked');
+  var isPrivate=visEl?visEl.value==='private':false;
 
   if(!name||!subj){showToast('Please enter a ring name and subject.');return;}
   if(btn){btn.textContent='Creating...';btn.disabled=true;}
 
   try{
-    var ring=await API.Rings.create({name:name,subject:subj,description:desc,max_participants:max==='Unlimited'?0:parseInt(max)});
+    var ring=await API.Rings.create({name:name,subject:subj,description:desc,is_private:isPrivate});
     // Add to local SG_DATA so it shows immediately
     SG_DATA.unshift(_ringToSG(ring, 0));
     currentRingId=ring.id;
     closeModal('ring-modal');
     buildSGGrid();
-    showToast('Study ring created! Joining now...');
-    setTimeout(function(){goTo('ring-detail');startStudyRing(ring.id);},400);
+    var msg=isPrivate?'Private ring created! You can now invite members.':'Study ring created! Joining now...';
+    showToast(msg);
+    setTimeout(function(){goTo('ring-detail');openRingDetail(SG_DATA[0]);},400);
   }catch(e){
     showToast(e.message||'Failed to create ring. Please try again.');
     if(btn){btn.textContent='Create Ring';btn.disabled=false;}
@@ -4723,9 +5139,9 @@ var _pendingRingInviteId=(function(){
     var user=API.Auth.restoreSession();
     if(user){
       var _name=(user.full_name||(user.first_name||'')+' '+(user.last_name||'')).trim()||'User';
-      // Hash routing takes priority; fall back to localStorage
+      // Hash routing → sessionStorage → localStorage (sessionStorage survives reload but not tab close)
       var hashScreen=(window.location.hash||'').slice(1).replace(/[^a-z0-9-]/g,'');
-      var storedScreen=localStorage.getItem('_t_screen')||'';
+      var storedScreen=sessionStorage.getItem('_t_screen')||localStorage.getItem('_t_screen')||'';
       var candidate=hashScreen||storedScreen;
       var safeScreens=['dashboard','tutor-match','sessions','assessments','progress',
         'study-groups','ring-detail','book','messages','payments','settings',

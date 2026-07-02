@@ -429,3 +429,21 @@ class SiteContentView(APIView):
         obj, _ = SiteContent.objects.update_or_create(key=key, defaults={'content': content})
         return Response({'key': obj.key, 'updated_at': obj.updated_at})
 
+
+# ─── USER SEARCH (for ring invite typeahead) ─────────────────────────────────
+class UserSearchView(generics.ListAPIView):
+    """GET /api/accounts/search/?q=... — authenticated users search for others by name/email/username."""
+    serializer_class   = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        q = self.request.query_params.get('q', '').strip()
+        if len(q) < 2:
+            return User.objects.none()
+        return User.objects.filter(
+            Q(email__icontains=q) |
+            Q(username__icontains=q) |
+            Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) |
+            Q(full_name__icontains=q)
+        ).exclude(pk=self.request.user.pk)[:15]

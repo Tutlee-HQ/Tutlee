@@ -10,6 +10,8 @@ class StudyRing(models.Model):
     members     = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='study_rings', blank=True)
     is_featured = models.BooleanField(default=False)
     is_active   = models.BooleanField(default=True)
+    is_private  = models.BooleanField(default=False)
+    invited_members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='ring_invites', blank=True)
     avatar_color = models.CharField(max_length=7, default='#0D9488')
     created_at  = models.DateTimeField(auto_now_add=True)
 

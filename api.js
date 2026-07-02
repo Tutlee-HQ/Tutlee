@@ -57,9 +57,17 @@ const TutleeAPI = (() => {
       // Persist refreshed tokens so the next page reload uses the valid token
       try { localStorage.setItem('_t_a', _access); if (data.refresh) localStorage.setItem('_t_r', _refresh); } catch(e) {}
       return true;
-    } catch {
-      _access = _refresh = _user = null;
-      if (_onAuthChange) _onAuthChange(null);
+    } catch(err) {
+      // Only clear session on genuine auth rejection — NOT on network errors or Render cold-start timeouts.
+      // A network error means err.status is undefined; a real rejection is 401/403/400.
+      const status = err && err.status;
+      if (status === 401 || status === 403 || status === 400) {
+        _access = _refresh = _user = null;
+        try { localStorage.removeItem('_t_a'); localStorage.removeItem('_t_r'); localStorage.removeItem('_t_u'); } catch(e) {}
+        if (_onAuthChange) _onAuthChange(null);
+      }
+      // For network errors (status undefined) we keep tokens in memory + localStorage intact
+      // so next retry or page reload will re-attempt the refresh
       return false;
     }
   }
@@ -206,11 +214,18 @@ const TutleeAPI = (() => {
 
   // ── KYT ──────────────────────────────────────────────────────────────────────
   const KYT = {
-    submit:   (formData) => _upload('POST', '/api/kyt/submit/', formData),
-    myApp:    ()         => get('/api/kyt/me/'),
-    list:     (status='')=> get(`/api/kyt/${status ? '?status='+status : ''}`),
-    approve:  (id)       => post(`/api/kyt/${id}/approve/`),
-    reject:   (id, data) => post(`/api/kyt/${id}/reject/`, data),
+    submit:           (formData)  => _upload('POST', '/api/kyt/submit/', formData),
+    myApp:            ()          => get('/api/kyt/me/'),
+    list:             (status='') => get(`/api/kyt/${status ? '?status='+status : ''}`),
+    approve:          (id)        => post(`/api/kyt/${id}/approve/`),
+    reject:           (id, data)  => post(`/api/kyt/${id}/reject/`, data),
+    // Proficiency test
+    getTest:          ()          => get('/api/kyt/proficiency/'),
+    submitTest:       (answers)   => post('/api/kyt/proficiency/', { answers }),
+    setQuestions:     (questions) => post('/api/kyt/proficiency/set/', { questions }),
+    // Demo session
+    requestDemo:      ()          => post('/api/kyt/demo/request/'),
+    markDemoComplete: (id)        => post(`/api/kyt/${id}/demo/complete/`),
   };
 
   // ── STUDY RINGS ───────────────────────────────────────────────────────────────
@@ -223,8 +238,14 @@ const TutleeAPI = (() => {
     join:    (id)         => post(`/api/rings/${id}/join/`),
     leave:   (id)         => post(`/api/rings/${id}/leave/`),
     feature: (id)         => post(`/api/rings/${id}/feature/`),
+    invite:  (id, emailOrUsername) => post(`/api/rings/${id}/invite/`, { email_or_username: emailOrUsername }),
     posts:   (id)         => get(`/api/rings/${id}/posts/`),
     addPost: (id, data)   => post(`/api/rings/${id}/posts/`, data),
+  };
+
+  // ── USER SEARCH ───────────────────────────────────────────────────────────────
+  const Search = {
+    users: (q) => get(`/api/accounts/search/?q=${encodeURIComponent(q)}`),
   };
 
   // ── REPORTS ───────────────────────────────────────────────────────────────────
@@ -270,7 +291,7 @@ const TutleeAPI = (() => {
   };
 
   // Public surface
-  return { Auth, Users, Sessions, Assessments, KYT, Rings, Reports, Payments, Content, Messages, ping, APIError };
+  return { Auth, Users, Sessions, Assessments, KYT, Rings, Search, Reports, Payments, Content, Messages, ping, APIError };
 
 })();
 
