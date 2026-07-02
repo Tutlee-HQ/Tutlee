@@ -1,1 +1,1 @@
-web: daphne -b 0.0.0.0 -p $PORT tutlee.asgi:application
+web: python manage.py migrate && (python manage.py seed || true) && daphne -b 0.0.0.0 -p $PORT tutlee.asgi:application
