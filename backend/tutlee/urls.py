@@ -54,7 +54,7 @@ urlpatterns = [
 
     path('', TemplateView.as_view(template_name='index.html'), name='app'),
     path('admin-panel/', TemplateView.as_view(template_name='admin.html'), name='admin-panel'),
-
+    re_path(r'^img/(?P<path>.*)$', serve, {'document_root': os.path.join(str(settings.BASE_DIR.parent), 'img')}),
     path('api/auth/login/',   LoginView.as_view(),        name='token_obtain'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
