@@ -123,8 +123,8 @@ body{font-family:var(--f);background:var(--w);color:var(--g9);font-size:14px;lin
 /* HERO */
 .hero{position:relative;padding-top:64px;background:var(--lp-bk);overflow:hidden}
 .hero-photo{position:relative;min-height:640px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#3a3226 0%,#1a140c 55%,#0a0906 100%);background-size:cover;background-position:center;overflow:hidden}
-.hero-photo::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,8,5,.35) 0%,rgba(10,8,5,.55) 55%,rgba(6,5,3,.85) 100%)}
-.hero-photo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85}
+.hero-photo::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,8,5,.35) 0%,rgba(10,8,5,.55) 55%,rgba(6,5,3,.85) 100%);z-index:1}
+.hero-photo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;z-index:0}
 .hero-content{position:relative;z-index:2;max-width:720px;margin:0 auto;padding:64px 32px 96px;text-align:center}
 .hero-lbl{display:block;font-size:12px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}
 .hero-h1{font-size:44px;font-weight:800;line-height:1.15;letter-spacing:-1px;color:var(--w);margin-bottom:18px}
