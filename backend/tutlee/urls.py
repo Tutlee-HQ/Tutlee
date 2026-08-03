@@ -9,6 +9,11 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from accounts.views import LoginView, SiteContentView
 import os
 
+def serve_img_cached(request, path, document_root=None, **kwargs):
+    response = serve(request, path, document_root=document_root, **kwargs)
+    response['Cache-Control'] = 'public, max-age=604800'  # cache images for 7 days
+    return response
+
 
 def serve_js_file(filename):
     """Serve a JS file — checks multiple locations so it works locally and on Render."""
@@ -54,7 +59,8 @@ urlpatterns = [
 
     path('', TemplateView.as_view(template_name='index.html'), name='app'),
     path('admin-panel/', TemplateView.as_view(template_name='admin.html'), name='admin-panel'),
-    re_path(r'^img/(?P<path>.*)$', serve, {'document_root': os.path.join(str(settings.BASE_DIR.parent), 'img')}),
+  
+    re_path(r'^img/(?P<path>.*)$', serve_img_cached, {'document_root': os.path.join(str(settings.BASE_DIR.parent), 'img')}),
     path('api/auth/login/',   LoginView.as_view(),        name='token_obtain'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
