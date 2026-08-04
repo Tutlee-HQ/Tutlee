@@ -2,62 +2,132 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Terms of Service – Tutlee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
-body{font-family:system-ui,sans-serif;margin:0;background:#fafafa;color:#1a1a2e}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:#fff;border-bottom:1px solid #eee}
-.nav a.logo{font-weight:700;font-size:20px;color:#1a1a2e;text-decoration:none}
-.nav-links a{margin-left:20px;text-decoration:none;color:#555;font-size:14px}
-.content{padding:80px 40px;max-width:760px;margin:0 auto}
-.content h1{font-size:36px;font-weight:800;margin-bottom:8px}
-.content .date{color:#999;font-size:13px;margin-bottom:40px}
-.content h2{font-size:20px;font-weight:700;margin:32px 0 10px}
-.content p,.content ul{color:#555;line-height:1.8;font-size:15px;margin-bottom:16px}
-.content ul{padding-left:20px}
-footer{background:#1a1a2e;color:#aaa;text-align:center;padding:32px;font-size:13px}
-footer a{color:#aaa;text-decoration:none;margin:0 10px}
+:root{--blk:#0F1318;--blk2:#000000;--g9:#0F0720;--g8:#1E1040;--g7:#3B3B3B;--g6:#6A6A6A;--g5:#8B8B8B;--g4:#B0B0B0;--g3:#D4D4D4;--g2:#EDEDED;--g1:#F5F5F5;--g0:#FAFAFA;--w:#FFFFFF;--lp-line:rgba(255,255,255,.1);--f:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--w);color:var(--g9);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--g2);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px}
+.nav a.logo{font-weight:800;font-size:20px;color:var(--g9);display:flex;align-items:center;gap:8px;letter-spacing:-.4px}
+.nav a.logo .logo-ic{width:32px;height:32px;background:var(--blk);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.nav a.logo img{width:100%;height:100%;object-fit:contain;padding:5px}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-size:13.5px;font-weight:500;color:var(--g7)}
+.nav-links a:hover{color:var(--blk)}
+.nav-links a.active{color:var(--blk);font-weight:700}
+.pp-hero{position:relative;background:var(--blk2);height:220px;display:flex;align-items:center;justify-content:center}
+.pp-hero h1{color:var(--w);font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.5px}
+.pp-wrap{max-width:760px;margin:0 auto;padding:56px 32px 96px}
+.pp-updated{text-align:center;font-size:15px;font-weight:700;margin-bottom:8px}
+.pp-intro{text-align:center;color:var(--g6);font-size:14.5px;line-height:1.8;max-width:620px;margin:0 auto 48px}
+.pp-wrap h2{font-size:21px;font-weight:800;letter-spacing:-.3px;margin:40px 0 12px;padding-top:16px;border-top:1px solid var(--g2)}
+.pp-wrap h2:first-of-type{border-top:none;padding-top:0}
+.pp-wrap p{color:var(--g6);font-size:14.5px;line-height:1.8;margin-bottom:14px}
+.pp-wrap ul{color:var(--g6);font-size:14.5px;line-height:1.9;margin-bottom:14px;padding-left:20px}
+.pp-wrap strong{color:var(--g9)}
+.pp-wrap a{color:var(--blk);font-weight:600;text-decoration:underline}
+.lfooter{background:#000000;padding:56px 0 28px}
+.footer-in{max-width:1200px;margin:0 auto;padding:0 32px}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;padding-bottom:28px;margin-bottom:28px;border-bottom:1px solid var(--lp-line)}
+.footer-top h3{font-size:20px;font-weight:800;color:var(--w);margin-bottom:6px}
+.fb-p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:380px}
+.footer-sub{display:flex;gap:8px}
+.footer-sub input{padding:11px 14px;border-radius:10px;border:1px solid var(--lp-line);background:transparent;color:var(--w);font-size:13px;font-family:var(--f);outline:none;width:220px}
+.footer-sub input::placeholder{color:rgba(255,255,255,.4)}
+.footer-sub button{padding:11px 18px;background:var(--w);color:#000;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f);white-space:nowrap}
+.footer-g{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-bottom:32px}
+.fc h4{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.fc a{display:block;font-size:13px;color:rgba(255,255,255,.55);margin-bottom:10px}
+.fc a:hover{color:var(--w)}
+.fb-bot{border-top:1px solid var(--lp-line);padding-top:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.fb-bot p{font-size:12px;color:rgba(255,255,255,.35)}
+.footer-brand-row{display:flex;align-items:center;gap:8px}
+.footer-brand-row .logo-ic{width:22px;height:22px;background:#0F1318;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.footer-brand-row img{width:100%;height:100%;object-fit:contain;padding:3px}
+@media (max-width:600px){.nav-links{display:none}.footer-g{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <nav class="nav">
-  <a class="logo" href="/">Tutlee</a>
+  <a class="logo" href="/"><span class="logo-ic"><img src="img/logo-mark-white-square.png" alt="Tutlee"></span>Tutlee</a>
   <div class="nav-links">
-    <a href="/index.html#features">Features</a>
-    <a href="/index.html#pricing">Pricing</a>
     <a href="/about.html">About</a>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html" class="active">Terms</a>
   </div>
 </nav>
-<div class="content">
-  <h1>Terms of Service</h1>
-  <p class="date">Last updated: June 2026</p>
-  <p>These Terms of Service govern your use of the Tutlee platform. By creating an account or using Tutlee, you agree to be bound by these terms.</p>
+<div class="pp-hero"><h1>Terms of Service</h1></div>
+<div class="pp-wrap">
+  <p class="pp-updated">Last Updated: 4 August 2026</p>
+  <p class="pp-intro">These Terms of Service ("Terms") govern your use of Tutlee, operated by Tutlee OÜ, a company registered in Tallinn, Estonia. By creating an account or using Tutlee, you agree to these Terms.</p>
+
   <h2>1. Eligibility</h2>
-  <p>You must be at least 18 years old to create a Tutlee account. By registering, you confirm that you meet this requirement.</p>
-  <h2>2. Account Responsibilities</h2>
-  <p>You are responsible for maintaining the security of your account credentials. You must not share your account with others or use another person's account without permission.</p>
-  <h2>3. Acceptable Use</h2>
+  <p>You must be 18 years or older to create a Tutlee account. By registering, you confirm that you meet this requirement and that the information you provide is accurate.</p>
+  <p>Tutlee is built for students. Accounts are verified using a university email address or, where a domain can't be automatically verified, through manual review of supporting documentation.</p>
+
+  <h2>2. Your account</h2>
+  <ul>
+    <li>You're responsible for keeping your login credentials secure.</li>
+    <li>You're responsible for all activity that happens under your account.</li>
+    <li>Notify us immediately at <a href="mailto:support@tutlee.com">support@tutlee.com</a> if you suspect unauthorized access to your account.</li>
+  </ul>
+
+  <h2>3. Acceptable use</h2>
   <p>You agree not to:</p>
   <ul>
-    <li>Use the platform for any unlawful purpose</li>
-    <li>Harass, abuse, or harm other users</li>
-    <li>Attempt to gain unauthorised access to any part of the platform</li>
-    <li>Reproduce or redistribute platform content without permission</li>
+    <li>Use Tutlee for any unlawful purpose or in violation of our <a href="/community.html">Community Guidelines</a></li>
+    <li>Misrepresent your identity, academic status, or qualifications</li>
+    <li>Attempt to bypass tutor verification (KYT) requirements</li>
+    <li>Complete assessments on another person's behalf, or facilitate others doing so</li>
+    <li>Attempt to move a paid booking off-platform to avoid Tutlee's fees or protections</li>
+    <li>Interfere with or disrupt the platform's operation or security</li>
   </ul>
-  <h2>4. Subscriptions and Billing</h2>
-  <p>Paid plans are billed monthly. You may cancel at any time. Cancellations take effect at the end of the current billing period. We do not provide partial refunds.</p>
-  <h2>5. Intellectual Property</h2>
-  <p>All content on the Tutlee platform, including text, graphics, and software, is owned by Tutlee or its licensors. You may not copy or redistribute this content without our express written consent.</p>
-  <h2>6. Limitation of Liability</h2>
-  <p>To the maximum extent permitted by law, Tutlee is not liable for any indirect, incidental, or consequential damages arising from your use of the platform.</p>
-  <h2>7. Changes to Terms</h2>
-  <p>We may update these Terms from time to time. We will notify you of significant changes via email or a notice on the platform. Continued use constitutes acceptance of the updated Terms.</p>
-  <h2>8. Contact</h2>
-  <p>Questions about these Terms? Email us at <a href="mailto:legal@tutlee.com">legal@tutlee.com</a>.</p>
+
+  <h2>4. Tutoring sessions &amp; Study Rings</h2>
+  <p>Learners book sessions with tutors verified through Tutlee's KYT process. Study Rings are open, peer-led group sessions and are not a substitute for formal tutoring. Tutlee is a platform connecting learners and tutors — sessions are conducted between users, and Tutlee is not itself providing educational instruction.</p>
+
+  <h2>5. Payments &amp; subscriptions</h2>
+  <p>Learners pay for individual sessions and optional subscription tiers (Learner Pro, Tutor Pro). Tutors earn from completed sessions, subject to Tutlee's commission structure, detailed on our <a href="/pricing.html">Pricing</a> page. See our <a href="/refund.html">Refund Policy</a> for cancellation and refund terms.</p>
+
+  <h2>6. Content &amp; intellectual property</h2>
+  <p>You retain ownership of content you create or share on Tutlee (messages, whiteboard content, uploaded documents). By using Tutlee, you grant us a limited license to store and process that content as needed to provide the service — for example, generating post-session assessments.</p>
+  <p>The Tutlee name, logo, and platform design are the property of Tutlee OÜ and may not be used without permission.</p>
+
+  <h2>7. Termination</h2>
+  <p>You may close your account at any time from Settings. We may suspend or terminate accounts that violate these Terms or our Community Guidelines, including for academic fraud, harassment, or safety concerns.</p>
+
+  <h2>8. Disclaimers &amp; limitation of liability</h2>
+  <p>Tutlee is provided "as is." We do our best to verify tutors and maintain a safe platform, but we can't guarantee uninterrupted service or specific learning outcomes. To the extent permitted by law, Tutlee OÜ is not liable for indirect or consequential damages arising from your use of the platform.</p>
+
+  <h2>9. Governing law</h2>
+  <p>These Terms are governed by the laws of Estonia. Any disputes will be handled in accordance with Estonian law, without regard to conflict-of-law principles.</p>
+
+  <h2>10. Changes to these Terms</h2>
+  <p>We may update these Terms from time to time. Material changes will be reflected by updating the "Last Updated" date above, and where appropriate, we'll notify you directly.</p>
+
+  <h2>11. Contact</h2>
+  <p>Questions about these Terms? Email <a href="mailto:support@tutlee.com">support@tutlee.com</a>.</p>
 </div>
-<footer>
-  <p>&copy; 2026 Tutlee. All rights reserved.</p>
-  <p><a href="/about.html">About</a><a href="/research.html">Research</a><a href="/blog.html">Blog</a><a href="/careers.html">Careers</a><a href="/help.html">Help</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a></p>
+<footer class="lfooter">
+  <div class="footer-in">
+    <div class="footer-top">
+      <div><div class="footer-brand-row"><h3>Tutlee.</h3></div><p class="fb-p">The global peer-to-peer learning platform where students learn, teach, and grow together.</p></div>
+      <form class="footer-sub" onsubmit="event.preventDefault();this.reset();"><input type="email" placeholder="Enter your email" required><button type="submit">Subscribe</button></form>
+    </div>
+    <div class="footer-g">
+      <div class="fc"><h4>Product</h4><a href="/features.html">Features</a><a href="/index.html">Become a Tutor</a><a href="/index.html">Start as a Learner</a><a href="/index.html#study-rings">Study Rings</a><a href="/pricing.html">Pricing</a></div>
+      <div class="fc"><h4>Company</h4><a href="/about.html">About Us</a><a href="/careers.html">Careers</a><a href="/press.html">Press</a><a href="/partners.html">Partners</a><a href="/contact.html">Contact Us</a></div>
+      <div class="fc"><h4>Resources</h4><a href="/help.html">Help Center</a><a href="/community.html">Community Guidelines</a><a href="/blog.html">Blog</a><a href="/success-stories.html">Success Stories</a></div>
+      <div class="fc"><h4>Social</h4><a href="https://x.com" target="_blank" rel="noopener">X</a><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a><a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a><a href="https://tiktok.com" target="_blank" rel="noopener">TikTok</a><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></div>
+      <div class="fc"><h4>Support &amp; Legal</h4><a href="/privacy.html">Privacy Policy</a><a href="/cookies.html">Cookie Policy</a><a href="/refund.html">Refund Policy</a><a href="/terms.html">Terms of Service</a></div>
+    </div>
+    <div class="fb-bot"><div class="footer-brand-row"><div class="logo-ic"><img src="img/logo-mark-white-square.png" alt="Tutlee"></div><span style="color:#fff;font-weight:700;font-size:14px">Tutlee</span></div><p><span>© 2026 Tutlee OÜ. All rights reserved.</span> <span style="margin-left:6px">Made for students, everywhere.</span></p></div>
+  </div>
 </footer>
 </body>
 </html>
