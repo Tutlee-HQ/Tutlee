@@ -5444,8 +5444,10 @@ var _pendingRingInviteId=(function(){
 })();
 
 (function(){
-  try{
-    var user=API.Auth.restoreSession();
+  function tryRestore(){
+    if(!window.API||!window.API.Auth){setTimeout(tryRestore,50);return;}
+    try{
+      var user=API.Auth.restoreSession();
     if(user){
       var _name=(user.full_name||(user.first_name||'')+' '+(user.last_name||'')).trim()||'User';
       // Hash routing → sessionStorage → localStorage (sessionStorage survives reload but not tab close)
@@ -5475,8 +5477,9 @@ var _pendingRingInviteId=(function(){
     } else if(_pendingRingInviteId){
       // Not logged in — store ring ID; after login we open it
       try{localStorage.setItem('_t_pending_ring',_pendingRingInviteId);}catch(e){}
-    }
-  }catch(e){}
+}catch(e){}
+  }
+  tryRestore();
 })();
 
 // ─── Wake up Render backend silently on page load ────────────────────────────
