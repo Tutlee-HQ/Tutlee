@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Contact Us – Tutlee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blk:#0F1318;--blk2:#000000;
+  --g9:#0F0720;--g8:#1E1040;--g7:#3B3B3B;--g6:#6A6A6A;--g5:#8B8B8B;--g4:#B0B0B0;--g3:#D4D4D4;--g2:#EDEDED;--g1:#F5F5F5;--g0:#FAFAFA;--w:#FFFFFF;
+  --lp-line:rgba(255,255,255,.1);
+  --f:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--w);color:var(--g9);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--g2);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px}
+.nav a.logo{font-weight:800;font-size:20px;color:var(--g9);display:flex;align-items:center;gap:8px;letter-spacing:-.4px}
+.nav a.logo .logo-ic{width:32px;height:32px;background:var(--blk);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.nav a.logo img{width:100%;height:100%;object-fit:contain;padding:5px}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-size:13.5px;font-weight:500;color:var(--g7)}
+.nav-links a:hover{color:var(--blk)}
+.nav-links a.active{color:var(--blk);font-weight:700}
+
+/* HERO */
+.ct-hero{background:var(--blk2);padding:64px 32px;text-align:center}
+.ct-hero h1{color:var(--w);font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-1px;margin-bottom:14px}
+.ct-hero p{color:rgba(255,255,255,.6);font-size:14.5px;max-width:480px;margin:0 auto;line-height:1.7}
+
+/* MAIN */
+.ct-wrap{max-width:1000px;margin:0 auto;padding:64px 32px 96px;display:grid;grid-template-columns:1fr 1.2fr;gap:48px}
+.ct-side h2{font-size:20px;font-weight:800;margin-bottom:14px}
+.ct-side>p{font-size:14px;color:var(--g6);line-height:1.7;margin-bottom:28px}
+.ct-item{display:flex;gap:12px;margin-bottom:20px}
+.ct-item .ic{width:38px;height:38px;border-radius:10px;background:var(--g1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ct-item h4{font-size:13.5px;font-weight:700;margin-bottom:2px}
+.ct-item a,.ct-item span{font-size:13px;color:var(--g6)}
+.ct-item a:hover{color:var(--blk)}
+
+.ct-form{background:var(--g0);border:1px solid var(--g2);border-radius:18px;padding:32px}
+.ct-row{margin-bottom:16px}
+.ct-row label{display:block;font-size:12.5px;font-weight:700;color:var(--g8);margin-bottom:6px}
+.ct-row input,.ct-row select,.ct-row textarea{width:100%;padding:11px 14px;border:1.5px solid var(--g2);border-radius:10px;font-size:13.5px;color:var(--g9);font-family:var(--f);outline:none;background:var(--w)}
+.ct-row textarea{resize:none;height:110px}
+.ct-row input:focus,.ct-row select:focus,.ct-row textarea:focus{border-color:var(--blk)}
+.btn-ct{width:100%;padding:13px;background:var(--blk2);color:var(--w);border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--f)}
+.btn-ct:hover{background:#1a1a1a}
+.ct-note{font-size:11.5px;color:var(--g5);margin-top:10px;text-align:center}
+
+/* FOOTER — reused from other pages for site-wide consistency */
+.lfooter{background:#000000;padding:56px 0 28px}
+.footer-in{max-width:1200px;margin:0 auto;padding:0 32px}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;padding-bottom:28px;margin-bottom:28px;border-bottom:1px solid var(--lp-line)}
+.footer-top h3{font-size:20px;font-weight:800;color:var(--w);margin-bottom:6px}
+.fb-p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:380px}
+.footer-sub{display:flex;gap:8px}
+.footer-sub input{padding:11px 14px;border-radius:10px;border:1px solid var(--lp-line);background:transparent;color:var(--w);font-size:13px;font-family:var(--f);outline:none;width:220px}
+.footer-sub input::placeholder{color:rgba(255,255,255,.4)}
+.footer-sub button{padding:11px 18px;background:var(--w);color:#000;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f);white-space:nowrap}
+.footer-g{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-bottom:32px}
+.fc h4{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.fc a{display:block;font-size:13px;color:rgba(255,255,255,.55);margin-bottom:10px}
+.fc a:hover{color:var(--w)}
+.fb-bot{border-top:1px solid var(--lp-line);padding-top:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.fb-bot p{font-size:12px;color:rgba(255,255,255,.35)}
+.footer-brand-row{display:flex;align-items:center;gap:8px}
+.footer-brand-row .logo-ic{width:22px;height:22px;background:#0F1318;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.footer-brand-row img{width:100%;height:100%;object-fit:contain;padding:3px}
+
+@media (max-width:800px){
+  .ct-wrap{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .nav-links{display:none}
+  .footer-g{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="logo" href="/"><span class="logo-ic"><img src="img/logo-mark-white-square.png" alt="Tutlee"></span>Tutlee</a>
+  <div class="nav-links">
+    <a href="/index.html#features">Find Tutors</a>
+    <a href="/index.html#study-rings">Study Rings</a>
+    <a href="/about.html">About</a>
+    <a href="/partners.html">Partners</a>
+    <a href="/contact.html" class="active">Contact</a>
+  </div>
+</nav>
+
+<section class="ct-hero">
+  <h1>Get in Touch</h1>
+  <p>Questions about Tutlee, a partnership idea, or press inquiry? We'd love to hear from you.</p>
+</section>
+
+<div class="ct-wrap">
+  <div class="ct-side">
+    <h2>Contact information</h2>
+    <p>Reach out directly, or use the form — we aim to respond within a reasonable timeframe.</p>
+
+    <div class="ct-item">
+      <div class="ic">✉️</div>
+      <div><h4>General support</h4><a href="mailto:support@tutlee.com">support@tutlee.com</a></div>
+    </div>
+    <div class="ct-item">
+      <div class="ic">📰</div>
+      <div><h4>Press &amp; media</h4><a href="mailto:press@tutlee.com">press@tutlee.com</a></div>
+    </div>
+    <div class="ct-item">
+      <div class="ic">🤝</div>
+      <div><h4>Partnerships</h4><a href="/partners.html">tutlee.com/partners</a></div>
+    </div>
+    <div class="ct-item">
+      <div class="ic">🔒</div>
+      <div><h4>Privacy requests</h4><a href="mailto:privacy@tutlee.com">privacy@tutlee.com</a></div>
+    </div>
+    <div class="ct-item">
+      <div class="ic">📍</div>
+      <div><h4>Headquarters</h4><span>Tallinn, Estonia</span></div>
+    </div>
+  </div>
+
+  <form class="ct-form" onsubmit="event.preventDefault();this.querySelector('.ct-sent').style.display='block';this.reset();">
+    <div class="ct-row"><label>Name</label><input type="text" placeholder="Your full name" required></div>
+    <div class="ct-row"><label>Email</label><input type="email" placeholder="you@example.com" required></div>
+    <div class="ct-row"><label>What's this about?</label>
+      <select required>
+        <option value="" disabled selected>Select a topic</option>
+        <option>General question</option>
+        <option>Partnership inquiry</option>
+        <option>Press &amp; media</option>
+        <option>Report a problem</option>
+        <option>Something else</option>
+      </select>
+    </div>
+    <div class="ct-row"><label>Message</label><textarea placeholder="How can we help?" required></textarea></div>
+    <button type="submit" class="btn-ct">Send message</button>
+    <p class="ct-note ct-sent" style="display:none;color:#0E8F84;font-weight:600">Thanks — your message has been noted. We'll get back to you soon.</p>
+  </form>
+</div>
+
+<footer class="lfooter">
+  <div class="footer-in">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-row"><h3>Tutlee.</h3></div>
+        <p class="fb-p">The global peer-to-peer learning platform where students learn, teach, and grow together.</p>
+      </div>
+      <form class="footer-sub" onsubmit="event.preventDefault();this.reset();">
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+    <div class="footer-g">
+      <div class="fc"><h4>Product</h4>
+        <a href="/index.html#features">Find Tutors</a>
+        <a href="/index.html">Become a Tutor</a>
+        <a href="/index.html">Start as a Learner</a>
+        <a href="/index.html#study-rings">Study Rings</a>
+        <a href="/index.html#pricing">Pricing</a>
+      </div>
+      <div class="fc"><h4>Company</h4>
+        <a href="/about.html">About Us</a>
+        <a href="/careers.html">Careers</a>
+        <a href="/press.html">Press</a>
+        <a href="/partners.html">Partners</a>
+        <a href="/contact.html">Contact Us</a>
+      </div>
+      <div class="fc"><h4>Resources</h4>
+        <a href="/help.html">Help Center</a>
+        <a href="/community.html">Community Guidelines</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/success-stories.html">Success Stories</a>
+      </div>
+      <div class="fc"><h4>Social</h4>
+        <a href="https://x.com" target="_blank" rel="noopener">X</a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://tiktok.com" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+      </div>
+      <div class="fc"><h4>Support &amp; Legal</h4>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/cookies.html">Cookie Policy</a>
+        <a href="/refund.html">Refund Policy</a>
+        <a href="/terms.html">Terms of Service</a>
+      </div>
+    </div>
+    <div class="fb-bot">
+      <div class="footer-brand-row"><div class="logo-ic"><img src="img/logo-mark-white-square.png" alt="Tutlee"></div><span style="color:#fff;font-weight:700;font-size:14px">Tutlee</span></div>
+      <p><span>© 2026 Tutlee OÜ. All rights reserved.</span> <span style="margin-left:6px">Made for students, everywhere.</span></p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
