@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Success Stories – Tutlee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--blk:#0F1318;--blk2:#000000;--g9:#0F0720;--g8:#1E1040;--g7:#3B3B3B;--g6:#6A6A6A;--g5:#8B8B8B;--g4:#B0B0B0;--g3:#D4D4D4;--g2:#EDEDED;--g1:#F5F5F5;--g0:#FAFAFA;--w:#FFFFFF;--lp-line:rgba(255,255,255,.1);--f:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--w);color:var(--g9);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--g2);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px}
+.nav a.logo{font-weight:800;font-size:20px;color:var(--g9);display:flex;align-items:center;gap:8px;letter-spacing:-.4px}
+.nav a.logo .logo-ic{width:32px;height:32px;background:var(--blk);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.nav a.logo img{width:100%;height:100%;object-fit:contain;padding:5px}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-size:13.5px;font-weight:500;color:var(--g7)}
+.nav-links a:hover{color:var(--blk)}
+.nav-links a.active{color:var(--blk);font-weight:700}
+.ss-hero{background:var(--blk2);padding:72px 32px;text-align:center}
+.ss-hero h1{color:var(--w);font-size:clamp(32px,5vw,48px);font-weight:800;letter-spacing:-1px;margin-bottom:16px}
+.ss-hero p{color:rgba(255,255,255,.6);font-size:15px;max-width:560px;margin:0 auto;line-height:1.8}
+.ss-wrap{max-width:760px;margin:0 auto;padding:72px 32px}
+.ss-empty{border:1.5px dashed var(--g2);border-radius:20px;padding:64px 32px;text-align:center}
+.ss-empty .ic{width:56px;height:56px;border-radius:16px;background:var(--g1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:26px}
+.ss-empty h3{font-size:18px;font-weight:700;margin-bottom:10px}
+.ss-empty p{font-size:14px;color:var(--g6);max-width:420px;margin:0 auto 24px;line-height:1.7}
+.btn-ss{display:inline-block;padding:12px 26px;background:var(--blk2);color:var(--w);border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--f)}
+.ss-what{max-width:900px;margin:0 auto;padding:0 32px 96px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ss-what-card{background:var(--g0);border:1px solid var(--g2);border-radius:14px;padding:22px;text-align:center}
+.ss-what-card .ic{font-size:24px;margin-bottom:10px}
+.ss-what-card h4{font-size:13.5px;font-weight:700;margin-bottom:6px}
+.ss-what-card p{font-size:12.5px;color:var(--g6);line-height:1.6}
+.lfooter{background:#000000;padding:56px 0 28px}
+.footer-in{max-width:1200px;margin:0 auto;padding:0 32px}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;padding-bottom:28px;margin-bottom:28px;border-bottom:1px solid var(--lp-line)}
+.footer-top h3{font-size:20px;font-weight:800;color:var(--w);margin-bottom:6px}
+.fb-p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:380px}
+.footer-sub{display:flex;gap:8px}
+.footer-sub input{padding:11px 14px;border-radius:10px;border:1px solid var(--lp-line);background:transparent;color:var(--w);font-size:13px;font-family:var(--f);outline:none;width:220px}
+.footer-sub input::placeholder{color:rgba(255,255,255,.4)}
+.footer-sub button{padding:11px 18px;background:var(--w);color:#000;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f);white-space:nowrap}
+.footer-g{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-bottom:32px}
+.fc h4{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.fc a{display:block;font-size:13px;color:rgba(255,255,255,.55);margin-bottom:10px}
+.fc a:hover{color:var(--w)}
+.fb-bot{border-top:1px solid var(--lp-line);padding-top:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.fb-bot p{font-size:12px;color:rgba(255,255,255,.35)}
+.footer-brand-row{display:flex;align-items:center;gap:8px}
+.footer-brand-row .logo-ic{width:22px;height:22px;background:#0F1318;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.footer-brand-row img{width:100%;height:100%;object-fit:contain;padding:3px}
+@media (max-width:700px){.ss-what{grid-template-columns:1fr}}
+@media (max-width:600px){.nav-links{display:none}.footer-g{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="logo" href="/"><span class="logo-ic"><img src="img/logo-mark-white-square.png" alt="Tutlee"></span>Tutlee</a>
+  <div class="nav-links">
+    <a href="/index.html#features">Find Tutors</a>
+    <a href="/index.html#study-rings">Study Rings</a>
+    <a href="/about.html">About</a>
+    <a href="/success-stories.html" class="active">Success Stories</a>
+  </div>
+</nav>
+
+<section class="ss-hero">
+  <h1>Success Stories</h1>
+  <p>Real stories from the students learning and teaching on Tutlee — coming soon.</p>
+</section>
+
+<div class="ss-wrap">
+  <div class="ss-empty">
+    <div class="ic">🌱</div>
+    <h3>We're just getting started</h3>
+    <p>Tutlee is a new platform, so we don't have student stories to share here yet. Once our first learners and tutors complete sessions, we'll feature their experiences here.</p>
+    <a href="/index.html" class="btn-ss">Be one of our first users</a>
+  </div>
+</div>
+
+<div class="ss-what">
+  <div class="ss-what-card"><div class="ic">🎓</div><h4>Learner journeys</h4><p>How students found the right tutor and improved through assessment-tracked progress.</p></div>
+  <div class="ss-what-card"><div class="ic">💰</div><h4>Tutor earnings</h4><p>How student tutors built income and experience by teaching what they know.</p></div>
+  <div class="ss-what-card"><div class="ic">🔥</div><h4>Study Ring wins</h4><p>How peer-led group sessions helped students prepare for exams together.</p></div>
+</div>
+
+<footer class="lfooter">
+  <div class="footer-in">
+    <div class="footer-top">
+      <div><div class="footer-brand-row"><h3>Tutlee.</h3></div><p class="fb-p">The global peer-to-peer learning platform where students learn, teach, and grow together.</p></div>
+      <form class="footer-sub" onsubmit="event.preventDefault();this.reset();"><input type="email" placeholder="Enter your email" required><button type="submit">Subscribe</button></form>
+    </div>
+    <div class="footer-g">
+      <div class="fc"><h4>Product</h4><a href="/index.html#features">Find Tutors</a><a href="/index.html">Become a Tutor</a><a href="/index.html">Start as a Learner</a><a href="/index.html#study-rings">Study Rings</a><a href="/pricing.html">Pricing</a></div>
+      <div class="fc"><h4>Company</h4><a href="/about.html">About Us</a><a href="/careers.html">Careers</a><a href="/press.html">Press</a><a href="/partners.html">Partners</a><a href="/contact.html">Contact Us</a></div>
+      <div class="fc"><h4>Resources</h4><a href="/help.html">Help Center</a><a href="/community.html">Community Guidelines</a><a href="/blog.html">Blog</a><a href="/success-stories.html">Success Stories</a></div>
+      <div class="fc"><h4>Social</h4><a href="https://x.com" target="_blank" rel="noopener">X</a><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a><a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a><a href="https://tiktok.com" target="_blank" rel="noopener">TikTok</a><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></div>
+      <div class="fc"><h4>Support &amp; Legal</h4><a href="/privacy.html">Privacy Policy</a><a href="/cookies.html">Cookie Policy</a><a href="/refund.html">Refund Policy</a><a href="/terms.html">Terms of Service</a></div>
+    </div>
+    <div class="fb-bot"><div class="footer-brand-row"><div class="logo-ic"><img src="img/logo-mark-white-square.png" alt="Tutlee"></div><span style="color:#fff;font-weight:700;font-size:14px">Tutlee</span></div><p><span>© 2026 Tutlee OÜ. All rights reserved.</span> <span style="margin-left:6px">Made for students, everywhere.</span></p></div>
+  </div>
+</footer>
+</body>
+</html>
