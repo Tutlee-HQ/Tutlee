@@ -82,6 +82,12 @@ urlpatterns = [
     path('research.html', TemplateView.as_view(template_name='research.html'), name='research'),
     path('safety.html',   TemplateView.as_view(template_name='safety.html'),   name='safety'),
     path('terms.html',    TemplateView.as_view(template_name='terms.html'),    name='terms'),
+    path('cookies.html', TemplateView.as_view(template_name='cookies.html'), name='cookies'),
+    path('community.html', TemplateView.as_view(template_name='community.html'), name='community'),
+    path('success-stories.html', TemplateView.as_view(template_name='success-stories.html'), name='success-stories'),
+    path('features.html', TemplateView.as_view(template_name='features.html'), name='features'),
+    path('pricing.html', TemplateView.as_view(template_name='pricing.html'), name='pricing'),
+    path('refund.html', TemplateView.as_view(template_name='refund.html'), name='refund'),
     path('api/content/<str:key>/', SiteContentView.as_view(), name='site-content'),
     path('api/content/',          SiteContentView.as_view(), name='site-content-default'),
     # Serve uploaded media files unconditionally (bypasses DEBUG-only static() helper)
