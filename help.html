@@ -2,74 +2,288 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Help Centre – Tutlee</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Help Center – Tutlee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
-body{font-family:system-ui,sans-serif;margin:0;background:#fafafa;color:#1a1a2e}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:#fff;border-bottom:1px solid #eee}
-.nav a.logo{font-weight:700;font-size:20px;color:#1a1a2e;text-decoration:none}
-.nav-links a{margin-left:20px;text-decoration:none;color:#555;font-size:14px}
-.hero{padding:80px 40px;max-width:760px;margin:0 auto}
-.hero h1{font-size:40px;font-weight:800;margin-bottom:16px}
-.hero p{font-size:18px;color:#555;line-height:1.7}
-.section{padding:0 40px 80px;max-width:760px;margin:0 auto}
-.section h2{font-size:26px;font-weight:700;margin-bottom:20px}
-details{background:#fff;border:1px solid #eee;border-radius:10px;margin-bottom:10px;padding:0}
-summary{padding:18px 20px;font-weight:600;cursor:pointer;font-size:15px;list-style:none}
+:root{
+  --blk:#0F1318;--blk2:#000000;
+  --g9:#0F0720;--g8:#1E1040;--g7:#3B3B3B;--g6:#6A6A6A;--g5:#8B8B8B;--g4:#B0B0B0;--g3:#D4D4D4;--g2:#EDEDED;--g1:#F5F5F5;--g0:#FAFAFA;--w:#FFFFFF;
+  --lp-line:rgba(255,255,255,.1);
+  --f:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--w);color:var(--g9);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--g2);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px}
+.nav a.logo{font-weight:800;font-size:20px;color:var(--g9);display:flex;align-items:center;gap:8px;letter-spacing:-.4px}
+.nav a.logo .logo-ic{width:32px;height:32px;background:var(--blk);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.nav a.logo img{width:100%;height:100%;object-fit:contain;padding:5px}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-size:13.5px;font-weight:500;color:var(--g7)}
+.nav-links a:hover{color:var(--blk)}
+.nav-links a.active{color:var(--blk);font-weight:700}
+
+/* HERO */
+.hc-hero{background:var(--blk2);padding:64px 32px;text-align:center}
+.hc-hero h1{color:var(--w);font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-1px;margin-bottom:14px}
+.hc-hero p{color:rgba(255,255,255,.6);font-size:14.5px;max-width:480px;margin:0 auto;line-height:1.7}
+.hc-search{max-width:480px;margin:28px auto 0;position:relative}
+.hc-search input{width:100%;padding:13px 18px 13px 42px;border-radius:12px;border:none;font-size:14px;font-family:var(--f);outline:none}
+.hc-search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--g5)}
+
+/* CATEGORY TABS */
+.hc-tabs{max-width:900px;margin:0 auto;padding:40px 32px 0;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.hc-tab{padding:9px 18px;border-radius:999px;border:1.5px solid var(--g2);background:var(--w);font-size:13px;font-weight:600;color:var(--g7);cursor:pointer;font-family:var(--f);transition:all .15s}
+.hc-tab:hover{border-color:var(--blk)}
+.hc-tab.active{background:var(--blk2);border-color:var(--blk2);color:var(--w)}
+
+/* FAQ SECTIONS */
+.hc-wrap{max-width:760px;margin:0 auto;padding:40px 32px 24px}
+.hc-cat{margin-bottom:44px}
+.hc-cat.hidden{display:none}
+.hc-cat h2{font-size:19px;font-weight:800;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--g1)}
+details{background:var(--g0);border:1px solid var(--g2);border-radius:12px;margin-bottom:10px;overflow:hidden}
+summary{padding:16px 18px;font-weight:600;cursor:pointer;font-size:14px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
 summary::-webkit-details-marker{display:none}
-details[open] summary{border-bottom:1px solid #eee}
-.answer{padding:16px 20px;color:#555;font-size:14px;line-height:1.7}
-.contact-box{background:#ede9fe;border-radius:12px;padding:28px;margin-top:32px}
-.contact-box h3{margin:0 0 8px;color:#4c1d95}
-.contact-box p{margin:0;color:#5b21b6;font-size:14px}
-.contact-box a{color:#4c1d95}
-footer{background:#1a1a2e;color:#aaa;text-align:center;padding:32px;font-size:13px}
-footer a{color:#aaa;text-decoration:none;margin:0 10px}
+summary::after{content:'⌄';font-size:16px;color:var(--g5);transition:transform .2s;flex-shrink:0}
+details[open] summary::after{transform:rotate(180deg)}
+details[open] summary{border-bottom:1px solid var(--g2)}
+.answer{padding:14px 18px 16px;color:var(--g6);font-size:13.5px;line-height:1.75}
+.answer a{color:var(--blk);font-weight:600;text-decoration:underline}
+
+.hc-contact{max-width:760px;margin:0 auto 96px;padding:0 32px}
+.hc-contact-box{background:var(--blk2);border-radius:18px;padding:32px;text-align:center}
+.hc-contact-box h3{color:var(--w);font-size:18px;font-weight:700;margin-bottom:8px}
+.hc-contact-box p{color:rgba(255,255,255,.55);font-size:13.5px;margin-bottom:18px}
+.hc-contact-box a.btn{display:inline-block;padding:12px 24px;background:var(--w);color:var(--blk2);border-radius:10px;font-size:13.5px;font-weight:700}
+
+/* FOOTER — reused from other pages for site-wide consistency */
+.lfooter{background:#000000;padding:56px 0 28px}
+.footer-in{max-width:1200px;margin:0 auto;padding:0 32px}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;padding-bottom:28px;margin-bottom:28px;border-bottom:1px solid var(--lp-line)}
+.footer-top h3{font-size:20px;font-weight:800;color:var(--w);margin-bottom:6px}
+.fb-p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:380px}
+.footer-sub{display:flex;gap:8px}
+.footer-sub input{padding:11px 14px;border-radius:10px;border:1px solid var(--lp-line);background:transparent;color:var(--w);font-size:13px;font-family:var(--f);outline:none;width:220px}
+.footer-sub input::placeholder{color:rgba(255,255,255,.4)}
+.footer-sub button{padding:11px 18px;background:var(--w);color:#000;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f);white-space:nowrap}
+.footer-g{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-bottom:32px}
+.fc h4{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.fc a{display:block;font-size:13px;color:rgba(255,255,255,.55);margin-bottom:10px}
+.fc a:hover{color:var(--w)}
+.fb-bot{border-top:1px solid var(--lp-line);padding-top:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.fb-bot p{font-size:12px;color:rgba(255,255,255,.35)}
+.footer-brand-row{display:flex;align-items:center;gap:8px}
+.footer-brand-row .logo-ic{width:22px;height:22px;background:#0F1318;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.footer-brand-row img{width:100%;height:100%;object-fit:contain;padding:3px}
+
+@media (max-width:600px){
+  .nav-links{display:none}
+  .footer-g{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
+
 <nav class="nav">
-  <a class="logo" href="/">Tutlee</a>
+  <a class="logo" href="/"><span class="logo-ic"><img src="img/logo-mark-white-square.png" alt="Tutlee"></span>Tutlee</a>
   <div class="nav-links">
-    <a href="/index.html#features">Features</a>
-    <a href="/index.html#pricing">Pricing</a>
+    <a href="/index.html#features">Find Tutors</a>
+    <a href="/index.html#study-rings">Study Rings</a>
     <a href="/about.html">About</a>
+    <a href="/help.html" class="active">Help</a>
+    <a href="/contact.html">Contact</a>
   </div>
 </nav>
-<div class="hero">
-  <h1>Help Centre</h1>
-  <p>Find answers to common questions about using Tutlee.</p>
+
+<section class="hc-hero">
+  <h1>Help Center</h1>
+  <p>Answers to common questions about learning, tutoring, and using Tutlee.</p>
+  <div class="hc-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="hc-search-inp" placeholder="Search for a topic…" oninput="hcSearch(this.value)">
+  </div>
+</section>
+
+<div class="hc-tabs" id="hc-tabs">
+  <button class="hc-tab active" onclick="hcFilter('all',this)">All</button>
+  <button class="hc-tab" onclick="hcFilter('learners',this)">For Learners</button>
+  <button class="hc-tab" onclick="hcFilter('tutors',this)">For Tutors</button>
+  <button class="hc-tab" onclick="hcFilter('account',this)">Account &amp; Payments</button>
+  <button class="hc-tab" onclick="hcFilter('safety',this)">Safety &amp; Trust</button>
 </div>
-<div class="section">
-  <h2>Frequently Asked Questions</h2>
-  <details>
-    <summary>How do I get started with Tutlee?</summary>
-    <div class="answer">Create a free account, complete a short placement assessment, and Tutlee will recommend a personalised learning path for you. You can start your first session immediately.</div>
-  </details>
-  <details>
-    <summary>What subjects does Tutlee cover?</summary>
-    <div class="answer">Tutlee currently covers Mathematics, Sciences, English, and Humanities for secondary and university-level students. We are continuously adding new subjects.</div>
-  </details>
-  <details>
-    <summary>How does billing work?</summary>
-    <div class="answer">You are billed monthly. You can cancel at any time and you will retain access until the end of your billing period. We do not offer partial refunds for unused time.</div>
-  </details>
-  <details>
-    <summary>Can I switch plans?</summary>
-    <div class="answer">Yes, you can upgrade or downgrade your plan at any time from your account settings. Changes take effect at the start of your next billing cycle.</div>
-  </details>
-  <details>
-    <summary>Is my data safe?</summary>
-    <div class="answer">Yes. We take data privacy seriously. Please read our <a href="/privacy.html">Privacy Policy</a> for full details on how we collect, use, and protect your data.</div>
-  </details>
-  <div class="contact-box">
+
+<div class="hc-wrap" id="hc-wrap">
+
+  <div class="hc-cat" data-cat="learners">
+    <h2>For Learners</h2>
+    <details open>
+      <summary>How do I find a tutor?</summary>
+      <div class="answer">Go to Tutor Match, search for your subject, and describe your specific weak area — not just the general topic. Tutlee matches you to tutors who are strongest in exactly what you're struggling with, then you pick a time and book.</div>
+    </details>
+    <details>
+      <summary>What happens after a session ends?</summary>
+      <div class="answer">Tutlee automatically generates a short assessment based on what was covered in your session. Complete it within 48 hours — your score determines whether you move on to the next topic or a rebook is suggested.</div>
+    </details>
+    <details>
+      <summary>What are Study Rings?</summary>
+      <div class="answer">Study Rings are open group sessions hosted by tutors — free to join, free to contribute. They're designed for peer collaboration and exam prep, separate from one-on-one paid tutoring.</div>
+    </details>
+    <details>
+      <summary>Is booking a session free?</summary>
+      <div class="answer">Creating an account and browsing tutors is always free. You only pay for the sessions you book. See our <a href="/index.html#pricing">Pricing</a> for full details.</div>
+    </details>
+  </div>
+
+  <div class="hc-cat" data-cat="tutors">
+    <h2>For Tutors</h2>
+    <details>
+      <summary>How do I become a verified tutor?</summary>
+      <div class="answer">Complete Know-Your-Tutor (KYT) verification: submit a government ID and academic credential, pass a subject proficiency test, and complete a short live demo teaching session. Unverified tutors cannot receive bookings.</div>
+    </details>
+    <details>
+      <summary>How do I get paid?</summary>
+      <div class="answer">You set your own hourly rate per subject. Payments are processed securely, and earnings are transferred to you according to the payout schedule once a session is completed.</div>
+    </details>
+    <details>
+      <summary>Can I teach and learn at the same time?</summary>
+      <div class="answer">Yes — many students do both. You can add both roles to your account from Settings.</div>
+    </details>
+    <details>
+      <summary>Can tutors host Study Rings?</summary>
+      <div class="answer">Yes, tutors can create and host Study Rings. Note that Study Rings are for open peer collaboration, not formal one-on-one instruction.</div>
+    </details>
+  </div>
+
+  <div class="hc-cat" data-cat="account">
+    <h2>Account &amp; Payments</h2>
+    <details>
+      <summary>Why do I need a university email to sign up?</summary>
+      <div class="answer">Tutlee is built exclusively for students, so we verify accounts using university email addresses to confirm you're currently affiliated with an academic institution. If your university uses a non-standard domain, your account may be held briefly for manual review.</div>
+    </details>
+    <details>
+      <summary>What if I need to cancel or reschedule a session?</summary>
+      <div class="answer">You can reschedule from My Sessions, based on your tutor's cancellation policy shown before booking. Rescheduling less than 1 hour before a session may incur a small penalty fee.</div>
+    </details>
+    <details>
+      <summary>Is my payment information secure?</summary>
+      <div class="answer">Yes. Payments are processed through secure, encrypted payment providers — Tutlee does not store your full card details.</div>
+    </details>
+  </div>
+
+  <div class="hc-cat" data-cat="safety">
+    <h2>Safety &amp; Trust</h2>
+    <details>
+      <summary>How are tutors verified?</summary>
+      <div class="answer">Every tutor completes KYT verification before teaching. Learners can also leave ratings and reviews after every session to help maintain a trusted community.</div>
+    </details>
+    <details>
+      <summary>How do I report a problem?</summary>
+      <div class="answer">Use the "Report harassment" or "Report academic fraud" options in Settings → Safety &amp; Account. Reports are reviewed by our team, typically within 24 hours.</div>
+    </details>
+    <details>
+      <summary>Is my data safe?</summary>
+      <div class="answer">Yes — read our full <a href="/privacy.html">Privacy Policy</a> for details on how we collect, use, and protect your data.</div>
+    </details>
+  </div>
+
+  <p id="hc-no-results" style="display:none;text-align:center;color:var(--g5);font-size:14px;padding:32px 0">No results found — try a different search, or contact us below.</p>
+</div>
+
+<div class="hc-contact">
+  <div class="hc-contact-box">
     <h3>Still need help?</h3>
-    <p>Email us at <a href="mailto:support@tutlee.com">support@tutlee.com</a> and we will get back to you within one business day.</p>
+    <p>Can't find what you're looking for? Our team is ready to help.</p>
+    <a href="/contact.html" class="btn">Contact Support</a>
   </div>
 </div>
-<footer>
-  <p>&copy; 2026 Tutlee. All rights reserved.</p>
-  <p><a href="/about.html">About</a><a href="/research.html">Research</a><a href="/blog.html">Blog</a><a href="/careers.html">Careers</a><a href="/help.html">Help</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a></p>
+
+<footer class="lfooter">
+  <div class="footer-in">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-row"><h3>Tutlee.</h3></div>
+        <p class="fb-p">The global peer-to-peer learning platform where students learn, teach, and grow together.</p>
+      </div>
+      <form class="footer-sub" onsubmit="event.preventDefault();this.reset();">
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+    <div class="footer-g">
+      <div class="fc"><h4>Product</h4>
+        <a href="/index.html#features">Find Tutors</a>
+        <a href="/index.html">Become a Tutor</a>
+        <a href="/index.html">Start as a Learner</a>
+        <a href="/index.html#study-rings">Study Rings</a>
+        <a href="/index.html#pricing">Pricing</a>
+      </div>
+      <div class="fc"><h4>Company</h4>
+        <a href="/about.html">About Us</a>
+        <a href="/careers.html">Careers</a>
+        <a href="/press.html">Press</a>
+        <a href="/partners.html">Partners</a>
+        <a href="/contact.html">Contact Us</a>
+      </div>
+      <div class="fc"><h4>Resources</h4>
+        <a href="/help.html">Help Center</a>
+        <a href="/community.html">Community Guidelines</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/success-stories.html">Success Stories</a>
+      </div>
+      <div class="fc"><h4>Social</h4>
+        <a href="https://x.com" target="_blank" rel="noopener">X</a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://tiktok.com" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+      </div>
+      <div class="fc"><h4>Support &amp; Legal</h4>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/cookies.html">Cookie Policy</a>
+        <a href="/refund.html">Refund Policy</a>
+        <a href="/terms.html">Terms of Service</a>
+      </div>
+    </div>
+    <div class="fb-bot">
+      <div class="footer-brand-row"><div class="logo-ic"><img src="img/logo-mark-white-square.png" alt="Tutlee"></div><span style="color:#fff;font-weight:700;font-size:14px">Tutlee</span></div>
+      <p><span>© 2026 Tutlee OÜ. All rights reserved.</span> <span style="margin-left:6px">Made for students, everywhere.</span></p>
+    </div>
+  </div>
 </footer>
+
+<script>
+function hcFilter(cat, btn){
+  document.querySelectorAll('.hc-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.hc-cat').forEach(c=>{
+    c.classList.toggle('hidden', cat!=='all' && c.dataset.cat!==cat);
+  });
+  document.getElementById('hc-search-inp').value='';
+  document.getElementById('hc-no-results').style.display='none';
+}
+function hcSearch(q){
+  q = q.trim().toLowerCase();
+  var anyVisible = false;
+  document.querySelectorAll('.hc-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.hc-cat').forEach(cat=>{
+    var catHasMatch = false;
+    cat.querySelectorAll('details').forEach(d=>{
+      var text = d.textContent.toLowerCase();
+      var match = !q || text.includes(q);
+      d.style.display = match ? '' : 'none';
+      if(match){catHasMatch = true; anyVisible = true;}
+      if(q && match) d.setAttribute('open',''); else if(!q) d.removeAttribute('open');
+    });
+    cat.classList.toggle('hidden', !catHasMatch);
+  });
+  document.getElementById('hc-no-results').style.display = (q && !anyVisible) ? 'block' : 'none';
+}
+</script>
 </body>
 </html>
