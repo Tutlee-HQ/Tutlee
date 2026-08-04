@@ -5477,6 +5477,7 @@ var _pendingRingInviteId=(function(){
     } else if(_pendingRingInviteId){
       // Not logged in — store ring ID; after login we open it
       try{localStorage.setItem('_t_pending_ring',_pendingRingInviteId);}catch(e){}
+    }
 }catch(e){}
   }
   tryRestore();
