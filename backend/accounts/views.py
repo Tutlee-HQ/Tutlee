@@ -10,6 +10,7 @@ from .serializers import (
     TutorProfileSerializer, LearnerProfileSerializer, PublicTutorSerializer,
 )
 from .permissions import IsAdminOrStaff
+from .gemini_match import gemini_rank_tutors
 
 
 class LoginView(APIView):
@@ -198,33 +199,80 @@ class SuspendUserView(APIView):
 
 
 class TutorMatchView(generics.ListAPIView):
-    """Tutor match: return KYT-verified tutors filtered by subject and weak areas."""
+    """
+    Tutor match: return KYT-verified tutors ranked by fit for the learner's
+    subject + described weak area.
+
+    Tries Gemini first for genuine semantic ranking (understands meaning,
+    not just literal word overlap) with a short reason per match. Falls
+    back to the original keyword/substring filter if Gemini is unavailable
+    (no API key set, request fails, times out) — the endpoint should never
+    hard-fail just because the AI call didn't work.
+    """
     serializer_class   = PublicTutorSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        subject    = self.request.query_params.get('subject', '')
-        weak_areas = self.request.query_params.getlist('weak_areas')
         qs = User.objects.filter(
             role__in=['tutor', 'both'],
             is_suspended=False,
             tutor_profile__isnull=False,
             kyt_application__status='approved',   # Only KYT-verified tutors are visible
         ).select_related('tutor_profile').order_by('-tutor_profile__rating')
+        return list(qs)
 
+    def _keyword_fallback(self, qs, subject, weak_areas):
+        """The original substring/overlap logic — used if Gemini can't be reached."""
         if subject:
-            # Case-insensitive partial match against each tutor's subjects list
             s_lower = subject.lower()
             qs = [u for u in qs if any(s_lower in s.lower() for s in (u.tutor_profile.subjects or []))]
-
         if weak_areas:
-            # Further filter by tutors whose specialities overlap with requested weak areas
             def overlaps(u):
                 specs = set(s.lower() for s in (u.tutor_profile.specialities or []))
                 return bool(specs & set(a.lower() for a in weak_areas))
             qs = [u for u in qs if overlaps(u)]
-
         return qs
+
+    def list(self, request, *args, **kwargs):
+        subject    = request.query_params.get('subject', '')
+        weak_areas = request.query_params.getlist('weak_areas')
+        weak_areas_text = ', '.join(weak_areas) if weak_areas else request.query_params.get('description', '')
+
+        qs = self.get_queryset()
+
+        # Narrow to the subject first if given (keeps the Gemini prompt focused and cheap);
+        # if that leaves nothing, fall back to the full pool so Gemini still has candidates.
+        subject_filtered = qs
+        if subject:
+            s_lower = subject.lower()
+            subject_filtered = [u for u in qs if any(s_lower in s.lower() for s in (u.tutor_profile.subjects or []))]
+        candidates = subject_filtered if subject_filtered else qs
+
+        tutor_dicts = [{
+            'id': u.id,
+            'full_name': u.full_name,
+            'subjects': u.tutor_profile.subjects,
+            'specialities': u.tutor_profile.specialities,
+            'bio': u.bio,
+        } for u in candidates]
+
+        ranked = gemini_rank_tutors(subject, weak_areas_text, tutor_dicts) if tutor_dicts else None
+
+        if ranked:
+            by_id = {u.id: u for u in candidates}
+            reason_by_id = {r['id']: r.get('reason', '') for r in ranked if 'id' in r}
+            ordered = [by_id[r['id']] for r in ranked if r.get('id') in by_id]
+            data = self.get_serializer(ordered, many=True).data
+            for row in data:
+                row['match_reason'] = reason_by_id.get(row['id'], '')
+            return Response(data)
+
+        # Gemini unavailable or returned nothing usable — fall back to keyword matching
+        fallback = self._keyword_fallback(qs, subject, weak_areas)
+        data = self.get_serializer(fallback, many=True).data
+        for row in data:
+            row['match_reason'] = ''
+        return Response(data)
 
 
 class TutorProfileUpdateView(generics.UpdateAPIView):
