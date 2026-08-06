@@ -69,6 +69,8 @@
   --b5:#3B82F6;--b4:#2563EB;
   /* Neutral / text */
   --g9:#111111;--g8:#1F1F1F;--g7:#3B3B3B;--g6:#6B6B6B;--g5:#8F8F8F;--g4:#B3B3B3;--g3:#D4D4D4;--g2:#EBEBEB;--g1:#F5F5F5;--g0:#FAFAFA;--w:#FFFFFF;
+  /* Was teal — now grayscale/black per rebrand */
+  --t0:#FAFAFA;--t1:#F0F0F0;--t2:#E0E0E0;--t3:#C4C4C4;--t4:#6B6B6B;--t5:#000000;--t6:#000000;--t7:#1F1F1F;--t8:#000000;--t9:#000000;
   /* Semantic */
   --ok:#16A34A;--ok-bg:#F0FDF4;--warn:#D97706;--warn-bg:#FFFBEB;--err:#DC2626;--err-bg:#FEF2F2;--info:#2563EB;--info-bg:#EFF6FF;
   /* Spacing (8pt grid) */
@@ -1074,7 +1076,7 @@ tr:hover td{background:var(--g1)}
         <div class="ob-step" id="ob-s1">
           <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">How do you want to use Tutlee?</h2>
           <p style="font-size:13px;color:var(--g5);margin-bottom:20px">You can add or change your role in Settings later.</p>
-          <div class="role-grid" style="grid-template-columns:1fr 1fr">
+         <div class="role-grid">
             <div class="role-opt" id="rc-learner" onclick="selRole('learner')">
               <div class="role-opt-ic" style="display:flex;align-items:center;justify-content:center">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--t7)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
@@ -1089,9 +1091,12 @@ tr:hover td{background:var(--g1)}
               <div class="role-opt-t">Tutor</div>
               <div class="role-opt-s">Teach and earn</div>
             </div>
-          </div>
+            <div class="role-opt" id="rc-both" onclick="selRole('both')">
+              <div class="role-opt-ic" style="display:flex;align-items:center;justify-content:center">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--t7)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              </div>
+            </div>
           <button class="btn-full btn-full-p" onclick="obNext()">Continue</button>
-        </div>
 
         <!-- Step 2: Account details -->
         <div class="ob-step" id="ob-s2">
@@ -1476,14 +1481,14 @@ tr:hover td{background:var(--g1)}
     <div class="sr-main">
       <div class="sr-top">
         <div><div style="font-size:13px;font-weight:700;color:#fff" id="sess-room-title">Session in progress</div><div style="font-size:11px;color:rgba(255,255,255,.4)" id="sess-timer">00:00</div></div>
-        <div style="display:flex;gap:8px;align-items:center"><span class="tag tr2">● LIVE</span><button onclick="goTo('ai-summary')" style="padding:6px 12px;background:rgba(23,207,191,.1);border:1px solid rgba(23,207,191,.25);border-radius:var(--r);font-size:12px;font-weight:700;color:var(--t4);cursor:pointer;font-family:var(--f)">AI Summary</button><button onclick="endSess()" style="padding:6px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);font-size:12px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;font-family:var(--f)">End session</button><button onclick="endSess();goTo('sessions')" style="padding:6px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);font-size:12px;font-weight:600;color:rgba(255,255,255,.35);cursor:pointer;font-family:var(--f)" title="Leave session">← Back</button></div>
+        <div style="display:flex;gap:8px;align-items:center"><span class="tag tr2">● LIVE</span><button onclick="goTo('ai-summary')" style="padding:6px 12px;background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.2);border-radius:var(--r);font-size:12px;font-weight:700;color:var(--t4);cursor:pointer;font-family:var(--f)">AI Summary</button><button onclick="endSess()" style="padding:6px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);font-size:12px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;font-family:var(--f)">End session</button><button onclick="endSess();goTo('sessions')" style="padding:6px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);font-size:12px;font-weight:600;color:rgba(255,255,255,.35);cursor:pointer;font-family:var(--f)" title="Leave session">← Back</button></div>
       </div>
       <div class="sr-vids">
         <div class="sr-vp"><video id="remote-video" autoplay playsinline style="width:100%;height:100%;object-fit:cover;border-radius:var(--rl)"></video><div style="width:56px;height:56px;border-radius:50%;background:var(--t8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;position:absolute" id="sr-tutor-av">??</div><div class="sr-vlbl" id="sr-tutor-name">Tutor</div><div style="position:absolute;top:8px;right:8px;background:var(--err);border-radius:5px;padding:2px 7px;font-size:10px;color:#fff;font-weight:700">● REC</div></div>
         <div class="sr-vp"><video id="local-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;border-radius:var(--rl)"></video><div style="width:56px;height:56px;border-radius:50%;background:var(--i6);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;position:absolute" id="sr-your-av">AM</div><div class="sr-vlbl">You</div></div>
       </div>
       <div class="sr-wb">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.06em">WHITEBOARD</span><div style="display:flex;gap:8px;align-items:center"><div onclick="wbClr('#1A2130')" style="width:17px;height:17px;border-radius:50%;background:#1A2130;cursor:pointer;border:2px solid var(--t4)"></div><div onclick="wbClr('#F5365C')" style="width:17px;height:17px;border-radius:50%;background:#F5365C;cursor:pointer"></div><div onclick="wbClr('#17CFBF')" style="width:17px;height:17px;border-radius:50%;background:#17CFBF;cursor:pointer"></div><div onclick="wbClr('#F59500')" style="width:17px;height:17px;border-radius:50%;background:#F59500;cursor:pointer"></div><button onclick="clearWB()" style="background:rgba(255,255,255,.07);border:none;border-radius:5px;padding:4px 9px;color:rgba(255,255,255,.4);font-size:11px;cursor:pointer;font-family:var(--f)">Clear</button></div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.06em">WHITEBOARD</span><div style="display:flex;gap:8px;align-items:center"><div onclick="wbClr('#1A2130')" style="width:17px;height:17px;border-radius:50%;background:#1A2130;cursor:pointer;border:2px solid var(--t4)"></div><div onclick="wbClr('#F5365C')" style="width:17px;height:17px;border-radius:50%;background:#F5365C;cursor:pointer"></div><div onclick="wbClr('#000000')" style="width:17px;height:17px;border-radius:50%;background:#000000;cursor:pointer"></div><div onclick="wbClr('#F59500')" style="width:17px;height:17px;border-radius:50%;background:#F59500;cursor:pointer"></div><button onclick="clearWB()" style="background:rgba(255,255,255,.07);border:none;border-radius:5px;padding:4px 9px;color:rgba(255,255,255,.4);font-size:11px;cursor:pointer;font-family:var(--f)">Clear</button></div></div>
         <canvas id="wb-c" style="background:#fff;border-radius:var(--r);cursor:crosshair;touch-action:none;width:100%;display:block;height:148px"></canvas>
       </div>
       <div class="sr-ctl">
@@ -1795,7 +1800,7 @@ tr:hover td{background:var(--g1)}
         <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
           <div onclick="sgWbClr('#1A2130')" style="width:20px;height:20px;border-radius:50%;background:#1A2130;cursor:pointer;border:2px solid var(--t4)"></div>
           <div onclick="sgWbClr('#F5365C')" style="width:20px;height:20px;border-radius:50%;background:#F5365C;cursor:pointer"></div>
-          <div onclick="sgWbClr('#17CFBF')" style="width:20px;height:20px;border-radius:50%;background:#17CFBF;cursor:pointer"></div>
+          <div onclick="sgWbClr('#000000')" style="width:20px;height:20px;border-radius:50%;background:#000000;cursor:pointer"></div>
           <div onclick="sgWbClr('#F59500')" style="width:20px;height:20px;border-radius:50%;background:#F59500;cursor:pointer"></div>
           <button onclick="clearSGWB()" style="background:var(--g0);border:1px solid var(--g2);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:var(--f);margin-left:auto;color:var(--g6)">Clear board</button>
         </div>
@@ -2380,7 +2385,7 @@ tr:hover td{background:var(--g1)}
       <video id="pj-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
       <!-- Cam-off overlay -->
       <div id="pj-cam-off" style="display:none;position:absolute;inset:0;background:#0A1628;flex-direction:column;align-items:center;justify-content:center;gap:10px">
-        <div id="pj-avatar" style="width:64px;height:64px;border-radius:50%;background:var(--t8,#0D9488);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff">ME</div>
+        <div id="pj-avatar" style="width:64px;height:64px;border-radius:50%;background:var(--t8,#000000);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff">ME</div>
         <div style="font-size:12px;color:rgba(255,255,255,.5)">Camera is off</div>
       </div>
       <!-- Controls overlay -->
@@ -3351,7 +3356,7 @@ async function sendMsgApp(){
 
 // ═══ STUDY RINGS ═══
 var AV_BG=['#0E8F84','#5243F5','#B85F00','#7B3F9E','#0E8F84'];
-var BG_PALETTE=['linear-gradient(135deg,#0E8F84,#17CFBF)','linear-gradient(135deg,#5243F5,#8B7CF7)','linear-gradient(135deg,#B85F00,#F5A623)','linear-gradient(135deg,#7B3F9E,#B06CD9)','linear-gradient(135deg,#0E5F8F,#17A0CF)'];
+var BG_PALETTE=['linear-gradient(135deg,#0E8F84,#000000)','linear-gradient(135deg,#5243F5,#8B7CF7)','linear-gradient(135deg,#B85F00,#F5A623)','linear-gradient(135deg,#7B3F9E,#B06CD9)','linear-gradient(135deg,#0E5F8F,#17A0CF)'];
 var ICON_PALETTE=['📚','🔬','📐','🎯','🌍','⚗️','💡','🧬','📊','🎓'];
 var curRingTab='live';
 
@@ -3716,7 +3721,7 @@ function drawLine(id,labels,data,color){
   ctx.beginPath();
   data.forEach(function(v,i){var x=pad.l+dw*i/(data.length-1);var y=pad.t+dh*(1-(v-mn)/(mx-mn));i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
   ctx.lineTo(pad.l+dw,pad.t+dh);ctx.lineTo(pad.l,pad.t+dh);ctx.closePath();
-  var g=ctx.createLinearGradient(0,pad.t,0,pad.t+dh);g.addColorStop(0,color.replace(')',',0.15)').replace('var(','rgba(').replace('--t5','23,207,191').replace('--ok','14,203,106').replace('--i5','82,67,245').replace('--a5','245,149,0')||'rgba(23,207,191,.15)');g.addColorStop(1,'rgba(255,255,255,0)');
+  var g=ctx.createLinearGradient(0,pad.t,0,pad.t+dh);g.addColorStop(0,color.replace(')',',0.15)').replace('var(','rgba(').replace('--t5','0,0,0').replace('--ok','14,203,106').replace('--i5','82,67,245').replace('--a5','245,149,0')||'rgba(0,0,0,.15)');g.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=g;ctx.fill();
   // Dots + X labels
   ctx.fillStyle=color.replace('var(','').replace(')','');
@@ -4481,7 +4486,7 @@ function startTour(role){
   tourOverlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;pointer-events:none';
   document.body.appendChild(tourOverlay);
   tourHighlight=document.createElement('div');
-  tourHighlight.style.cssText='position:fixed;z-index:800;pointer-events:none;transition:all .3s;border-radius:8px;box-shadow:0 0 0 4px #17CFBF,0 0 0 9999px rgba(0,0,0,.55)';
+  tourHighlight.style.cssText='position:fixed;z-index:800;pointer-events:none;transition:all .3s;border-radius:8px;box-shadow:0 0 0 4px #000000,0 0 0 9999px rgba(0,0,0,.55)';
   document.body.appendChild(tourHighlight);
   tourTip=document.createElement('div');
   tourTip.style.cssText='position:fixed;background:#fff;border-radius:14px;padding:20px 24px;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:801;pointer-events:all';
@@ -4845,7 +4850,7 @@ function _syncRingLocalTile(){
       var user=API.Auth.currentUser();
       var nm=(user&&(user.full_name||user.first_name))||'You';
       var av=nm.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'?';
-      ov.innerHTML='<div style="width:52px;height:52px;border-radius:50%;background:var(--t8,#0D9488);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff">'+av+'</div>'
+      ov.innerHTML='<div style="width:52px;height:52px;border-radius:50%;background:var(--t8,#000000);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff">'+av+'</div>'
         +'<div style="font-size:10px;color:rgba(255,255,255,.5)">Camera off</div>';
       tile.appendChild(ov);
     }
@@ -5598,7 +5603,7 @@ var _pendingRingInviteId=(function(){
         if(!listEl)return;
         if(!list.length){if(emptyEl)emptyEl.style.display='block';return;}
         // Show up to 3 rings on landing page
-        var bgPalette=['linear-gradient(135deg,#0E8F84,#17CFBF)','linear-gradient(135deg,#5243F5,#8B7CF7)','linear-gradient(135deg,#B85F00,#F5A623)'];
+        var bgPalette=['linear-gradient(135deg,#0E8F84,#000000)','linear-gradient(135deg,#5243F5,#8B7CF7)','linear-gradient(135deg,#B85F00,#F5A623)'];
         var iconPalette=['📚','🔬','📐','🎯','🌍','⚗️'];
         var shown=list.slice(0,3);
         listEl.innerHTML=shown.map(function(r,i){
