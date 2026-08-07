@@ -125,8 +125,10 @@ SIMPLE_JWT = {
 }
 
 # ── CORS ──
-CORS_ALLOW_ALL_ORIGINS   = True
-CORS_ORIGIN_ALLOW_ALL    = True   # legacy alias for older django-cors-headers
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    'https://tutlee.com',
+]
 CORS_ALLOW_CREDENTIALS   = True
 CORS_PREFLIGHT_MAX_AGE   = 86400
 CORS_ALLOW_HEADERS       = [
