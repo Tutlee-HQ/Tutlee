@@ -11,7 +11,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: "tutlee-backend.onrender.com,tutlee-hq.github.io"
+        value: "tutlee.com,tutlee-backend.onrender.com,tutlee-hq.github.io"
       - key: PYTHON_VERSION
         value: "3.11.0"
       - key: DATABASE_URL
