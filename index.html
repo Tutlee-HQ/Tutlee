@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="icon" href="img/logo-mark-square.png" type="image/png">
 <title>Tutlee</title>
-<script>window.TUTLEE_API_BASE ='https://tutlee-backend.onrender.com';</script>
+<script>window.TUTLEE_API_BASE ='https://tutlee.com';</script>
 <script>
 // ── STORAGE BRIDGE: redirect auth sessionStorage keys to localStorage ──
 (function(){
@@ -20,7 +20,7 @@
 <script src="api.js?v=20260612" onerror="
   var s=document.createElement('script');
   s.src='/static/js/api.js?v=20260612';
-  s.onerror=function(){s.src='https://tutlee-backend.onrender.com/api.js?v=20260612';s.onerror=function(){console.error('api.js failed to load');};document.head.appendChild(s);};
+  s.onerror=function(){s.src='https://tutlee.com/api.js?v=20260612';s.onerror=function(){console.error('api.js failed to load');};document.head.appendChild(s);};
   document.head.appendChild(s);
 "></script>
 <script>
@@ -29,7 +29,7 @@
   function tryPatch(){
     if(!window.API||!window.API.Auth){setTimeout(tryPatch,50);return;}
     var A=window.API.Auth;
-    var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
+    var BASE=window.TUTLEE_API_BASE||'https://tutlee.com';
     function apiPost(path,body,noAuth){
       var headers={'Content-Type':'application/json'};
       return fetch(BASE+path,{method:'POST',headers:headers,body:JSON.stringify(body)})
@@ -2459,7 +2459,7 @@ function _ensureServer(onTick){
       function tryPing(){
         var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
         var tid=ctrl?setTimeout(function(){ctrl.abort();},10000):null;
-        fetch('https://tutlee-backend.onrender.com/api/health/',
+        fetch('https://tutlee.com/api/health/',
           {method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:ctrl?ctrl.signal:undefined})
           .then(function(){
             if(tid)clearTimeout(tid);
@@ -2523,7 +2523,7 @@ async function sendPasswordReset(){
   if(errEl)errEl.style.display='none';
   if(btn){btn.disabled=true;btn.textContent='Sending…';}
   try{
-    var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
+    var BASE=window.TUTLEE_API_BASE||'https://tutlee.com';
     await fetch(BASE+'/api/accounts/password-reset/',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({email:email})
@@ -2551,7 +2551,7 @@ async function confirmPasswordReset(){
   if(errEl)errEl.style.display='none';
   if(btn){btn.disabled=true;btn.textContent='Saving…';}
   try{
-    var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
+    var BASE=window.TUTLEE_API_BASE||'https://tutlee.com';
     var r=await fetch(BASE+'/api/accounts/password-reset/confirm/',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({email:_resetEmail,code:code,password:pass})
@@ -2762,7 +2762,7 @@ async function resendOTP(){
   var btn=document.getElementById('otp-resend-btn');
   if(btn){btn.textContent='Sending…';btn.style.pointerEvents='none';}
   try{
-    var BASE=window.TUTLEE_API_BASE||'https://tutlee-backend.onrender.com';
+    var BASE=window.TUTLEE_API_BASE||'https://tutlee.com';
     var r=await fetch(BASE+'/api/accounts/otp/send/',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -4307,7 +4307,7 @@ function submitKYT() {
     btn.textContent = 'Submit for verification'; btn.disabled = false;
   };
 
-  var base = 'https://tutlee-backend.onrender.com';
+  var base = 'https://tutlee.com';
   xhr.open('POST', base + '/api/kyt/submit/');
   if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
   xhr.send(fd);
@@ -5497,13 +5497,13 @@ var _pendingRingInviteId=(function(){
 
 // ─── Wake up Render backend silently on page load ────────────────────────────
 (function(){
-  try{fetch('https://tutlee-backend.onrender.com/api/health/',{method:'GET'}).catch(function(){});}catch(e){}
+  try{fetch('https://tutlee.com/api/health/',{method:'GET'}).catch(function(){});}catch(e){}
 })();
 
 // ─── CMS: load homepage content from backend ─────────────────────────────────
 (function loadCMSHomepage(){
   try{
-    fetch('https://tutlee-backend.onrender.com/api/accounts/site-content/?key=homepage')
+    fetch('https://tutlee.com/api/accounts/site-content/?key=homepage')
       .then(function(r){return r.ok?r.json():null;})
       .then(function(data){
         if(!data||!data.content)return;
@@ -5588,7 +5588,7 @@ var _pendingRingInviteId=(function(){
 // ─── Landing page: load live study rings from API (no auth needed) ───────────
 (function loadLandingRings(){
   try{
-    var BASE='https://tutlee-backend.onrender.com';
+    var BASE='https://tutlee.com';
     fetch(BASE+'/api/rings/')
       .then(function(r){return r.ok?r.json():null;})
       .then(function(data){
