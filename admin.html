@@ -2187,7 +2187,7 @@ async function initApp() {
     // Reports
     if (reportsRes.status === 'fulfilled') {
       const list = reportsRes.value.results || reportsRes.value;
-      window.reportsData = list.map(r => ({
+      reportsData = list.map(r => ({
         id: r.id,
         reporter: r.reporter_name,
         accused: r.accused_name,
