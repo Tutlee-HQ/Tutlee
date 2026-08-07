@@ -7,7 +7,7 @@
 const TutleeAPI = (() => {
 
   // ── CONFIG ──────────────────────────────────────────────────────────────────
-  const BASE = 'https://tutlee-backend.onrender.com';
+  const BASE = 'https://tutlee.com';
 
   let _access  = null;
   let _refresh = null;
